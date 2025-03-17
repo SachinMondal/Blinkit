@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Backdrop, Modal, Fade, Button } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OTPModal from "./OTPScreen";
-export default function TransitionsModal({isOpen,setIsOpen}) {
+export default function SignUp({isOpen,setIsOpen}) {
   
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState("");

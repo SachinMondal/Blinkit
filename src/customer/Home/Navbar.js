@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
-import TransitionsModal from "../customer/auth/SignUp";
+import TransitionsModal from "../auth/SignUp";
 
 
 
@@ -44,10 +44,10 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
     <div className={`relative ${isSidebarOpen ? "overflow-hidden" : ""}`}>
       <nav
         className={`bg-[#F1C542] p-4 w-full relative z-40 ${
-          isMobile ? "h-[20vh] flex flex-col items-center justify-around" : ""
+          isMobile ? "h-[20vh] flex flex-col items-center justify-around" : "flex justify-center"
         }`}
       >
-        <div className={`flex justify-around w-full px-4`}>
+        <div className={`flex justify-around w-full lg:w-[90%] px-4 `}>
           {isMobile ? (
             <>
               <div className="w-full">
@@ -213,28 +213,36 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
           </button>
         </div>
         <nav className="p-4 space-y-2">
-          {categories.map((category, index) => (
-            <div key={index} className="relative cursor-pointer">
-              {/* Hover trigger only on category name */}
-              <span className="text-gray-800 font-semibold px-4 py-2 cursor-pointer inline-block hover-trigger">
-                {category.name}
-                <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300"></i>
-              </span>
-
-              {/* Dropdown menu (hidden by default, only shows when hovering over category name) */}
-              <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible transition-opacity duration-300 hover-trigger-hover:opacity-100 hover-trigger-hover:visible z-40">
-                {category.products.map((product, idx) => (
-                  <button
-                    key={idx}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
-                  >
-                    {product}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
+        {categories.map((category, index) => (
+          <div key={index} className="border-b">
+            <p
+              className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
+              onClick={() => handleCategoryClick(category.name)}
+            >
+              {category.name}
+              <i
+                className={`fa-solid fa-chevron-down transition-transform ${
+                  activeCategory === category.name ? "rotate-180" : "rotate-0"
+                }`}
+              ></i>
+            </p>
+            <ul
+              className={`ml-4 overflow-hidden transition-all duration-300 ${
+                activeCategory === category.name ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              {category.products.map((product, idx) => (
+                <li
+                  key={idx}
+                  className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
+                >
+                  {product}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </nav>
         <TransitionsModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
         
       </div>

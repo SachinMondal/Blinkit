@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 
 const Footer = () => {
@@ -18,24 +19,24 @@ const Footer = () => {
               <h3 className="text-lg font-semibold">Quick as</h3>
               <ul className="mt-2 space-y-2">
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     About Us
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Services
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Contact
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -45,24 +46,24 @@ const Footer = () => {
               <h3 className="text-lg font-semibold">Support</h3>
               <ul className="mt-2 space-y-2">
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     FAQ
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Help Center
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Privacy Policy
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
                     Terms & Conditions
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -71,18 +72,16 @@ const Footer = () => {
             <div>
               <h3 className="text-lg font-semibold">Follow Us</h3>
               <div className="flex space-x-4 mt-3 justify-center">
-                <a href="#" className="text-gray-400 hover:text-white text-xl">
+                <Link href="#" className="text-gray-400 hover:text-white text-xl">
                   <i className="fa-brands fa-facebook"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white text-xl">
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-white text-xl">
                   <i className="fa-brands fa-twitter"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white text-xl">
+                </Link>
+                <Link href="#" className="text-gray-400 hover:text-white text-xl">
                   <i className="fa-brands fa-instagram"></i>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white text-xl">
-                  <i className="fa-brands fa-aedin"></i>
-                </a>
+                </Link>
+               
               </div>
             </div>
           </div>

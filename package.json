@@ -9,6 +9,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
     "@mui/icons-material": "^6.4.7",
+    "@mui/lab": "^6.0.0-beta.30",
     "@mui/material": "^6.4.7",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -17,8 +18,12 @@
     "lucide-react": "^0.482.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-loading": "^2.0.3",
     "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
+    "react-slick": "^0.30.3",
+    "skeleton": "^0.1.2",
+    "slick-carousel": "^1.8.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
