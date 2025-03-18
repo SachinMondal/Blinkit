@@ -3,9 +3,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ProductTile from "./ProductTile";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+
 
 const ProductCarousel = ({ products }) => {
+  const {category}=useParams();
   const sliderRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate=useNavigate();
@@ -35,8 +37,10 @@ const ProductCarousel = ({ products }) => {
     <div className="relative px-4 mt-6 lg:max-w-5xl w-full">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
-        <p className="text-left font-bold text-2xl">Fruits & Vegetables</p>
-        <p className="text-right font-bold text-lg text-green-700 cursor-pointer">See All</p>
+        <p className="text-left font-bold text-2xl">Electronics</p>
+        <Link to={`/categoryviewAll/Electronics`} className="text-right font-bold text-lg text-green-700 cursor-pointer">
+    See All
+  </Link>
       </div>
 
       {/* Left Navigation Button (Hidden if at first slide) */}
