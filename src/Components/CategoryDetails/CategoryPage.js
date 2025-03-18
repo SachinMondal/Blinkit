@@ -147,17 +147,24 @@ const mockProducts = {
 };
 
 const CategoryPage = () => {
-  const { category } = useParams(); 
-  const navigate=useNavigate();
+  const { category } = useParams();
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState(
     category || "Electronics"
   );
   const [sortedProducts, setSortedProducts] = useState([
     ...mockProducts[selectedCategory],
   ]);
-  const [sortOrder, setSortOrder] = useState("asc");
-  const containerRef = useRef(null);
 
+  const containerRef = useRef(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [sortOrder, setSortOrder] = useState("asc");
+  const[showScollButton,setShowScrollButton]=useState(false);
+  
+  const handleSort = (order) => {
+    setSortOrder(order);
+    setShowDropdown(false); 
+  };
   useEffect(() => {
     if (mockProducts[selectedCategory]) {
       setSortedProducts(
@@ -166,30 +173,39 @@ const CategoryPage = () => {
         )
       );
     } else {
-      setSortedProducts([]); 
+      setSortedProducts([]);
     }
   }, [selectedCategory, sortOrder]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const scrollToTop = () => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = 0;
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
-  
   return (
-    <div className="max-w-5xl mx-auto p-4 flex flex-col md:flex-row flex-wrap">
-
+    <div className="max-w-5xl mx-auto p-4 flex flex-row flex-wrap">
       {/* Left Sidebar - Categories */}
-
-      <div className="sm:w-1/5 w-1/4 border-r p-4 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
-        <ul className="flex flex-col w-/1/4 lg:w-full">
+      <div className="w-1/4 min-w-[4rem] border-r p-4 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
+        <ul className="flex flex-col w-full">
           {mockCategories.map((cat, index) => (
             <div key={cat.id}>
               <li
-                className={`p-2 cursor-pointer rounded flex flex-col items-left md:items-center relative md:flex-row w-5/6 md:w-full ${
+                className={`p-2 cursor-pointer rounded flex flex-col items-left md:items-center relative md:flex-row w-full ${
                   selectedCategory === cat.name
                     ? "bg-green-200 font-bold"
                     : "hover:bg-gray-200"
@@ -208,9 +224,9 @@ const CategoryPage = () => {
                 <img
                   src={cat.image}
                   alt={cat.name}
-                  className="w-10 h-10 items-center md:w-14 md:h-14 object-contain rounded-md"
+                  className="w-10 h-10 md:w-14 md:h-14 object-contain rounded-md"
                 />
-                <div className=" flex flex-nowrap">
+                <div className="flex flex-nowrap">
                   <span className="ml-0 md:ml-4 text-xs md:text-base truncate max-w-[100px] md:max-w-full whitespace-nowrap">
                     {cat.name}
                   </span>
@@ -227,36 +243,67 @@ const CategoryPage = () => {
       </div>
 
       {/* Right Side - Sorted Products */}
-      <div
-        className="w-3/4 p-4 relative flex flex-col space-y-4"
-        ref={containerRef}
-      >
-          <div className="mb-4 text-sm text-gray-600 self-start">
-              <Link to="/" className="text-blue-500 hover:underline">
-                Home
-              </Link>{" "}
-              &gt;{" "}
-              
-               <span className="text-gray-900">{category}</span>
-            </div>
+      <div className="w-3/4 p-4 flex flex-col space-y-4" ref={containerRef}>
+        <div className="text-sm text-gray-600 self-start">
+          <Link to="/" className="text-blue-500 hover:underline">
+            Home
+          </Link>{" "}
+          &gt; <span className="text-gray-900">{category}</span>
+        </div>
+
         {/* Sort Dropdown */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">{selectedCategory} Products</h2>
-          <div>
-            <label className="mr-2 font-semibold">Sort By:</label>
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="border p-2 rounded-md"
+        <div className="flex justify-between items-center -mt-5">
+          <h2 className="text-s md:text-lg font-semibold">
+            {selectedCategory} Products
+          </h2>
+
+          {/* Sort Dropdown for Mobile */}
+          <div className="relative">
+            {/* Dropdown Button */}
+            <button
+              className="md:hidden p-2 rounded-md flex items-center text-sm font-semibold"
+              onClick={() => setShowDropdown(!showDropdown)}
             >
-              <option value="asc">Price: Low to High</option>
-              <option value="desc">Price: High to Low</option>
-            </select>
+              Sort By ▼
+            </button>
+
+            {/* Dropdown Menu - Positioned to the Left */}
+            {showDropdown && (
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white border rounded-md shadow-md z-50">
+                <ul className="text-sm">
+                  <li
+                    className="p-2 hover:bg-gray-200 cursor-pointer"
+                    onClick={() => handleSort("asc")}
+                  >
+                    Price: Low to High
+                  </li>
+                  <li
+                    className="p-2 hover:bg-gray-200 cursor-pointer"
+                    onClick={() => handleSort("desc")}
+                  >
+                    Price: High to Low
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            {/* Default Sort Dropdown - Visible on Larger Screens */}
+            <div className="hidden md:flex items-center border p-2 rounded-md">
+              <label className="mr-2 font-semibold">Sort By:</label>
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="border p-2 rounded-md"
+              >
+                <option value="asc">Price: Low to High</option>
+                <option value="desc">Price: High to Low</option>
+              </select>
+            </div>
           </div>
         </div>
 
         {/* Sorted Product List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-auto overflow-x-hidden overflow-y-auto scrollbar-hide">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {sortedProducts.map((product, index) => (
             <ProductTile
               key={index}
@@ -264,19 +311,21 @@ const CategoryPage = () => {
               name={product.name}
               quantity={30}
               price={product.price}
-              onClick={()=>handleProductClick(product.id)}
+              onClick={() => handleProductClick(product.id)}
             />
           ))}
         </div>
       </div>
 
-      {/* Go to Top Button */}
-      <button
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 flex items-center"
+      {showScollButton &&(
+        <button
+        className="fixed bottom-6 right-6 bg-green-200 text-white p-3 rounded-full shadow-lg hover:bg-green-700 flex items-center"
         onClick={scrollToTop}
       >
         <ChevronUp className="w-5 h-5" />
       </button>
+      )}
+      
     </div>
   );
 };

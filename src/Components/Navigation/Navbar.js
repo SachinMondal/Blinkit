@@ -127,7 +127,7 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
                     17
                   </span>
-                  <i class="fa-solid fa-cart-shopping"></i>
+                  <i className="fa-solid fa-cart-shopping"></i>
                 </button>
 
                 {isLoggedIn ? (
