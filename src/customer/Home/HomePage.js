@@ -1,69 +1,36 @@
-import React, { useEffect, useRef, useState } from "react";
-import Navbar from "./Navbar";
-import LocationModal from "../../utils/LocationPopUp";
-import Footer from "./Footer";
+import React, { useEffect, useState } from "react";
 import { Skeleton } from "@mui/material";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import CategoryTile from "../../utils/CategoryTile.js";
-import ProductCarousel from "../../utils/ProductCarosel.js";
-import CartItem from "../../utils/CartItems.js";
+import CategoryTile from "../../Components/CategoryDetails/CategoryTile.js";
+import ProductCarousel from "../../Components/ProductDetails/ProductCarosel.js";
+
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userLocation, setUserLocation] = useState("");
-  const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [loading, setLoading] = useState(true);
-const footerRef=useRef(null);
+  const navigate = useNavigate();
   useEffect(() => {
-    const storedLocation = localStorage.getItem("userLocation");
-    if (storedLocation) {
-      setUserLocation(storedLocation);
-    } else {
-      setIsModalOpen(true);
-    }
-
     setTimeout(() => {
       setLoading(false);
-    }, 2000); // Simulate loading time
+    }, 2000);
   }, []);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsFooterVisible(entry.isIntersecting);
-      },
-      { root: null, threshold: 0.1 }
-    );
-
-    if (footerRef.current) {
-      observer.observe(footerRef.current);
-    }
-
-    return () => {
-      if (footerRef.current) {
-        observer.unobserve(footerRef.current);
-      }
-    };
-  }, []);
-  const handleLocationSelect = (location) => {
-    setUserLocation(location);
-    localStorage.setItem("userLocation", location);
-    setIsModalOpen(false);
+  const handleCategoryClick = (category) => {
+    navigate(`/category/${category}`);
   };
 
   const images = [
-   "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-   "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-   "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-   "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
     "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-
+    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
+    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
+    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
+    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
   ];
   const data = [
     {
       src: "https://images.unsplash.com/photo-1502657877623-f66bf489d236",
-      title: "Night view",
+      title: "Electronics",
       description: "4.21M views",
     },
     {
@@ -92,7 +59,6 @@ const footerRef=useRef(null);
       description: "3.98M views",
     },
   ];
-
 
   // Image Carousel Settings
   const sliderSettings = {
@@ -106,61 +72,70 @@ const footerRef=useRef(null);
   };
   const products = [
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Apple",
       quantity: "1kg",
       price: 120,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Banana",
       quantity: "500g",
       price: 60,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Orange",
       quantity: "1kg",
       price: 100,
     },
     {
-      image: "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
+      image:
+        "https://purepng.com/public/uploads/large/purepng.com-orangeorangefruitfoodtastydeliciousorangecolorclipart-331522582453ydcfp.png",
       name: "Grapes",
       quantity: "750g",
       price: 90,
     },
   ];
-  
+
   const settings = {
     infinite: true,
     speed: 800,
@@ -172,32 +147,22 @@ const footerRef=useRef(null);
     responsive: [
       {
         breakpoint: 1024,
-        settings: { slidesToShow: 2 },
+        settings: { slidesToShow: 5, slidesToScroll: 1 },
       },
       {
         breakpoint: 640,
-        settings: { slidesToShow: 1 },
+        settings: { slidesToShow: 2.5, slidesToScroll: 1 },
+      },
+      {
+        breakpoint: 425,
+        settings: { slidesToShow: 1, slidesToScroll: 1 },
       },
     ],
   };
+  
 
   return (
     <>
-      {/* Location Popup */}
-      {isModalOpen && (
-        <LocationModal
-          onClose={() => setIsModalOpen(false)}
-          onLocationSelect={handleLocationSelect}
-        />
-      )}
-
-      {/* Navbar */}
-      <Navbar
-        location={userLocation}
-        isLoggedIn={false}
-        setLocationModal={setIsModalOpen}
-      />
-
       {/* Skeleton Loader */}
       {loading ? (
         <div className="flex flex-col items-center justify-center p-6">
@@ -212,7 +177,10 @@ const footerRef=useRef(null);
             {/* Carosel  */}
             <Slider {...sliderSettings}>
               {images.map((img, index) => (
-                <div key={index} className="flex justify-center max-w-7xl mx-auto px-4">
+                <div
+                  key={index}
+                  className="flex justify-center max-w-7xl mx-auto px-4"
+                >
                   <img
                     src={img}
                     alt={`Slide ${index}`}
@@ -231,6 +199,7 @@ const footerRef=useRef(null);
                     image={item.src}
                     name={item.title}
                     discount={40}
+                    onClick={() => handleCategoryClick(item.title)}
                   />
                 ))}
               </Slider>
@@ -238,22 +207,13 @@ const footerRef=useRef(null);
 
             {/* ProductTiles */}
             <div className="w-full max-w-7xl mx-auto mt-4 px-4 ">
-              
               <div className="flex gap-6 mt-3">
-              <ProductCarousel products={products} />
+                <ProductCarousel products={products} />
               </div>
             </div>
           </div>
         </>
       )}
-   <div className={`${isFooterVisible ? "hidden" : "fixed bottom-4 left-1/2"} transition-all duration-300`}>
-        <CartItem />
-      </div>
-
-      {/* Footer */}
-      <div ref={footerRef}>
-        <Footer />
-      </div>
     </>
   );
 };

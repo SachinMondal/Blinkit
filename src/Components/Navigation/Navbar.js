@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
-import TransitionsModal from "../auth/SignUp";
+import SignUp from "../../customer/auth/SignUp";
 
 
 
@@ -41,10 +41,10 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
   // };
 
   return (
-    <div className={`relative ${isSidebarOpen ? "overflow-hidden" : ""}`}>
+    <div className={`sticky top-0 z-40 ${isSidebarOpen ? "overflow-hidden" : ""}`}>
       <nav
         className={`bg-[#F1C542] p-4 w-full relative z-40 ${
-          isMobile ? "h-[20vh] flex flex-col items-center justify-around" : "flex justify-center"
+          isMobile ? "h-[22vh] flex flex-col items-center justify-around" : "flex justify-center"
         }`}
       >
         <div className={`flex justify-around w-full lg:w-[90%] px-4 `}>
@@ -79,7 +79,7 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
                 </div>
 
                 {/* Search Bar Moved Below */}
-                <div className="mt-4 bg-white rounded-md px-3 py-2 items-center w-full sm:w-96 flex sticky top-0 z-40">
+                <div className="mt-4 bg-white rounded-md px-3 py-2 items-center w-full  sm:w-full flex sticky top-0 z-40">
                   <i className="fa-solid fa-magnifying-glass"></i>
                   <input
                     type="text"
@@ -154,7 +154,7 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
         )}
       </nav>
 
-      <div className="bg-gray-100 p-2 shadow-md z-40 sticky top-0">
+      <div className="bg-gray-100 p-1 lg:p-2 shadow-md z-40 sticky top-0">
         <div
           className={`container mx-auto flex space-x-6 ${
             isMobile
@@ -168,32 +168,30 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
                 .map((product, idx) => (
                   <div
                     key={idx}
-                    className="bg-white shadow-md rounded-md px-4 py-2 text-gray-800 text-sm"
+                    className="bg-white shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2"
                   >
                     {product}
                   </div>
                 ))
             : categories.map((category, index) => (
-                <div
-                  key={index}
-                  className="relative group cursor-pointer"
-                  //onClick={() => handleCategoryClick(category.name)}
-                >
-                  <span className="text-gray-800 font-semibold px-4 py-2 cursor-default">
-                    {category.name}
-                    <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
-                  </span>
-                  <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-40">
-                    {category.products.map((product, idx) => (
-                      <button
-                        key={idx}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
-                      >
-                        {product}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              <div key={index} className="relative cursor-pointer group">
+              <div onClick={() => handleCategoryClick(category.name)} className="inline-flex items-center">
+                <span className="text-gray-800 font-semibold px-4 py-2 cursor-default">
+                  {category.name}
+                  <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
+                </span>
+              </div>
+            
+              {/* Dropdown menu */}
+              <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
+                {category.products.map((product, idx) => (
+                  <button key={idx} className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left">
+                    {product}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
               ))}
         </div>
       </div>
@@ -243,7 +241,7 @@ export default function Navbar({ isLoggedIn, location,setLocationModal }) {
           </div>
         ))}
       </nav>
-        <TransitionsModal isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+        <SignUp isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
         
       </div>
     </div>

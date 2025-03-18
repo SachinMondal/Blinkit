@@ -3,11 +3,12 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ProductTile from "./ProductTile";
+import { useNavigate } from "react-router-dom";
 
 const ProductCarousel = ({ products }) => {
   const sliderRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
-
+  const navigate=useNavigate();
   const settings = {
     infinite: false,
     speed: 500,
@@ -24,6 +25,9 @@ const ProductCarousel = ({ products }) => {
     ],
   };
 
+  const handleProductClick = (product) => {
+    navigate(`/product/${product}`);
+  };
   // Calculate last visible slide index
   const lastSlideIndex = products.length - settings.slidesToShow;
 
@@ -50,7 +54,7 @@ const ProductCarousel = ({ products }) => {
         <Slider ref={sliderRef} {...settings}>
           {products.map((item, index) => (
             <div key={index} className="px-2">
-              <ProductTile {...item} />
+              <ProductTile {...item} onClick={()=>handleProductClick(item.name)} />
             </div>
           ))}
         </Slider>

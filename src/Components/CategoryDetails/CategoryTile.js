@@ -1,8 +1,8 @@
 import React from "react";
 
-const ProductTile = ({ image, name, discount }) => {
+const ProductTile = ({ image, name, discount ,onClick}) => {
   return (
-    <div className="relative rounded-lg overflow-hidden shadow-sm w-[140px] cursor-pointer">
+    <div className="relative rounded-lg overflow-hidden shadow-sm w-[140px] cursor-pointer" onClick={onClick}>
       {/* Discount Tag */}
       {discount && (
         <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-md">
