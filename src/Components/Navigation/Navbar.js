@@ -236,7 +236,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                       : "bg-white"
                   }`}
                 >
-                  <Link to={`/category/${product}`}>{product}+1</Link>
+                  <Link to={`/category/${product}`}>{product}</Link>
                 </div>
               ))
           : categories.map((category, index) => (
