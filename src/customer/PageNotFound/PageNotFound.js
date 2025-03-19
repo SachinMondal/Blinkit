@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import PageNotFoundImage from "../../images/pagenotfound.png";
 const PageNotFound = () => {
   return (
@@ -11,12 +10,7 @@ const PageNotFound = () => {
         The page you are looking for might have been removed, had its name changed, 
         or is temporarily unavailable.
       </p>
-      <Link
-        to="/"
-        className="mt-6 px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-300"
-      >
-        Go Home
-      </Link>
+ 
     </div>
   );
 };

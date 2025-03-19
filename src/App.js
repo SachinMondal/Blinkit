@@ -15,6 +15,7 @@ import TermsAndConditions from "./customer/TermsCondition/Terms&Condition";
 import PrivacyPolicy from "./customer/Privacy&Policy/PrivacyPolicy";
 import Cart from "./Components/Cart/CartPage";
 import PageNotFound from "./customer/PageNotFound/PageNotFound";
+import AboutUs from "./Components/AboutUs/Aboutus";
 
 // Dummy Auth Function (Replace with actual auth logic)
 // const isAuthenticated = () => {
@@ -159,7 +160,7 @@ function App() {
 
         <Route path="/dashboard" element={<HomePage />} />
 
-        <Route path="/category/:category" element={<CategoryPage />} />
+        <Route path="/:category/:category" element={<CategoryPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/categoryviewAll/:category" element={<ViewAll products={allProducts} />} />
         <Route path="/profile" element={<Profile />} />
@@ -167,6 +168,7 @@ function App() {
         <Route path="/privacypolicy" element={<PrivacyPolicy />} />
         <Route path="/cart" element={<Cart />} />
 
+        <Route path="/aboutUs" element={<AboutUs />} />
         {/* Catch-All Route (404 Page) */}
         <Route path="*" element={<PageNotFound />} />
       </Routes>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const Footer = () => {
     return (
-      <footer className="bg-gray-900 text-white py-6 mt-10">
+      <footer className="bg-gray-900 text-white py-6 mt-10 bottom-0">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Brand Section */}
@@ -19,22 +19,22 @@ const Footer = () => {
               <h3 className="text-lg font-semibold">Quick as</h3>
               <ul className="mt-2 space-y-2">
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={"/"} className="text-gray-400 hover:underline hover:text-white">
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={'/aboutUs'} className="text-gray-400 hover:underline hover:text-white">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={'/services'} className="text-gray-400 hover:underline hover:text-white">
                     Services
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={'/contact'} className="text-gray-400 hover:underline hover:text-white">
                     Contact
                   </Link>
                 </li>
@@ -46,12 +46,12 @@ const Footer = () => {
               <h3 className="text-lg font-semibold">Support</h3>
               <ul className="mt-2 space-y-2">
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={'/faq'} className="text-gray-400 hover:underline hover:text-white">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-gray-400 hover:underline hover:text-white">
+                  <Link to={'/helpCenter'} className="text-gray-400 hover:underline hover:text-white">
                     Help Center
                   </Link>
                 </li>

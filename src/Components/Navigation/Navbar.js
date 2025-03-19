@@ -1,12 +1,34 @@
 import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import SignUp from "../../customer/auth/SignUp";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar({ isLoggedIn, location, setLocationModal }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isSticky, setIsSticky] = useState(false);
+  const [categoryTop, setCategoryTop] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
+  useEffect(() => {
+    // Get initial position of the category list
+    const categoryList = document.getElementById("category-list");
+    if (categoryList) {
+      setCategoryTop(categoryList.offsetTop);
+    }
+
+    const handleScroll = () => {
+      if (window.scrollY > categoryTop + 10) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [categoryTop]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -33,19 +55,26 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
   const handleCategoryClick = (categoryName) => {
     setActiveCategory((prev) => (prev === categoryName ? null : categoryName));
   };
-
-  // const handleCategoryClick = (category) => {
-  //   navigate(`/category/${category}`);
-  // };
+  const handleCategorySelection = (categoryName) => {
+    if (selectedCategory === categoryName) {
+      setSelectedCategory(""); // Unselect category
+      navigate("/"); // Redirect to home
+    } else {
+      setSelectedCategory(categoryName); // Select new category
+    }
+    handleCategoryClick(categoryName);
+  };
 
   return (
     <div
-      className={`sticky top-0 z-40 ${isSidebarOpen ? "overflow-hidden" : ""}`}
+      className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
+        isSidebarOpen ? "overflow-hidden" : ""
+      }`}
     >
       <nav
         className={`bg-[#F1C542] p-4 w-full relative z-40 ${
           isMobile
-            ? "h-[22vh] flex flex-col items-center justify-around"
+            ? "h-[30vh] flex flex-col items-center justify-around rounded-b-3xl"
             : "flex justify-center"
         }`}
       >
@@ -82,7 +111,21 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                     </Button>
                   )}
                 </div>
-
+                <div className="">
+                  <p className="text-black font-bold text-left">
+                    Delivery in 15 min
+                  </p>
+                  {location ? (
+                    <p className="font-semibold">{location}</p>
+                  ) : (
+                    <button
+                      onClick={() => setLocationModal(true)}
+                      className="text-black underline"
+                    >
+                      Select Location
+                    </button>
+                  )}
+                </div>
                 {/* Search Bar Moved Below */}
                 <div className="mt-4 bg-white rounded-md px-3 py-2 items-center w-full  sm:w-full flex sticky top-0 z-40">
                   <i className="fa-solid fa-magnifying-glass"></i>
@@ -133,7 +176,10 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                 />
               </div>
               <div className=" flex gap-8 items-center justify-center">
-                <Link to={'/cart'} className="relative p-2 rounded-full transition">
+                <Link
+                  to={"/cart"}
+                  className="relative p-2 rounded-full transition"
+                >
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
                     17
                   </span>
@@ -163,56 +209,63 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
           </p>
         )}
       </nav>
-
-      <div className="bg-gray-100 p-1 lg:p-2  shadow-md z-40 sticky top-0">
-        <div
-          className={`container max-w-5xl xl:max-w-6xl mx-auto flex space-x-6 ${
-            isMobile
-              ? "overflow-x-auto p-2 whitespace-nowrap scrollbar-hide"
-              : ""
-          }`}
-        >
-          {isMobile
-            ? categories
-                .flatMap((category) => category.products)
-                .map((product, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-white shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 "
-                  >
-                    {product}
-                  </div>
-                ))
-            : categories.map((category, index) => (
-                <div key={index} className="relative cursor-pointer group">
-                  <div
-                    onClick={() => handleCategoryClick(category.name)}
-                    className="inline-flex items-center"
-                  >
-                    <span className="text-gray-800 font-semibold px-4 py-2 cursor-pointer">
-                      {category.name}
-                      <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
-                    </span>
-                  </div>
-
-                  {/* Dropdown menu */}
-                  <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
-                    {category.products.map((product, idx) => (
-                      <button
-                        key={idx}
-                        className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
-                      >
-                        {product}
-                      </button>
-                    ))}
-                  </div>
+      <div
+        id="category-list"
+        className={`container max-w-5xl xl:max-w-6xl mx-auto flex space-x-6 transition-all duration-300 ${
+          isMobile ? "overflow-x-auto p-2 whitespace-nowrap scrollbar-hide" : ""
+        } ${
+          isSticky && isMobile ? "fixed top-0 left-0 w-full bg-white shadow-md z-40" : ""
+        }`}
+      >
+        {isMobile
+          ? categories
+              .flatMap((category) =>
+                category.products.map((product) => ({
+                  product,
+                  categoryName: category.name,
+                }))
+              )
+              .map(({ product }, idx) => (
+                <div
+                  key={`${product}-${idx}`}
+                  onClick={() => handleCategorySelection(product)}
+                  className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
+                    selectedCategory === product
+                      ? "bg-green-600 border-b-4 border-green-950 text-white"
+                      : "bg-white"
+                  }`}
+                >
+                  <Link to={`/category/${product}`}>{product}+1</Link>
                 </div>
-              ))}
-        </div>
+              ))
+          : categories.map((category, index) => (
+              <div key={index} className="relative cursor-pointer group">
+                <div className="inline-flex items-center">
+                  <span
+                    className={`font-semibold px-4 py-2 cursor-pointer transition-all duration-300`}
+                  >
+                    {category.name}
+                    <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
+                  </span>
+                </div>
+
+                {/* Dropdown menu */}
+                <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
+                  {category.products.map((product, idx) => (
+                    <button
+                      key={idx}
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
+                    >
+                      <Link to={`/${category.name}/${product}`}>{product}</Link>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
       </div>
 
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform rounded-r-xl z-44 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         } z-40`}
       >
@@ -240,18 +293,19 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                 ></i>
               </p>
               <ul
-                className={`ml-4 overflow-hidden transition-all duration-300 ${
+                className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
                   activeCategory === category.name
                     ? "max-h-40 opacity-100"
                     : "max-h-0 opacity-0"
                 }`}
+                onClick={() => setIsSidebarOpen(false)}
               >
                 {category.products.map((product, idx) => (
                   <li
                     key={idx}
                     className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
                   >
-                    {product}
+                    <Link to={`/${category.name}/${product}`}>{product}</Link>
                   </li>
                 ))}
               </ul>
