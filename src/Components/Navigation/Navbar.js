@@ -2,6 +2,7 @@ import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import SignUp from "../../customer/auth/SignUp";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "../../images/logo.png"
 
 export default function Navbar({ isLoggedIn, location, setLocationModal }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -94,7 +95,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                       to={"/"}
                       className="text-white text-lg font-semibold cursor-pointer"
                     >
-                      Brand
+                      <img src={Logo} alt="brand" className="w-12 h-12" />
                     </Link>
                   </div>
 
@@ -150,7 +151,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                   to={"/"}
                   className="text-white text-lg font-semibold cursor-pointer"
                 >
-                  Brand
+                  <img src={Logo} alt="brand" className="w-12 h-12" />
                 </Link>
                 <div className="flex flex-col text-white text-sm items-start ml-5">
                   <p className="text-black font-bold">Delivery in 15 min</p>

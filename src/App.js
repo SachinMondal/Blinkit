@@ -150,7 +150,7 @@ function App() {
       )}
       <Navbar
         location={userLocation}
-        isLoggedIn={true}
+        isLoggedIn={false}
         setLocationModal={setIsModalOpen}
       />
       <Routes>
