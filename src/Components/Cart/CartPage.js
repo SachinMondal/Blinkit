@@ -1,30 +1,8 @@
 import { useState } from "react";
 import CartProduct from "./CartProduct";
 import CartSummary from "./CartSummary";
-
-const dummyItems = [
-  {
-    id: 1,
-    name: "Apple",
-    price: 50,
-    qty: 2,
-    image: "https://via.placeholder.com/50", // Replace with actual image URL
-  },
-  {
-    id: 2,
-    name: "Banana",
-    price: 30,
-    qty: 3,
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    id: 3,
-    name: "Mango",
-    price: 80,
-    qty: 1,
-    image: "https://via.placeholder.com/50",
-  },
-];
+import CartImage from "../../images/emptycart.avif";
+const dummyItems = [];
 
 const Cart = ({ items = dummyItems }) => {
   const [cartItems, setCartItems] = useState(items);
@@ -50,9 +28,17 @@ const Cart = ({ items = dummyItems }) => {
             />
           ))
         ) : (
-          <div className="flex items-center justify-center h-[50vh] w-[90vw]">
-            <p className="text-gray-500 text-lg">Your cart is empty</p>
+          <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
+          <div className=" flex flex-col items-center justify-center p-5 rounded-md">
+            <img
+              src={CartImage}
+              alt="Empty Cart"
+              className="object-contain mb-3 h-48 w-48"
+            />
+            <p className="text-gray-500 text-center text-lg">Your cart is empty</p>
           </div>
+        </div>
+        
         )}
       </div>
 

@@ -37,8 +37,8 @@ const ProductCarousel = ({ products }) => {
     <div className="relative px-4 mt-6 lg:max-w-5xl w-full">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
-        <p className="text-left font-bold text-2xl">Electronics</p>
-        <Link to={`/categoryviewAll/Electronics`} className="text-right font-bold text-lg text-green-700 cursor-pointer">
+        <p className="text-left font-bold text-2xl">{category}</p>
+        <Link to={`/categoryviewAll/${category}`} className="text-right font-bold text-lg text-green-700 cursor-pointer">
     See All
   </Link>
       </div>

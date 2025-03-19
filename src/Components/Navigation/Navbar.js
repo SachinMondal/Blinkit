@@ -49,7 +49,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
             : "flex justify-center"
         }`}
       >
-        <div className={`flex justify-around w-full lg:w-[90%] px-4 `}>
+        <div className={`flex justify-around w-full max-w-5xl lg:max-w-6xl `}>
           {isMobile ? (
             <>
               <div className="w-full">
@@ -164,9 +164,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
         )}
       </nav>
 
-      <div className="bg-gray-100 p-1 lg:p-2 shadow-md z-40 sticky top-0">
+      <div className="bg-gray-100 p-1 lg:p-2  shadow-md z-40 sticky top-0">
         <div
-          className={`container mx-auto flex space-x-6 ${
+          className={`container max-w-5xl xl:max-w-6xl mx-auto flex space-x-6 ${
             isMobile
               ? "overflow-x-auto p-2 whitespace-nowrap scrollbar-hide"
               : ""
@@ -178,7 +178,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                 .map((product, idx) => (
                   <div
                     key={idx}
-                    className="bg-white shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2"
+                    className="bg-white shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 "
                   >
                     {product}
                   </div>
@@ -189,7 +189,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                     onClick={() => handleCategoryClick(category.name)}
                     className="inline-flex items-center"
                   >
-                    <span className="text-gray-800 font-semibold px-4 py-2 cursor-default">
+                    <span className="text-gray-800 font-semibold px-4 py-2 cursor-pointer">
                       {category.name}
                       <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
                     </span>

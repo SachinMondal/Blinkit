@@ -1,6 +1,6 @@
 const PersonalInfo = ({ user}) => {
     return (
-      <div className="p-4 bg-white shadow-md rounded-lg">
+      <div className="p-4 rounded-lg">
         <h2 className="text-lg font-bold mb-3">Personal Information</h2>
         <p><strong>Name:</strong> {user.name}</p>
         <p><strong>Email:</strong> {user.email}</p>
@@ -8,7 +8,7 @@ const PersonalInfo = ({ user}) => {
         <p><strong>Joined on:</strong> {user.joinDate}</p>
   
         <div className="flex justify-between mt-4">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          <button className="bg-green-300 hover:bg-green-500 text-white font-semibold px-4 py-2 rounded-md"
           //  onClick={onEdit}
            >
             Edit

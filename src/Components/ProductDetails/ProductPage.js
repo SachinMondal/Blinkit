@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
-
+import { useParams, Link } from "react-router-dom";
+import emptyProduct from "../../images/emptyProduct.jpg";
 const ProductPage = () => {
   const { productId } = useParams();
-  const location = useLocation();
   const [count, setCount] = useState(0);
   const handleAdd = (e) => {
     e.stopPropagation();
@@ -98,9 +97,17 @@ const ProductPage = () => {
 
   if (!product) {
     return (
-      <div className="text-center text-2xl text-red-500 mt-10">
-        Product not found!
+      <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
+      <div className=" flex flex-col items-center justify-center p-5 rounded-md">
+        <img
+          src={emptyProduct}
+          alt="Product Not Found"
+          className="w-40 h-40 object-contain mb-3"
+        />
+        <p className="text-gray-500 text-center text-lg">Product Not Found</p>
       </div>
+    </div>
+    
     );
   }
 

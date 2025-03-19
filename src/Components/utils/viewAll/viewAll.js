@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import ProductTile from "../ProductDetails/ProductTile";
+import ProductTile from "../../ProductDetails/ProductTile";
 
 const ViewAll = ({ products }) => {
   const { category } = useParams();

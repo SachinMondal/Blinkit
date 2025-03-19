@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
+
 
 const CartProduct = ({ item, onQuantityChange }) => {
   const [quantity, setQuantity] = useState(item.qty);

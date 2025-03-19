@@ -3,7 +3,8 @@ import { Modal } from "../../Components/AddressModalComponent/AddressModal";
 import { Link } from "react-router-dom";
 import OrderModel from "../../Components/OrderModel/OrderModel";
 import PersonalInfo from "../../Components/PersonalInfo/PersonalInfo";
-
+import emptyAddress from "../../images/emptyAddress.png";
+import emptyOrder from "../../images/emptyOrder.png";
 const Profile = () => {
   const [activeSection, setActiveSection] = useState("address");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,64 +13,11 @@ const Profile = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   // Dummy Data
   const [addresses, setAddresses] = useState([
-    { id: 1, name: "Home", details: "123 Main St, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
-    { id: 2, name: "Work", details: "456 Office Rd, City, Country" },
+    
   ]);
 
   const orders = [
-    {
-      id: 1,
-      item: "Apple",
-      qty: "1 kg",
-      price: 120,
-      date: "2024-03-18",
-      status: "Delivered",
-    },
-    {
-      id: 2,
-      item: "Banana",
-      qty: "1 dozen",
-      price: 80,
-      date: "2024-03-17",
-      status: "Delivered",
-    },
-    {
-      id: 3,
-      item: "Tomato",
-      qty: "2 kg",
-      price: 60,
-      date: "2024-03-16",
-      status: "Delivered",
-    },
-    {
-      id: 1,
-      item: "Apple",
-      qty: "1 kg",
-      price: 120,
-      date: "2024-03-18",
-      status: "Delivered",
-    },
-    {
-      id: 2,
-      item: "Banana",
-      qty: "1 dozen",
-      price: 80,
-      date: "2024-03-17",
-      status: "Delivered",
-    },
-    {
-      id: 3,
-      item: "Tomato",
-      qty: "2 kg",
-      price: 60,
-      date: "2024-03-16",
-      status: "Delivered",
-    },
+    
   ];
 
   // Function to Add New Address
@@ -79,7 +27,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto flex gap-2 flex-col overflow-hidden">
+    <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
       {/* Breadcrumb - Now Fixed at the Top */}
       <nav className="w-full mb-3 text-sm text-gray-600 text-left">
         <Link to="/" className="text-blue-500 hover:underline">Home</Link> &gt;
@@ -140,7 +88,7 @@ const Profile = () => {
         </div>
 
         {/* Right Content - Stays in Position */}
-        <div className="flex-1 p-3 md:p-6 rounded-lg overflow-x-hidden overflow-y-auto scrollbar-hide text-sm md:text-base text-left">
+        <div className="flex-1 p-3 md:p-6 rounded-lg overflow-x-hidden overflow-y-auto scrollbar-hide text-sm md:text-base text-left transition-all duration-300">
           {activeSection === "personalInfo" ? (
      <PersonalInfo user={{ name: "cc", email: "example@example.com" }} />
 
@@ -159,8 +107,9 @@ const Profile = () => {
                 </button>
               </div>
 
-              <ul>
-                {addresses.map((addr) => (
+              <ul className=" min-h-screen overflow-y-auto max-h-screen scrollbar-hide">
+                {addresses.length>0?
+                (addresses.map((addr) => (
                   <li
                     key={addr.id}
                     className="border-b p-2 md:p-3 rounded-md my-2"
@@ -195,7 +144,13 @@ const Profile = () => {
                       </div>
                     </div>
                   </li>
-                ))}
+                ))):(
+                  <div className="flex flex-col items-center justify-center min-h-[300px] p-5 rounded-md">
+                  <img src={emptyAddress} alt="Empty Address" className="w-40 h-40 object-contain mb-3" />
+                  <p className="text-gray-500 text-center text-lg">No addresses saved yet.</p>
+                </div>
+                
+                )}
               </ul>
             </div>
           ) : selectedOrder ? (
@@ -206,7 +161,7 @@ const Profile = () => {
           ) : (
             <div className="overflow-x-hidden overflow-y-auto scrollbar-hide">
               <h2 className="text-lg md:text-xl font-bold mb-3">My Orders</h2>
-              {orders.map((order) => (
+              {orders.length>0?(orders.map((order) => (
                 <div
                   key={order.id}
                   className="grid grid-cols-12 items-center py-3 border-b border-gray-300"
@@ -230,7 +185,13 @@ const Profile = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              ))):(
+                <div className=" flex flex-col items-center justify-center min-h-[300px] p-5 rounded-md">
+  <img src={emptyOrder} alt="Empty Orders" className="w-40 h-40 object-contain mb-3" />
+  <p className="text-gray-500 text-center text-lg">No placed yet.</p>
+</div>
+
+              )}
             </div>
           )}
         </div>

@@ -146,23 +146,32 @@ const HomePage = () => {
     cssEase: "linear",
     responsive: [
       {
-        breakpoint: 1024,
-        settings: { slidesToShow: 4, slidesToScroll: 1 },
+        breakpoint: 1536, 
+        settings: { slidesToShow: 7, slidesToScroll: 1 },
       },
       {
-        breakpoint: 640,
+        breakpoint: 1280, 
+        settings: { slidesToShow: 5.5, slidesToScroll: 1 },
+      },
+      {
+        breakpoint: 1024, 
+        settings: { slidesToShow: 6, slidesToScroll: 1 },
+      },
+      {
+        breakpoint: 640, 
         settings: { slidesToShow: 2.8, slidesToScroll: 1 },
       },
       {
-        breakpoint: 425,
+        breakpoint: 425, // For small mobile screens
         settings: { slidesToShow: 2, slidesToScroll: 1 },
       },
       {
-        breakpoint: 320,
+        breakpoint: 320, // For extra small screens
         settings: { slidesToShow: 1.5, slidesToScroll: 1 },
       },
     ],
   };
+  
   
 
   return (
@@ -177,7 +186,8 @@ const HomePage = () => {
       ) : (
         <>
           {/* Image Carousel */}
-          <div className="max-w-5xl mx-auto mt-6 flex gap-16 flex-col overflow-hidden">
+          <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
+
             {/* Carosel  */}
             <Slider {...sliderSettings}>
               {images.map((img, index) => (

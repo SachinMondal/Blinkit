@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route, useNavigate, Link } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import HomePage from "./customer/Home/HomePage";
 import SignUp from "./customer/auth/SignUp";
 import CategoryPage from "./Components/CategoryDetails/CategoryPage";
@@ -9,16 +9,17 @@ import Navbar from "./Components/Navigation/Navbar";
 import Footer from "./Components/Footer/Footer";
 import CartItem from "./Components/Cart/CartItems";
 import ProductPage from "./Components/ProductDetails/ProductPage";
-import ViewAll from "./Components/viewAll/viewAll";
+import ViewAll from "./Components/utils/viewAll/viewAll";
 import Profile from "./customer/Profile/Profile";
 import TermsAndConditions from "./customer/TermsCondition/Terms&Condition";
 import PrivacyPolicy from "./customer/Privacy&Policy/PrivacyPolicy";
 import Cart from "./Components/Cart/CartPage";
+import PageNotFound from "./customer/PageNotFound/PageNotFound";
 
 // Dummy Auth Function (Replace with actual auth logic)
-const isAuthenticated = () => {
-  return localStorage.getItem("user") !== null;
-};
+// const isAuthenticated = () => {
+//   return localStorage.getItem("user") !== null;
+// };
 
 // Protected Route Wrapper
 // const ProtectedRoute = ({ children }) => {
@@ -119,6 +120,7 @@ function App() {
 
     return () => {
       if (footerRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(footerRef.current);
       }
     };
@@ -166,7 +168,7 @@ function App() {
         <Route path="/cart" element={<Cart />} />
 
         {/* Catch-All Route (404 Page) */}
-        <Route path="*" element={<h2>404 - Page Not Found</h2>} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Link to={'/cart'}
         className={`${
@@ -182,10 +184,6 @@ function App() {
     </div>
   );
 }
-function SignupModalRoute() {
-  const navigate = useNavigate();
-  
-  return <SignUp isOpen={true} setIsOpen={() => navigate("/")} />;
-}
+
 
 export default App;
