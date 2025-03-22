@@ -199,6 +199,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                     SignUp/Login
                   </Button>
                 )}
+                <div>
+                  <Link to={'/admin/'}>Admin</Link>
+                </div>
               </div>
             </>
           )}
