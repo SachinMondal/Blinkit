@@ -132,7 +132,7 @@ const AddProduct = () => {
         {step > 1 ? (
           <button onClick={prevStep} className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600">Back</button>
         ) : (
-          <button onClick={() => navigate("/")} className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600">Cancel</button>
+          <button onClick={() => navigate("/admin/admin")} className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600">Cancel</button>
         )}
         {step < 4 ? (
           <button onClick={nextStep} className="bg-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-blue-600">Next</button>

@@ -31,7 +31,7 @@ const AddCategory = () => {
 
   const handleSubmit = () => {
     console.log("Category Data Submitted:", formData);
-    navigate("/category");
+    navigate("/admin/category");
   };
 
   return (

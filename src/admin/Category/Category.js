@@ -42,7 +42,7 @@ const Category = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Categories</h1>
         <button
-          onClick={() => navigate("/category/addCategory")}
+          onClick={() => navigate("/admin/category/addCategory")}
           className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg font-medium mt-4 sm:mt-0"
         >
           + Add Category
@@ -68,7 +68,7 @@ const Category = () => {
                   <td className="p-4">
                     <button
                       className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm mr-2"
-                      onClick={() => navigate(`/category/edit/${category.id}`)}
+                      onClick={() => navigate(`/admin/category/edit/${category.id}`)}
                     >
                       Edit
                     </button>

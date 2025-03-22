@@ -91,7 +91,7 @@ const EditCategory = () => {
           {/* Buttons */}
           <div className="flex gap-4 mt-4">
             <button
-              onClick={() => navigate("/categories")}
+              onClick={() => navigate("/admin/category")}
               className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
             >
               Cancel
