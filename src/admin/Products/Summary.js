@@ -19,7 +19,7 @@ const Summary = () => {
 
       <div className="flex gap-4 mt-6">
         <button onClick={() => navigate(-1)} className="bg-yellow-500 text-white px-6 py-3 rounded-lg">Edit</button>
-        <button className="bg-green-500 text-white px-6 py-3 rounded-lg" onClick={()=>navigate("/products")}>Submit</button>
+        <button className="bg-green-500 text-white px-6 py-3 rounded-lg" onClick={()=>navigate("/admin/products")}>Submit</button>
       </div>
     </div>
   );

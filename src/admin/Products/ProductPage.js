@@ -30,7 +30,7 @@ const ProductsPage = () => {
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Products</h1>
         <button
-          onClick={() => navigate("/products/addProduct")}
+          onClick={() => navigate("/admin/products/addProduct")}
           className="bg-green-500 text-white px-6 py-3 rounded-lg text-lg font-medium"
         >
           + Add Product
@@ -58,10 +58,10 @@ const ProductsPage = () => {
                   <td className="p-4">{product.price}</td>
                   <td className="p-4">{product.stock}</td>
                   <td className="p-4 flex justify-center space-x-4">
-                    <Link to={`/products/${product.id}`} className="text-blue-600 hover:underline">
+                    <Link to={`/admin/products/${product.id}`} className="text-blue-600 hover:underline">
                       View
                     </Link>
-                    <Link to={`/products/editProduct/${product.id}`} className="text-yellow-600 hover:underline">
+                    <Link to={`/admin/products/editProduct/${product.id}`} className="text-yellow-600 hover:underline">
                       Edit
                     </Link>
                     <button

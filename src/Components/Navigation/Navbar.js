@@ -200,7 +200,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                   </Button>
                 )}
                 <div>
-                  <Link to={'/admin/'}>Admin</Link>
+                  <Link to={'/admin/admin'}>Admin</Link>
                 </div>
               </div>
             </>
@@ -316,6 +316,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
             </div>
           ))}
         </nav>
+        <div>
+                  <Link to={'/admin/admin'}>Admin</Link>
+                </div>
         <SignUp isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       </div>
     </div>

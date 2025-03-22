@@ -23,7 +23,7 @@ const EditProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Updated Product:", formData);
-    navigate("/products"); // Redirect after update
+    navigate("/admin/products"); // Redirect after update
   };
 
   return (

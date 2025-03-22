@@ -55,7 +55,7 @@ const Customers = () => {
                 <td className="p-3">{customer.orders}</td>
                 <td className="p-3">
                   <Link
-                    to={`/customers/${customer.id}`}
+                    to={`/admin/customers/${customer.id}`}
                     className="bg-blue-500 text-white px-3 py-1 rounded-md mr-2 hover:bg-blue-600 transition"
                   >
                     View

@@ -39,7 +39,7 @@ const OrderView = () => {
       {/* Back Button */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Order #{order.id}</h1>
-        <Link to="/orders" className="text-blue-500 hover:underline">
+        <Link to="/admin/orders" className="text-blue-500 hover:underline">
           ← Back to Orders
         </Link>
       </div>

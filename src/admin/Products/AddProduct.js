@@ -34,7 +34,7 @@ const AddProduct = () => {
 
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
-  const handleSubmit = () => navigate("/products/summary", { state: formData });
+  const handleSubmit = () => navigate("/admin/products/summary", { state: formData });
 
   return (
     <div className="w-full min-h-screen px-4 sm:px-12 py-10">

@@ -36,7 +36,7 @@ const OrderTile = ({ order }) => {
       {/* Buttons */}
       <div className="mt-3 flex flex-col sm:flex-row justify-between gap-2">
         <Link
-          to={`/orders/${order.id}`}
+          to={`/admin/orders/${order.id}`}
           className="text-blue-500 font-medium hover:underline text-center"
         >
           View
