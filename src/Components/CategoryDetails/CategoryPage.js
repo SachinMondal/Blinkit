@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ChevronUp } from "lucide-react";
 import ProductTile from "../ProductDetails/ProductTile";
 import emptyCategory from "../../images/emptyCategory.jpg";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 // Sample categories and products data
 const mockCategories = [
   {
@@ -207,7 +208,7 @@ const CategoryPage = () => {
       !sortedProducts ||
       sortedProducts.length === 0 ? (
         <div className="w-full flex flex-col items-center justify-center min-h-screen">
-          <img src={emptyCategory} alt="Empty" className="w-48 h-48" />
+          <LazyImage src={emptyCategory} alt="Empty" className="w-48 h-48" />
 
         </div>
       ) : (
@@ -232,7 +233,7 @@ const CategoryPage = () => {
                           : "bg-transparent"
                       }`}
                     ></div>
-                    <img
+                    <LazyImage
                       src={cat.image}
                       alt={cat.name}
                       className="w-10 h-10 md:w-14 md:h-14 object-contain rounded-md"

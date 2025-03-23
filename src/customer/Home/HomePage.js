@@ -7,6 +7,8 @@ import CategoryTile from "../../Components/CategoryDetails/CategoryTile.js";
 import ProductCarousel from "../../Components/ProductDetails/ProductCarosel.js";
 
 import { useNavigate } from "react-router-dom";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading.js";
+
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -195,11 +197,13 @@ const HomePage = () => {
                   key={index}
                   className="flex justify-center max-w-7xl mx-auto px-4"
                 >
-                  <img
-                    src={img}
-                    alt={`Slide ${index}`}
-                    className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
-                  />
+                  
+                   <LazyImage
+                      src={img}
+                      alt={`Slide ${index}`}
+                      className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
+                    />
+                
                 </div>
               ))}
             </Slider>

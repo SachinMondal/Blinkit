@@ -1,8 +1,9 @@
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import PageNotFoundImage from "../../images/pagenotfound.png";
 const PageNotFound = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen text-gray-800">
-       <img src={PageNotFoundImage} alt="Empty" className="w-30 h-48" />
+       <LazyImage src={PageNotFoundImage} alt="Empty" className="w-30 h-48" />
       <h2 className="text-2xl md:text-3xl font-semibold mt-4">
         Oops! Page Not Found
       </h2>

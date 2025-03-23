@@ -1,3 +1,5 @@
+import LazyImage from "../utils/LazyLoading/LazyLoading";
+
 const AboutUs = () => {
   const teamMembers = [
     { name: "John Doe", role: "CEO & Founder", img: "https://via.placeholder.com/150", linkedin: "#" },
@@ -27,7 +29,7 @@ const AboutUs = () => {
         <div className="flex flex-wrap justify-center mt-6 gap-6">
           {teamMembers.map((member, index) => (
             <div key={index} className="bg-white shadow-md rounded-lg p-6 text-center w-64">
-              <img src={member.img} alt={member.name} className="w-24 h-24 mx-auto rounded-full" />
+              <LazyImage src={member.img} alt={member.name} className="w-24 h-24 mx-auto rounded-full" />
               <h3 className="mt-4 text-lg font-semibold">{member.name}</h3>
               <p className="text-gray-500">{member.role}</p>
               <a href={member.linkedin} className="mt-2 inline-block text-blue-500 hover:text-blue-700">

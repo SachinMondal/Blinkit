@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 
 // Mock API Fetch Function (Replace with actual API)
 const fetchLiveOrders = async () => {
@@ -96,7 +97,7 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center text-center">
-            <img
+            <LazyImage
               src="https://i.imgur.com/qIufhof.png"
               alt="No orders"
               className="w-40 h-40 opacity-75"

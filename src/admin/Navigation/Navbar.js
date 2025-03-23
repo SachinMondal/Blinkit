@@ -26,6 +26,7 @@ const Navbar = () => {
 
         {/* Navigation Links - Desktop View */}
         <div className="hidden md:flex space-x-6 transition-all duration-300">
+        <NavLink to="/" text="Dashboard" path={location.pathname} mobile onClick={() => setIsOpen(false)} /> 
           <NavLink to="/admin/orders" text="Orders" path={location.pathname} />
           <NavLink to="/admin/category" text="Category" path={location.pathname} />
           <NavLink to="/admin/products" text="Products" path={location.pathname} />
@@ -57,6 +58,7 @@ const Navbar = () => {
 
         {/* Navigation Links */}
         <div className="mt-16 flex flex-col space-y-4 px-6">
+        <NavLink to="/" text="Dashboard" path={location.pathname} mobile onClick={() => setIsOpen(false)} /> 
           <NavLink to="/admin/" text="Dashboard" path={location.pathname} mobile onClick={() => setIsOpen(false)} />
           <NavLink to="/admin/orders" text="Orders" path={location.pathname} mobile onClick={() => setIsOpen(false)} />
           <NavLink to="/admin/category" text="Category" path={location.pathname} mobile onClick={() => setIsOpen(false)} />

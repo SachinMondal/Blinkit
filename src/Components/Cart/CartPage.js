@@ -2,6 +2,7 @@ import { useState } from "react";
 import CartProduct from "./CartProduct";
 import CartSummary from "./CartSummary";
 import CartImage from "../../images/emptycart.avif";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 const dummyItems = [];
 
 const Cart = ({ items = dummyItems }) => {
@@ -30,7 +31,7 @@ const Cart = ({ items = dummyItems }) => {
         ) : (
           <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
           <div className=" flex flex-col items-center justify-center p-5 rounded-md">
-            <img
+            <LazyImage
               src={CartImage}
               alt="Empty Cart"
               className="object-contain mb-3 h-48 w-48"

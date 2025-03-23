@@ -1,5 +1,6 @@
 import { useState } from "react";
 import OrderTile from "./OrderTile"; // Importing OrderTile Component
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 
 const OrdersPage = () => {
   const [orders] = useState([
@@ -47,7 +48,7 @@ const OrdersPage = () => {
       filteredOrders.map((order) => <OrderTile key={order.id} order={order} />)
     ) : (
       <div className="col-span-full text-center p-10">
-        <img src="https://via.placeholder.com/150" alt="No Orders" className="w-32 h-32 mb-4 mx-auto" />
+        <LazyImage src="https://via.placeholder.com/150" alt="No Orders" className="w-32 h-32 mb-4 mx-auto" />
         <p className="text-gray-600">No orders available</p>
       </div>
     )}

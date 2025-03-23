@@ -1,4 +1,5 @@
 import React from "react";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 const ProductTile = ({ image, name, discount ,onClick}) => {
   return (
@@ -12,7 +13,7 @@ const ProductTile = ({ image, name, discount ,onClick}) => {
 
       {/* Image */}
       <div className="w-full h-24">
-        <img src={image} alt={name} className="w-full h-full object-cover" />
+        <LazyImage src={image} alt={name} className="w-full h-full object-cover" />
       </div>
 
       {/* Product Name */}

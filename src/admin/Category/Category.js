@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
+import EmptyCategory from "../../images/emptyCategory.jpg";
 const Category = () => {
   const navigate = useNavigate();
 
   // Sample categories data (Replace with API data)
   const [categories, setCategories] = useState([
-    { id: 1, name: "Fruits", description: "Fresh and organic fruits" },
-    { id: 2, name: "Vegetables", description: "Healthy green vegetables" },
-    { id: 3, name: "Dairy", description: "Milk, cheese, and more" },
+    // { id: 1, name: "Fruits", description: "Fresh and organic fruits" },
+    // { id: 2, name: "Vegetables", description: "Healthy green vegetables" },
+    // { id: 3, name: "Dairy", description: "Milk, cheese, and more" },
   ]);
 
   // State for modal
@@ -84,6 +85,7 @@ const Category = () => {
             ) : (
               <tr>
                 <td colSpan="3" className="p-6 text-center text-gray-500">
+              
                   No categories available.
                 </td>
               </tr>

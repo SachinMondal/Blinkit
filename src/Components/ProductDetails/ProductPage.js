@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import emptyProduct from "../../images/emptyProduct.jpg";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 const ProductPage = () => {
   const { productId } = useParams();
   const [count, setCount] = useState(0);
@@ -99,7 +100,7 @@ const ProductPage = () => {
     return (
       <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
       <div className=" flex flex-col items-center justify-center p-5 rounded-md">
-        <img
+        <LazyImage
           src={emptyProduct}
           alt="Product Not Found"
           className="w-40 h-40 object-contain mb-3"
@@ -129,7 +130,7 @@ const ProductPage = () => {
   
       {/* Left Section (Product Image & Details) */}
       <div className="w-full lg:w-1/2 p-4 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
-        <img
+        <LazyImage
           src={product.image}
           alt={product.name}
           className="w-full max-h-96 object-contain rounded-lg"

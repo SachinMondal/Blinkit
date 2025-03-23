@@ -58,10 +58,10 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
   };
   const handleCategorySelection = (categoryName) => {
     if (selectedCategory === categoryName) {
-      setSelectedCategory(""); // Unselect category
-      navigate("/"); // Redirect to home
+      setSelectedCategory("");
+      navigate("/"); 
     } else {
-      setSelectedCategory(categoryName); // Select new category
+      setSelectedCategory(categoryName); 
     }
     handleCategoryClick(categoryName);
   };
@@ -199,9 +199,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
                     SignUp/Login
                   </Button>
                 )}
-                <div>
-                  <Link to={'/admin/admin'}>Admin</Link>
-                </div>
+            
               </div>
             </>
           )}

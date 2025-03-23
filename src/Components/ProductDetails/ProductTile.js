@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 const ProductTile = ({ image, name, quantity, price, discount="30",onClick }) => {
   const [count, setCount] = useState(0);
@@ -22,7 +23,7 @@ const ProductTile = ({ image, name, quantity, price, discount="30",onClick }) =>
     <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-48 cursor-pointer relative" onClick={onClick}>
       {/* Product Image with Discount Tag */}
       <div className="w-full h-20 bg-gray-100 flex justify-center items-center relative">
-        <img src={image} alt={name} className="w-full h-full object-contain rounded-md" />
+        <LazyImage src={image} alt={name} className="w-full h-full object-contain rounded-md" />
         {discount && (
           <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
             {discount}% OFF

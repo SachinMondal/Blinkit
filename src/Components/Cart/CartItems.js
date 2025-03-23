@@ -1,4 +1,5 @@
 import React from "react";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 
 const avatars = [
@@ -15,7 +16,7 @@ const CartItem = ({ max = 3 }) => {
         {/* Display up to `max` avatars */}
         <div className="flex -space-x-2">
           {avatars.slice(0, max).map((avatar) => (
-            <img
+            <LazyImage
               key={avatar.id}
               src={avatar.src}
               alt={avatar.name}

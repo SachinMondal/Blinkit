@@ -1,4 +1,5 @@
 import { useState } from "react";
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 
 const CartProduct = ({ item, onQuantityChange }) => {
@@ -25,7 +26,7 @@ const CartProduct = ({ item, onQuantityChange }) => {
     <div className="border rounded-lg shadow-sm bg-white p-4 w-72 h-40">
       {/* Product Details */}
       <div className="flex items-center space-x-3">
-        <img src={item.image} alt={item.name} className="w-14 h-14 rounded-md object-contain" />
+        <LazyImage src={item.image} alt={item.name} className="w-14 h-14 rounded-md object-contain" />
 
         <div className="flex-1">
           <h3 className="text-sm font-semibold">{item.name}</h3>

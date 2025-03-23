@@ -5,6 +5,7 @@ import OrderModel from "../../Components/OrderModel/OrderModel";
 import PersonalInfo from "../../Components/PersonalInfo/PersonalInfo";
 import emptyAddress from "../../images/emptyAddress.png";
 import emptyOrder from "../../images/emptyOrder.png";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 const Profile = () => {
   const [activeSection, setActiveSection] = useState("address");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -187,7 +188,7 @@ const Profile = () => {
                 </div>
               ))):(
                 <div className=" flex flex-col items-center justify-center min-h-[300px] p-5 rounded-md">
-  <img src={emptyOrder} alt="Empty Orders" className="w-40 h-40 object-contain mb-3" />
+  <LazyImage src={emptyOrder} alt="Empty Orders" className="w-40 h-40 object-contain mb-3" />
   <p className="text-gray-500 text-center text-lg">No placed yet.</p>
 </div>
 
