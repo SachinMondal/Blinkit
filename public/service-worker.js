@@ -2,8 +2,8 @@ const CACHE_NAME = "app-cache-v2"; // Increment version when updating
 const urlsToCache = [
   "/",
   "/index.html",
-  "/logo192.png",
   "/logo512.png",
+  "/logo1024.png",
   "/manifest.json"
 ];
 
