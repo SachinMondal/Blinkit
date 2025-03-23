@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
-import EmptyCategory from "../../images/emptyCategory.jpg";
 const Category = () => {
   const navigate = useNavigate();
 

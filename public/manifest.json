@@ -3,12 +3,12 @@
   "name": "Grocery Store",
   "icons": [
     {
-      "src": "logo192.png",
+      "src": "logo512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "logo192.png",
+      "src": "logo1024.png",
       "sizes": "1024x1024",
       "type": "image/png"
     }
