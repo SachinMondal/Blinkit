@@ -6,13 +6,14 @@ import PersonalInfo from "../../Components/PersonalInfo/PersonalInfo";
 import emptyAddress from "../../images/emptyAddress.png";
 import emptyOrder from "../../images/emptyOrder.png";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
+import {logout} from "../../redux/state/auth/Action";
+import { useDispatch } from "react-redux";
 const Profile = () => {
-  const [activeSection, setActiveSection] = useState("address");
+  const dispatch=useDispatch();
+  const [activeSection, setActiveSection] = useState("personalInfo");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [selectedOrder, setSelectedOrder] = useState(null);
-  // Dummy Data
   const [addresses, setAddresses] = useState([
     
   ]);
@@ -26,6 +27,13 @@ const Profile = () => {
     setAddresses([...addresses, { id: addresses.length + 1, ...newAddress }]);
     setIsModalOpen(false);
   };
+
+  
+
+  const logoutUser = () => {
+    dispatch(logout());
+  };
+  
 
   return (
     <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
@@ -43,7 +51,7 @@ const Profile = () => {
       </nav>
       <div className="md:hidden flex justify-evenly items-center mb-3 ">
         <h2 className="text-lg font-bold">My Profile</h2>
-        <button className="bg-red-500 text-white px-3 py-1 rounded-md text-sm">
+        <button className="bg-red-500 text-white px-3 py-1 rounded-md text-sm" onClick={logoutUser}>
           Logout
         </button>
       </div>
@@ -82,7 +90,7 @@ const Profile = () => {
               My Orders
             </div>
 
-            <button className="w-full bg-red-500 text-white p-2 rounded-md text-sm md:text-base mt-3 md:block hidden">
+            <button className="w-full bg-red-500 text-white p-2 rounded-md text-sm md:text-base mt-3 md:block hidden" onClick={logoutUser}>
               Logout
             </button>
           </div>
@@ -91,7 +99,7 @@ const Profile = () => {
         {/* Right Content - Stays in Position */}
         <div className="flex-1 p-3 md:p-6 rounded-lg overflow-x-hidden overflow-y-auto scrollbar-hide text-sm md:text-base text-left transition-all duration-300">
           {activeSection === "personalInfo" ? (
-     <PersonalInfo user={{ name: "cc", email: "example@example.com" }} />
+     <PersonalInfo />
 
           ) : 
           activeSection === "address" ? (

@@ -4,7 +4,7 @@ import SignUp from "../../customer/auth/SignUp";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../images/logo.png"
 
-export default function Navbar({ isLoggedIn, location, setLocationModal }) {
+export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -314,9 +314,12 @@ export default function Navbar({ isLoggedIn, location, setLocationModal }) {
             </div>
           ))}
         </nav>
-        <div>
-                  <Link to={'/admin/admin'}>Admin</Link>
-                </div>
+        {isAdmin &&
+            <div>
+            <Link to={'/admin/admin'}>Admin</Link>
+          </div>
+        }
+    
         <SignUp isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       </div>
     </div>

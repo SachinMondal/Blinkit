@@ -1,9 +1,10 @@
-
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useSelector, useDispatch } from "react-redux"; 
+import { fetchUserInfo } from "../redux/state/auth/Action"; // Import user fetch action
 import HomePage from "../customer/Home/HomePage";
 import SignUp from "../customer/auth/SignUp";
 import CategoryPage from "../Components/CategoryDetails/CategoryPage";
-import { useEffect, useRef, useState } from "react";
 import LocationModal from "../Components/Location/LocationPopUp";
 import Navbar from "../Components/Navigation/Navbar";
 import Footer from "../Components/Footer/Footer";
@@ -17,95 +18,36 @@ import Cart from "../Components/Cart/CartPage";
 import PageNotFound from "../customer/PageNotFound/PageNotFound";
 import AboutUs from "../Components/AboutUs/Aboutus";
 
-// Dummy Auth Function (Replace with actual auth logic)
-// const isAuthenticated = () => {
-//   return localStorage.getItem("user") !== null;
-// };
-
 // Protected Route Wrapper
-// const ProtectedRoute = ({ children }) => {
-//   return isAuthenticated() ? children : <Navigate to="/signup" />;
-// };
+const ProtectedRoute = ({ children }) => {
+  const token = useSelector((state) => state.auth.token); 
+  return token ? children : <Navigate to="/" />;
+};
 
 function Customer() {
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // Admin state
   const footerRef = useRef(null);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
 
-  const allProducts = [
-    {
-      category: "Electronics",
-      products: [
-        {
-          id: 1,
-          name: "Fresh Apple",
-          qty: "1 kg",
-          image: "https://via.placeholder.com/150",
-          price: 120,
-          discount: 10, // in percentage
-        },
-        {
-          id: 2,
-          name: "Banana",
-          qty: "1 dozen",
-          image: "https://via.placeholder.com/150",
-          price: 80,
-          discount: 5,
-        },
-        {
-          id: 3,
-          name: "Tomato",
-          qty: "2 kg",
-          image: "https://via.placeholder.com/150",
-          price: 60,
-          discount: 15,
-        },
-        {
-          id: 4,
-          name: "Potato",
-          qty: "5 kg",
-          image: "https://via.placeholder.com/150",
-          price: 100,
-          discount: 8,
-        },
-        {
-          id: 5,
-          name: "Carrot",
-          qty: "1 kg",
-          image: "https://via.placeholder.com/150",
-          price: 50,
-          discount: 12,
-        },
-        {
-          id: 6,
-          name: "Broccoli",
-          qty: "1 piece",
-          image: "https://via.placeholder.com/150",
-          price: 90,
-          discount: 7,
-        },
-        {
-          id: 7,
-          name: "Orange",
-          qty: "1 dozen",
-          image: "https://via.placeholder.com/150",
-          price: 150,
-          discount: 10,
-        },
-        {
-          id: 8,
-          name: "Strawberry",
-          qty: "500g",
-          image: "https://via.placeholder.com/150",
-          price: 200,
-          discount: 5,
-        },
-      ],
-    },
-  ];
-  
-  
+  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user); // Get user from Redux
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchUserInfo(token)); // Fetch user info
+    }
+  }, [token, dispatch]);
+
+  useEffect(() => {
+    if (user && user.role === "admin") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -121,11 +63,11 @@ function Customer() {
 
     return () => {
       if (footerRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(footerRef.current);
       }
     };
   }, []);
+
   useEffect(() => {
     const storedLocation = localStorage.getItem("userLocation");
     if (storedLocation) {
@@ -134,11 +76,13 @@ function Customer() {
       setIsModalOpen(true);
     }
   }, []);
+
   const handleLocationSelect = (location) => {
     setUserLocation(location);
     localStorage.setItem("userLocation", location);
     setIsModalOpen(false);
   };
+
   return (
     <div className="App">
       {/* Location Modal */}
@@ -148,31 +92,45 @@ function Customer() {
           onLocationSelect={handleLocationSelect}
         />
       )}
-      <Navbar
-        location={userLocation}
-        isLoggedIn={false}
-        setLocationModal={setIsModalOpen}
-      />
+
+      <Navbar location={userLocation} isLoggedIn={!!token} isAdmin={isAdmin} setLocationModal={setIsModalOpen} />
+
       <Routes>
-        
-        <Route path="/" element={<HomePage userLocation={userLocation} />} />
         <Route path="/signup" element={<SignUp />} />
-
-        <Route path="/dashboard" element={<HomePage />} />
-
+        <Route path="/" element={<HomePage userLocation={userLocation} />} />
         <Route path="/:category/:category" element={<CategoryPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
-        <Route path="/categoryviewAll/:category" element={<ViewAll products={allProducts} />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/categoryviewAll/:category" element={<ViewAll />} />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/termsconditions" element={<TermsAndConditions />} />
         <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-        <Route path="/cart" element={<Cart />} />
+
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <Cart />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="/aboutUs" element={<AboutUs />} />
+
         {/* Catch-All Route (404 Page) */}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
-      <Link to={'/cart'}
+
+      <Link
+        to={"/cart"}
         className={`${
           isFooterVisible ? "hidden" : "fixed bottom-4 left-1/2"
         } transition-all duration-300 ease-out`}
@@ -186,6 +144,5 @@ function Customer() {
     </div>
   );
 }
-
 
 export default Customer;
