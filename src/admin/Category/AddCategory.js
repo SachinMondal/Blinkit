@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { addCategory } from "../../redux/state/category/Action";
+import { useDispatch, useSelector } from "react-redux";
+import { CircularProgress } from "@mui/material";
 
 const AddCategory = () => {
   const navigate = useNavigate();
+  const dispatch=useDispatch();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     image: null,
-    attributes: "",
+    attributes: {},
     parentCategory: "",
     seoTitle: "",
     seoDescription: "",
     isVisible: true,
   });
-
+  const { loading, error } = useSelector((state) => state.category);
   const handleNext = () => setStep((prev) => prev + 1);
   const handleBack = () => setStep((prev) => prev - 1);
   const handleChange = (e) => {
@@ -29,11 +33,69 @@ const AddCategory = () => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
 
-  const handleSubmit = () => {
-    console.log("Category Data Submitted:", formData);
-    navigate("/admin/category");
+  const handleSubmit = async () => {
+    try {
+      const categoryData = new FormData();
+      categoryData.append("name", formData.name);
+      categoryData.append("description", formData.description);
+      categoryData.append("seoTitle", formData.seoTitle);
+      categoryData.append("seoDescription", formData.seoDescription);
+      categoryData.append("isVisible", formData.isVisible ? "true" : "false"); 
+      
+      // ✅ Fix: Do NOT send "null" as a string. Send an empty value properly
+      if (formData.parentCategory) {
+        categoryData.append("parentCategory", formData.parentCategory);
+      }
+  
+      if (formData.image) categoryData.append("image", formData.image);
+  
+      // ✅ Fix: Send `attributes` as an object, not a string
+      Object.entries(formData.attributes).forEach(([key, value]) => {
+        categoryData.append(`attributes[${key}]`, value);
+      });
+  
+      await dispatch(addCategory(categoryData));
+      navigate("/admin/category");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+  
+  const handleAttribute = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+  const handleAttributeChange = (index, newKey, newValue) => {
+    setFormData((prev) => {
+      const updatedAttributes = { ...prev.attributes };
+      const keys = Object.keys(updatedAttributes);
+      const oldKey = keys[index];
+
+      delete updatedAttributes[oldKey];
+      updatedAttributes[newKey] = newValue;
+
+      return { ...prev, attributes: updatedAttributes };
+    });
   };
 
+  const handleAddAttribute = () => {
+    setFormData((prev) => ({
+      ...prev,
+      attributes: { ...prev.attributes, "": "" },
+    }));
+  };
+  const handleRemoveAttribute = (index) => {
+    setFormData((prev) => {
+      const updatedAttributes = { ...prev.attributes };
+      const keys = Object.keys(updatedAttributes);
+      delete updatedAttributes[keys[index]];
+
+      return { ...prev, attributes: updatedAttributes };
+    });
+  };
   return (
     <div className="w-full min-h-screen px-6 sm:px-12 py-10">
       {/* Title */}
@@ -47,7 +109,9 @@ const AddCategory = () => {
           <div
             key={index}
             className={`flex-1 sm:w-auto text-center py-2 cursor-pointer ${
-              step === index + 1 ? "border-b-4 border-blue-500 text-blue-500 font-semibold" : "text-gray-500"
+              step === index + 1
+                ? "border-b-4 border-blue-500 text-blue-500 font-semibold"
+                : "text-gray-500"
             }`}
             onClick={() => setStep(index + 1)}
           >
@@ -60,19 +124,23 @@ const AddCategory = () => {
       {step === 1 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
           <div>
-            <label className="block text-lg font-medium text-gray-700">Category Name</label>
+            <label className="block text-lg font-medium text-gray-700">
+              Category Name
+            </label>
             <input
               type="text"
               name="name"
               placeholder="Enter category name"
               value={formData.name}
-              onChange={handleChange}
+              onChange={handleAttribute}
               className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
             />
           </div>
 
           <div>
-            <label className="block text-lg font-medium text-gray-700">Description</label>
+            <label className="block text-lg font-medium text-gray-700">
+              Description
+            </label>
             <textarea
               name="description"
               placeholder="Enter category description"
@@ -83,8 +151,14 @@ const AddCategory = () => {
           </div>
 
           <div className="sm:col-span-2">
-            <label className="block text-lg font-medium text-gray-700">Category Image</label>
-            <input type="file" onChange={handleImageUpload} className="w-full mt-2 p-3 border border-gray-300 rounded-lg" />
+            <label className="block text-lg font-medium text-gray-700">
+              Category Image
+            </label>
+            <input
+              type="file"
+              onChange={handleImageUpload}
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+            />
           </div>
         </div>
       )}
@@ -92,25 +166,70 @@ const AddCategory = () => {
       {/* Step 2: Attributes */}
       {step === 2 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+          {/* Attributes Section */}
           <div>
-            <label className="block text-lg font-medium text-gray-700">Attributes</label>
-            <input
-              type="text"
-              name="attributes"
-              placeholder="e.g., Organic, Imported"
-              value={formData.attributes}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
-            />
+            <label className="block text-sm sm:text-lg font-medium text-gray-700">
+              Attributes
+            </label>
+
+            <div className="flex flex-col gap-2">
+              {Object.entries(formData.attributes).map(
+                ([key, value], index) => (
+                  <div
+                    key={index}
+                    className="flex flex-wrap sm:flex-nowrap gap-2 items-center"
+                  >
+                    {/* Attribute Key */}
+                    <input
+                      type="text"
+                      placeholder="Attribute Name (e.g., Fat)"
+                      value={key}
+                      onChange={(e) =>
+                        handleAttributeChange(index, e.target.value, value)
+                      }
+                      className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                    />
+                    {/* Attribute Value */}
+                    <input
+                      type="text"
+                      placeholder="Attribute Value (e.g., Low Fat)"
+                      value={value}
+                      onChange={(e) =>
+                        handleAttributeChange(index, key, e.target.value)
+                      }
+                      className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                    />
+                    {/* Remove Button */}
+                    <button
+                      onClick={() => handleRemoveAttribute(index)}
+                      className="p-2 text-red-600 border border-red-400 rounded-lg hover:bg-red-50"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Add Attribute Button */}
+            <button
+              onClick={handleAddAttribute}
+              className="mt-3 px-4 py-2 text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50 w-full sm:w-auto"
+            >
+              + Add Attribute
+            </button>
           </div>
 
+          {/* Parent Category Section */}
           <div>
-            <label className="block text-lg font-medium text-gray-700">Parent Category</label>
+            <label className="block text-sm sm:text-lg font-medium text-gray-700">
+              Parent Category
+            </label>
             <select
               name="parentCategory"
               value={formData.parentCategory}
               onChange={handleChange}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+              className="w-full mt-2 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
             >
               <option value="">None</option>
               <option value="Fruits">Fruits</option>
@@ -124,7 +243,9 @@ const AddCategory = () => {
       {step === 3 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
           <div>
-            <label className="block text-lg font-medium text-gray-700">SEO Title</label>
+            <label className="block text-lg font-medium text-gray-700">
+              SEO Title
+            </label>
             <input
               type="text"
               name="seoTitle"
@@ -136,7 +257,9 @@ const AddCategory = () => {
           </div>
 
           <div>
-            <label className="block text-lg font-medium text-gray-700">SEO Description</label>
+            <label className="block text-lg font-medium text-gray-700">
+              SEO Description
+            </label>
             <textarea
               name="seoDescription"
               placeholder="SEO description for search engines"
@@ -162,17 +285,27 @@ const AddCategory = () => {
       {/* Navigation Buttons */}
       <div className="flex flex-col sm:flex-row justify-between mt-10 space-y-4 sm:space-y-0">
         {step > 1 && (
-          <button onClick={handleBack} className="px-6 py-3 text-lg font-medium text-gray-700 border rounded-lg w-full sm:w-auto">
+          <button
+            onClick={handleBack}
+            className="px-6 py-3 text-lg font-medium text-gray-700 border rounded-lg w-full sm:w-auto"
+          >
             Back
           </button>
         )}
         {step < 3 ? (
-          <button onClick={handleNext} className="px-6 py-3 text-lg font-medium bg-blue-500 text-white rounded-lg w-full sm:w-auto">
+          <button
+            onClick={handleNext}
+            className="px-6 py-3 text-lg font-medium bg-blue-500 text-white rounded-lg w-full sm:w-auto"
+          >
             Next
           </button>
         ) : (
-          <button onClick={handleSubmit} className="px-6 py-3 text-lg font-medium bg-green-500 text-white rounded-lg w-full sm:w-auto">
-            Submit
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-3 text-lg font-medium bg-green-500 text-white rounded-lg w-full sm:w-auto"
+          >
+            {loading ? <CircularProgress size={24} className="text-white" /> :"Submit"} 
+            {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
           </button>
         )}
       </div>

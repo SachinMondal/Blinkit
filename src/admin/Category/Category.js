@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories, deleteCategory } from "../../redux/state/category/Action";
+
 const Category = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Sample categories data (Replace with API data)
-  const [categories, setCategories] = useState([
-    // { id: 1, name: "Fruits", description: "Fresh and organic fruits" },
-    // { id: 2, name: "Vegetables", description: "Healthy green vegetables" },
-    // { id: 3, name: "Dairy", description: "Milk, cheese, and more" },
-  ]);
+  // Get categories from Redux store
+  const { categories, loading } = useSelector((state) => state.category);
 
   // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+
+  useEffect( () => {
+    dispatch(fetchCategories()); 
+  }, [dispatch]);
 
   // Open delete modal
   const openModal = (category) => {
@@ -29,8 +33,7 @@ const Category = () => {
   // Handle category deletion
   const handleDelete = () => {
     if (categoryToDelete) {
-      // TODO: Replace with actual API call
-      setCategories(categories.filter((cat) => cat.id !== categoryToDelete.id));
+      dispatch(deleteCategory(categoryToDelete._id));
       closeModal();
     }
   };
@@ -59,15 +62,21 @@ const Category = () => {
             </tr>
           </thead>
           <tbody>
-            {categories.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="3" className="p-6 text-center text-gray-500">
+                  Loading categories...
+                </td>
+              </tr>
+            ) : categories.length > 0 ? (
               categories.map((category) => (
-                <tr key={category.id} className="border-b hover:bg-gray-50">
+                <tr key={category._id} className="border-b hover:bg-gray-50">
                   <td className="p-4 text-lg">{category.name}</td>
                   <td className="p-4 hidden sm:table-cell">{category.description}</td>
                   <td className="p-4">
                     <button
                       className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm mr-2"
-                      onClick={() => navigate(`/admin/category/edit/${category.id}`)}
+                      onClick={() => navigate(`/admin/category/edit/${category._id}`)}
                     >
                       Edit
                     </button>
@@ -83,7 +92,6 @@ const Category = () => {
             ) : (
               <tr>
                 <td colSpan="3" className="p-6 text-center text-gray-500">
-              
                   No categories available.
                 </td>
               </tr>

@@ -33,11 +33,11 @@ function Customer() {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
 
   const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state) => state.auth.user); // Get user from Redux
+  const user = useSelector((state) => state.auth.user); 
 
   useEffect(() => {
     if (token) {
-      dispatch(fetchUserInfo(token)); // Fetch user info
+      dispatch(fetchUserInfo(token)); 
     }
   }, [token, dispatch]);
 
