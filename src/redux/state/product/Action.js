@@ -18,6 +18,9 @@ import {
   DELETE_PRODUCT_REQUEST,
   DELETE_PRODUCT_SUCCESS,
   DELETE_PRODUCT_FAILURE,
+  GET_PRODUCTS_CATEGORY_REQUEST,
+  GET_PRODUCTS_CATEGORY_SUCCESS,
+  GET_PRODUCTS_CATEGORY_FAILURE,
 } from "./ActionType";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL 
@@ -98,7 +101,7 @@ export const getProductsByCategory = (categoryId) => async (dispatch, getState) 
   }
 };
 
-// 🔹 Update Product (multipart/form-data)
+
 export const updateProduct = (id, productData) => async (dispatch, getState) => {
   try {
     dispatch({ type: UPDATE_PRODUCT_REQUEST });
@@ -115,7 +118,7 @@ export const updateProduct = (id, productData) => async (dispatch, getState) => 
   }
 };
 
-// 🔹 Delete Product (application/json)
+
 export const deleteProduct = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: DELETE_PRODUCT_REQUEST });
@@ -131,3 +134,18 @@ export const deleteProduct = (id) => async (dispatch, getState) => {
     });
   }
 };
+
+export const getCategoryProduct=()=>async(dispatch ,getState)=>{
+  try{
+    dispatch({type: GET_PRODUCTS_CATEGORY_REQUEST});
+    const config = getAuthHeaders(getState);
+    const data = await axios.get(`${API_URL}/api/product/home`, config);
+    console.log(data.data.categories);
+    dispatch({ type: GET_PRODUCTS_CATEGORY_SUCCESS, payload: data.data.categories });
+  }catch(err){
+    dispatch({
+      type: GET_PRODUCTS_CATEGORY_FAILURE,
+      payload: err.response?.data?.message || "Something went wrong",
+    });
+  }
+}

@@ -20,13 +20,13 @@ const Navbar = () => {
       {/* Top Navbar */}
       <nav className="bg-[#F1C542] text-white shadow-md fixed top-0 left-0 w-full h-16 z-50 px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/admin/admin" className="text-white text-lg font-semibold cursor-pointer">
+        <Link to="/" className="text-white text-lg font-semibold cursor-pointer">
           <img src={Logo} alt="brand" className="w-12 h-12" />
         </Link>
 
         {/* Navigation Links - Desktop View */}
         <div className="hidden md:flex space-x-6 transition-all duration-300">
-        <NavLink to="/" text="Dashboard" path={location.pathname} mobile onClick={() => setIsOpen(false)} /> 
+        <NavLink to="/admin/admin" text="Dashboard" path={location.pathname} mobile onClick={() => setIsOpen(false)} /> 
           <NavLink to="/admin/orders" text="Orders" path={location.pathname} />
           <NavLink to="/admin/category" text="Category" path={location.pathname} />
           <NavLink to="/admin/products" text="Products" path={location.pathname} />

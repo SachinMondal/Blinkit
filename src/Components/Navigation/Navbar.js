@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import SignUp from "../../customer/auth/SignUp";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../images/logo.png"
-
+import { getCategoriesAndSubCategories } from "../../redux/state/category/Action";
+import { useDispatch, useSelector } from "react-redux";
 export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin }) {
+  const dispatch=useDispatch();
+  const categories = useSelector((state) => state.category.categories);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -37,20 +40,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const categories = [
-    {
-      name: "Electronics",
-      products: ["Laptops", "Mobile Phones", "Headphones", "Smart Watches"],
-    },
-    {
-      name: "Fashion",
-      products: ["Men's Wear", "Women's Wear", "Footwear", "Accessories"],
-    },
-    {
-      name: "Home & Kitchen",
-      products: ["Furniture", "Kitchenware", "Home Decor", "Lighting"],
-    },
-  ];
+ useEffect(()=>{
+  dispatch(getCategoriesAndSubCategories());
+ })
   const [activeCategory, setActiveCategory] = useState(null);
 
   const handleCategoryClick = (categoryName) => {
@@ -221,51 +213,52 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
       >
         {isMobile
           ? categories
-              .flatMap((category) =>
-                category.products.map((product) => ({
-                  product,
-                  categoryName: category.name,
-                }))
-              )
-              .map(({ product }, idx) => (
-                <div
-                  key={`${product}-${idx}`}
-                  onClick={() => handleCategorySelection(product)}
-                  className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
-                    selectedCategory === product
-                      ? "bg-green-600 border-b-4 border-green-950 text-white"
-                      : "bg-white"
-                  }`}
-                >
-                  <Link to={`/category/${product}`}>{product}</Link>
-                </div>
-              ))
-          : categories.map((category, index) => (
-              <div key={index} className="relative cursor-pointer group">
-                <div className="inline-flex items-center">
-                  <span
-                    className={`font-semibold px-4 py-2 cursor-pointer transition-all duration-300`}
-                  >
-                    {category.name}
+          ?.filter((category) => category.isVisible === true) // Show only visible categories
+          .flatMap((category) => category.subcategories.map((sub) => sub.name)) // Extract only subcategory names
+          .map((cat, idx) => (
+            <div
+              key={`${cat}-${idx}`}
+              onClick={() => handleCategorySelection(cat)}
+              className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
+                selectedCategory === cat
+                  ? "bg-green-600 border-b-4 border-green-950 text-white"
+                  : "bg-white"
+              }`}
+            >
+              <Link to={`/category/${cat}`}>{cat}</Link>
+            </div>
+          ))
+          :categories
+          .filter((category) => category.isVisible === true)
+          .map((category) => (
+            <div key={category._id} className="relative cursor-pointer group">
+              {/* Parent Category Name */}
+              <div className="inline-flex items-center">
+                <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
+                  {category.name}
+                  {category.subcategories.length > 0 && (
                     <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
-                  </span>
-                </div>
-
-                {/* Dropdown menu */}
+                  )}
+                </span>
+              </div>
+          
+              {/* Subcategory Dropdown */}
+              {category.subcategories.length > 0 && (
                 <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
-                  {category.products.map((product, idx) => (
-                    <button
-                      key={idx}
+                  {category.subcategories.map((sub) => (
+                    <Link
+                      key={sub._id}
+                      to={`/${category.name}/${sub.name}`} // Link structure
                       className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
                     >
-                      <Link to={`/${category.name}/${product}`}>{product}</Link>
-                    </button>
+                      {sub.name}
+                    </Link>
                   ))}
                 </div>
-              </div>
-            ))}
-      </div>
-
+              )}
+            </div>
+          ))}
+          </div>
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform rounded-r-xl z-44 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -281,39 +274,42 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
           </button>
         </div>
         <nav className="p-4 space-y-2">
-          {categories.map((category, index) => (
-            <div key={index} className="border-b">
-              <p
-                className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
-                onClick={() => handleCategoryClick(category.name)}
-              >
-                {category.name}
-                <i
-                  className={`fa-solid fa-chevron-down transition-transform ${
-                    activeCategory === category.name ? "rotate-180" : "rotate-0"
-                  }`}
-                ></i>
-              </p>
-              <ul
-                className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
-                  activeCategory === category.name
-                    ? "max-h-40 opacity-100"
-                    : "max-h-0 opacity-0"
-                }`}
-                onClick={() => setIsSidebarOpen(false)}
-              >
-                {category.products.map((product, idx) => (
-                  <li
-                    key={idx}
-                    className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
-                  >
-                    <Link to={`/${category.name}/${product}`}>{product}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+  {categories
+    .map((category, index) => (
+      <div key={index} className="border-b">
+        <p
+          className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
+          onClick={() => handleCategoryClick(category.name)}
+        >
+          {category.name}
+          <i
+            className={`fa-solid fa-chevron-down transition-transform ${
+              activeCategory === category.name ? "rotate-180" : "rotate-0"
+            }`}
+          ></i>
+        </p>
+        <ul
+          className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
+            activeCategory === category.name
+              ? "max-h-40 opacity-100"
+              : "max-h-0 opacity-0"
+          }`}
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          {category.subcategories.map((cat, idx) => (
+            <li
+              key={idx}
+              className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
+            >
+              <Link to={`/${category.name}/${cat.name}`}>{cat.name}</Link>
+            </li>
           ))}
-        </nav>
+        </ul>
+      </div>
+    ))}
+</nav>
+
+
         {isAdmin &&
             <div>
             <Link to={'/admin/admin'}>Admin</Link>

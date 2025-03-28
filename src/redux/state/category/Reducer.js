@@ -14,6 +14,9 @@ import {
     CATEGORY_DELETE_REQUEST,
     CATEGORY_DELETE_SUCCESS,
     CATEGORY_DELETE_FAIL,
+    CATEGORY_AND_SUBCATEGORY_FAIL,
+    CATEGORY_AND_SUBCATEGORY_SUCCESS,
+    CATEGORY_AND_SUBCATEGORY_REQUEST,
 } from "./ActionType";
 
 const initialState = {
@@ -30,6 +33,7 @@ export const categoryReducer = (state = initialState, action) => {
         case CATEGORY_ADD_REQUEST:
         case CATEGORY_UPDATE_REQUEST:
         case CATEGORY_DELETE_REQUEST:
+        case CATEGORY_AND_SUBCATEGORY_REQUEST:
             return { ...state, loading: true, error: null };
 
         case CATEGORY_LIST_SUCCESS:
@@ -64,12 +68,15 @@ export const categoryReducer = (state = initialState, action) => {
                 loading: false,
                 categories: (state.categories || []).filter((cat) => cat._id !== action.payload),
             };
-
+        case CATEGORY_AND_SUBCATEGORY_SUCCESS:{
+            return {...state, loading: false, categories: action.payload };
+        }
         case CATEGORY_LIST_FAIL:
         case CATEGORY_DETAILS_FAIL:
         case CATEGORY_ADD_FAIL:
         case CATEGORY_UPDATE_FAIL:
         case CATEGORY_DELETE_FAIL:
+        case CATEGORY_AND_SUBCATEGORY_FAIL:
             return { ...state, loading: false, error: action.payload };
 
         default:

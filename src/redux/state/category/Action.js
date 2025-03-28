@@ -15,11 +15,12 @@ import {
   CATEGORY_DELETE_REQUEST,
   CATEGORY_DELETE_SUCCESS,
   CATEGORY_DELETE_FAIL,
+  CATEGORY_AND_SUBCATEGORY_REQUEST,
+  CATEGORY_AND_SUBCATEGORY_FAIL,
+  CATEGORY_AND_SUBCATEGORY_SUCCESS,
 } from "./ActionType";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-
-// 🔹 Fetch All Categories (GET)
 export const fetchCategories = () => async (dispatch, getState) => {
   try {
     dispatch({ type: CATEGORY_LIST_REQUEST });
@@ -38,7 +39,6 @@ export const fetchCategories = () => async (dispatch, getState) => {
   }
 };
 
-// 🔹 Fetch Single Category (GET by ID)
 export const fetchCategoryById = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: CATEGORY_DETAILS_REQUEST });
@@ -58,7 +58,6 @@ export const fetchCategoryById = (id) => async (dispatch, getState) => {
   }
 };
 
-// 🔹 Add New Category (POST)
 export const addCategory = (categoryData) => async (dispatch, getState) => {
   try {
     dispatch({ type: CATEGORY_ADD_REQUEST });
@@ -79,7 +78,7 @@ export const addCategory = (categoryData) => async (dispatch, getState) => {
   }
 };
 
-// 🔹 Update Category (PUT)
+
 export const updateCategory =
   (id, categoryData) => async (dispatch, getState) => {
     try {
@@ -107,7 +106,7 @@ export const updateCategory =
     }
   };
 
-// 🔹 Delete Category (DELETE)
+
 export const deleteCategory = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: CATEGORY_DELETE_REQUEST });
@@ -128,3 +127,22 @@ export const deleteCategory = (id) => async (dispatch, getState) => {
     });
   }
 };
+
+export const getCategoriesAndSubCategories= ()=>async (dispatch, getState)=>{
+  try{
+    dispatch({type:CATEGORY_AND_SUBCATEGORY_REQUEST});
+    const token = getState().auth.token;
+    const data = await axios.get(`${API_URL}/api/category/get`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    dispatch({type:CATEGORY_AND_SUBCATEGORY_SUCCESS, payload: data.data.data});
+
+  }catch(error){
+    dispatch({
+      type: CATEGORY_AND_SUBCATEGORY_FAIL,
+      payload: error.response?.data?.message || "Something went wrong",
+    });
+  }
+}
