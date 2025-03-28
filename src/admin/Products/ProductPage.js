@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProducts, deleteProduct } from "../../redux/state/product/Action";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([
-    { id: 1, name: "Apple", category: "Fruits", price: "$2.99", stock: 50 },
-    { id: 2, name: "Tomato", category: "Vegetables", price: "$1.49", stock: 100 },
-    { id: 3, name: "Milk", category: "Dairy", price: "$3.49", stock: 30 },
-  ]);
+  const dispatch = useDispatch();
+
+  // Get products from Redux store
+  const { products, loading } = useSelector((state) => state.product);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+
+  // Fetch products when component mounts
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
 
   // Open modal with selected product
   const handleDeleteClick = (product) => {
@@ -20,7 +27,11 @@ const ProductsPage = () => {
 
   // Confirm delete
   const confirmDelete = () => {
-    setProducts(products.filter((p) => p.id !== productToDelete.id));
+    if (productToDelete?._id) {
+      dispatch(deleteProduct(productToDelete._id)).then(() => {
+        dispatch(getAllProducts()); 
+      });
+    }
     setIsModalOpen(false);
   };
 
@@ -37,6 +48,10 @@ const ProductsPage = () => {
         </button>
       </div>
 
+      {/* Show Loading/Error */}
+      {loading && <p className="text-center text-lg">Loading products...</p>}
+    
+
       {/* Products Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full border-collapse">
@@ -50,18 +65,20 @@ const ProductsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {products.length > 0 ? (
+            {Array.isArray(products) && products.length > 0 ? (
               products.map((product) => (
-                <tr key={product.id} className="border-b hover:bg-gray-50">
+                <tr key={product._id} className="border-b hover:bg-gray-50">
                   <td className="p-4 text-lg">{product.name}</td>
-                  <td className="p-4">{product.category}</td>
+                  <td className="p-4">
+                    {typeof product.category === "object" ? product.category.name : product.category}
+                  </td>
                   <td className="p-4">{product.price}</td>
                   <td className="p-4">{product.stock}</td>
                   <td className="p-4 flex justify-center space-x-4">
-                    <Link to={`/admin/products/${product.id}`} className="text-blue-600 hover:underline">
+                    <Link to={`/admin/products/${product._id}`} className="text-blue-600 hover:underline">
                       View
                     </Link>
-                    <Link to={`/admin/products/editProduct/${product.id}`} className="text-yellow-600 hover:underline">
+                    <Link to={`/admin/products/editProduct/${product._id}`} className="text-yellow-600 hover:underline">
                       Edit
                     </Link>
                     <button
