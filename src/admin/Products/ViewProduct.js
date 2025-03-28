@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductById } from "../../redux/state/product/Action";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 
 const ViewProduct = () => {
   const { id } = useParams();
@@ -36,7 +37,7 @@ const ViewProduct = () => {
         <div className="bg-white shadow-lg p-6 rounded-lg max-w-4xl mx-auto">
           {/* Product Image */}
           <div className="flex justify-center mb-6">
-            <img
+            <LazyImage
               src={product?.image}
               alt={product?.name}
               className="w-64 h-64 object-cover rounded-lg shadow-md"

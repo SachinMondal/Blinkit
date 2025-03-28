@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addCategory } from "../../redux/state/category/Action";
+import { addCategory, fetchCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 import { CircularProgress } from "@mui/material";
 
@@ -8,6 +8,7 @@ const AddCategory = () => {
   const navigate = useNavigate();
   const dispatch=useDispatch();
   const [step, setStep] = useState(1);
+  const categories = useSelector((state) => state.category.categories || []);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -32,7 +33,9 @@ const AddCategory = () => {
   const handleImageUpload = (e) => {
     setFormData({ ...formData, image: e.target.files[0] });
   };
-
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
   const handleSubmit = async () => {
     try {
       const categoryData = new FormData();
@@ -41,15 +44,14 @@ const AddCategory = () => {
       categoryData.append("seoTitle", formData.seoTitle);
       categoryData.append("seoDescription", formData.seoDescription);
       categoryData.append("isVisible", formData.isVisible ? "true" : "false"); 
-      
-      // ✅ Fix: Do NOT send "null" as a string. Send an empty value properly
+  
+      // ✅ Fix: Ensure ID is passed instead of name
       if (formData.parentCategory) {
-        categoryData.append("parentCategory", formData.parentCategory);
+        categoryData.append("parentCategory", formData.parentCategory); // This is now an ID
       }
   
       if (formData.image) categoryData.append("image", formData.image);
   
-      // ✅ Fix: Send `attributes` as an object, not a string
       Object.entries(formData.attributes).forEach(([key, value]) => {
         categoryData.append(`attributes[${key}]`, value);
       });
@@ -60,6 +62,7 @@ const AddCategory = () => {
       console.error(error);
     }
   };
+  
   
   
   const handleAttribute = (e) => {
@@ -222,20 +225,24 @@ const AddCategory = () => {
 
           {/* Parent Category Section */}
           <div>
-            <label className="block text-sm sm:text-lg font-medium text-gray-700">
-              Parent Category
-            </label>
-            <select
-              name="parentCategory"
-              value={formData.parentCategory}
-              onChange={handleChange}
-              className="w-full mt-2 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
-            >
-              <option value="">None</option>
-              <option value="Fruits">Fruits</option>
-              <option value="Vegetables">Vegetables</option>
-            </select>
-          </div>
+  <label className="block text-sm sm:text-lg font-medium text-gray-700">
+    Parent Category
+  </label>
+  <select
+    name="parentCategory"
+    value={formData.parentCategory}
+    onChange={handleChange}
+    className="w-full mt-2 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+  >
+    <option value="">None</option>
+    {categories.map((category) => (
+      <option key={category._id} value={category._id}>
+        {category.name} 
+      </option>
+    ))}
+  </select>
+</div>
+
         </div>
       )}
 

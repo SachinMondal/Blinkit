@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 const steps = [
   "Add Product",
   "Basic Details",
@@ -180,7 +181,7 @@ const AddProduct = () => {
               />
               {formData.image && (
                 <div>
-                  <img
+                  <LazyImage
                     src={
                       typeof formData.image === "string"
                         ? formData.image

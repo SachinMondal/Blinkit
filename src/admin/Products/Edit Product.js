@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductById, updateProduct } from "../../redux/state/product/Action";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 
 const EditProduct = () => {
   const { id } = useParams();
@@ -176,7 +177,7 @@ const EditProduct = () => {
         <label className="block font-semibold mb-2">Product Image</label>
         <div className="flex items-center gap-4">
           {formData.imagePreview || formData.image ? (
-            <img
+            <LazyImage
               src={formData.imagePreview || formData.image}
               alt="Product"
               className="w-32 h-32 object-cover rounded shadow"

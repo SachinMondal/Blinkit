@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { addProduct } from "../../redux/state/product/Action";
 import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 
 const Summary = () => {
   const location = useLocation();
@@ -60,7 +61,7 @@ const Summary = () => {
       <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-6">
         {imagePreview && (
           <div className="mb-6 flex justify-center">
-            <img
+            <LazyImage
               src={imagePreview}
               alt="Product Preview"
               className="w-48 h-48 object-cover rounded-md shadow-md border"
