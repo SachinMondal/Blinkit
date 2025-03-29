@@ -42,7 +42,7 @@ export const addProduct = (productData) => async (dispatch, getState) => {
     const config = getAuthHeaders(getState, true); // Set multipart/form-data
 
     const { data } = await axios.post(`${API_URL}/api/product/add`, productData, config);
-    console.log(data);
+
 
     dispatch({ type: ADD_PRODUCT_SUCCESS, payload: data });
   } catch (error) {
@@ -71,11 +71,8 @@ export const getAllProducts = () => async (dispatch, getState) => {
 
 export const getProductById = (id) => async (dispatch, getState) => {
   try {
-
     dispatch({ type: GET_PRODUCT_BY_ID_REQUEST });
-
-    const config = getAuthHeaders(getState);
-    const  data  = await axios.get(`${API_URL}/api/product/${id}`, config);
+    const  data  = await axios.get(`${API_URL}/api/product/${id}`);
     dispatch({ type: GET_PRODUCT_BY_ID_SUCCESS, payload: data.data.data });
   } catch (error) {
     dispatch({
@@ -106,8 +103,7 @@ export const updateProduct = (id, productData) => async (dispatch, getState) => 
   try {
     dispatch({ type: UPDATE_PRODUCT_REQUEST });
     const config = getAuthHeaders(getState, true); 
-    const data  = await axios.put(`${API_URL}/api/product/update/${id}`, productData, config);
-    console.log(data);
+    const data  = await axios.put(`${API_URL}/api/product/update/${id}`, productData, config)
 
     dispatch({ type: UPDATE_PRODUCT_SUCCESS, payload: data });
   } catch (error) {
@@ -140,7 +136,6 @@ export const getCategoryProduct=()=>async(dispatch ,getState)=>{
     dispatch({type: GET_PRODUCTS_CATEGORY_REQUEST});
     const config = getAuthHeaders(getState);
     const data = await axios.get(`${API_URL}/api/product/home`, config);
-    console.log(data.data.categories);
     dispatch({ type: GET_PRODUCTS_CATEGORY_SUCCESS, payload: data.data.categories });
   }catch(err){
     dispatch({

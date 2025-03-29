@@ -17,11 +17,15 @@ import {
     CATEGORY_AND_SUBCATEGORY_FAIL,
     CATEGORY_AND_SUBCATEGORY_SUCCESS,
     CATEGORY_AND_SUBCATEGORY_REQUEST,
+    CATEGORY_AND_PRODUCT_FAIL,
+    CATEGORY_AND_PRODUCT_SUCCESS,
+    CATEGORY_AND_PRODUCT_REQUEST,
 } from "./ActionType";
 
 const initialState = {
     categories: [],
     category: null,
+    categoryAndProduct:[],
     loading: false,
     error: null,
 };
@@ -34,6 +38,7 @@ export const categoryReducer = (state = initialState, action) => {
         case CATEGORY_UPDATE_REQUEST:
         case CATEGORY_DELETE_REQUEST:
         case CATEGORY_AND_SUBCATEGORY_REQUEST:
+        case CATEGORY_AND_PRODUCT_REQUEST:
             return { ...state, loading: true, error: null };
 
         case CATEGORY_LIST_SUCCESS:
@@ -61,7 +66,8 @@ export const categoryReducer = (state = initialState, action) => {
                     cat._id === action.payload._id ? action.payload : cat
                 ),
             };
-
+        case CATEGORY_AND_PRODUCT_SUCCESS:
+            return {...state, loading: false, categoryAndProduct: action.payload };
         case CATEGORY_DELETE_SUCCESS:
             return {
                 ...state,
@@ -69,7 +75,11 @@ export const categoryReducer = (state = initialState, action) => {
                 categories: (state.categories || []).filter((cat) => cat._id !== action.payload),
             };
         case CATEGORY_AND_SUBCATEGORY_SUCCESS:{
-            return {...state, loading: false, categories: action.payload };
+            return {
+                ...state,
+                loading: false,
+                categories: Array.isArray(action.payload) ? action.payload : [],
+            };
         }
         case CATEGORY_LIST_FAIL:
         case CATEGORY_DETAILS_FAIL:
@@ -77,6 +87,7 @@ export const categoryReducer = (state = initialState, action) => {
         case CATEGORY_UPDATE_FAIL:
         case CATEGORY_DELETE_FAIL:
         case CATEGORY_AND_SUBCATEGORY_FAIL:
+        case CATEGORY_AND_PRODUCT_FAIL:
             return { ...state, loading: false, error: action.payload };
 
         default:

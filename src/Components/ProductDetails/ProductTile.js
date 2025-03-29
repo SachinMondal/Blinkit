@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 
-const ProductTile = ({ product }) => {
+const ProductTile = ({ product,onClick }) => {
   const { name, image, price, discount, quantity, variants } = product;
 
   const [count, setCount] = useState(0);
@@ -25,9 +25,9 @@ const ProductTile = ({ product }) => {
   };
 
   return (
-    <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative">
+    <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative" >
       {/* Product Image with Discount Tag */}
-      <div className="w-full h-20 bg-gray-100 flex justify-center items-center relative">
+      <div className="w-full h-20 bg-gray-100 flex justify-center items-center relative" onClick={onClick}>
         <LazyImage
           src={image}
           alt={name}

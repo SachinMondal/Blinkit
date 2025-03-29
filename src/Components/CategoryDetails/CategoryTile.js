@@ -1,7 +1,7 @@
 import React from "react";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 
-const ProductTile = ({ image, name, discount ,onClick}) => {
+const CategoryTile = ({ image, name, discount ,onClick}) => {
   return (
     <div className="relative rounded-lg overflow-hidden shadow-sm w-[140px] cursor-pointer" onClick={onClick}>
       {/* Discount Tag */}
@@ -24,4 +24,4 @@ const ProductTile = ({ image, name, discount ,onClick}) => {
   );
 };
 
-export default ProductTile;
+export default CategoryTile;

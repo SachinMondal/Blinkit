@@ -18,6 +18,9 @@ import {
   CATEGORY_AND_SUBCATEGORY_REQUEST,
   CATEGORY_AND_SUBCATEGORY_FAIL,
   CATEGORY_AND_SUBCATEGORY_SUCCESS,
+  CATEGORY_AND_PRODUCT_REQUEST,
+  CATEGORY_AND_PRODUCT_SUCCESS,
+  CATEGORY_AND_PRODUCT_FAIL,
 } from "./ActionType";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -145,4 +148,17 @@ export const getCategoriesAndSubCategories= ()=>async (dispatch, getState)=>{
       payload: error.response?.data?.message || "Something went wrong",
     });
   }
+}
+
+export const getCategoryAndProduct=(categoryId)=>async(dispatch,getState)=>{
+  try{
+    dispatch({type:CATEGORY_AND_PRODUCT_REQUEST});
+    const data = await axios.get(`${API_URL}/api/category/subAndProd/${categoryId}`);
+    dispatch({type: CATEGORY_AND_PRODUCT_SUCCESS, payload: data.data});
+}catch(error){
+  dispatch({
+    type: CATEGORY_AND_PRODUCT_FAIL,
+    payload: error.response?.data?.message || "Something went wrong",
+  });
+}
 }

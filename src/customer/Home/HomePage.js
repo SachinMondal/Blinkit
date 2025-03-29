@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading.js";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProduct } from "../../redux/state/product/Action.js";
+import { getBanners } from "../../redux/state/home/Action.js";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,10 @@ const HomePage = () => {
   const category = useSelector((state) => state.category.categories);
   const data = useSelector((state) => state.product.categories);
   const loading = useSelector((state) => state.product.loading);
-
+  const banners = useSelector((state) => state.banner.banners||[]);
+  useEffect(()=>{
+    dispatch(getBanners());
+  },[dispatch,banners.length]);
   useEffect(() => {
     if (!category.length) {
       dispatch(getCategoryProduct());
@@ -41,12 +45,6 @@ const HomePage = () => {
   }, []);
 
 
-
-  const images = [
-    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-    "https://i.pinimg.com/originals/db/d4/d1/dbd4d1c40f3a03ffd7108cf099f5c6d8.jpg",
-  ];
 
   const sliderSettings = {
     dots: true,
@@ -87,11 +85,11 @@ const HomePage = () => {
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           <Slider {...sliderSettings}>
-            {images.map((img, index) => (
+            {banners && banners?.data?.map((img, index) => (
               <div key={index} className="flex justify-center max-w-7xl mx-auto px-4">
                 <LazyImage
-                  src={img}
-                  alt={`Slide ${index}`}
+                  src={img.image}
+                  alt={img.alt}
                   className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
                 />
               </div>
@@ -106,7 +104,7 @@ const HomePage = () => {
                   image={item.image}
                   name={item.name}
                   discount={40}
-                  onClick={() => handleCategoryClick(item.name)}
+                  onClick={() => handleCategoryClick(item._id)}
                 />
               ))}
             </Slider>

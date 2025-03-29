@@ -57,7 +57,6 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
     }
     handleCategoryClick(categoryName);
   };
-
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
@@ -213,8 +212,8 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
       >
         {isMobile
           ? categories
-          ?.filter((category) => category.isVisible === true) // Show only visible categories
-          .flatMap((category) => category.subcategories.map((sub) => sub.name)) // Extract only subcategory names
+          ?.filter((category) => category.isVisible === true) 
+          .flatMap((category) => category.subcategories.map((sub) => sub.name)) 
           .map((cat, idx) => (
             <div
               key={`${cat}-${idx}`}

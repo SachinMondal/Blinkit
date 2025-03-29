@@ -4,161 +4,20 @@ import { ChevronUp } from "lucide-react";
 import ProductTile from "../ProductDetails/ProductTile";
 import emptyCategory from "../../images/emptyCategory.jpg";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
-// Sample categories and products data
-const mockCategories = [
-  {
-    id: 1,
-    name: "Electronics",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 2,
-    name: "Clothing",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 3,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 4,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 5,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 6,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 7,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 8,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 9,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-  {
-    id: 10,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-
-  {
-    id: 11,
-    name: "Books",
-    image:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-  },
-];
-
-const mockProducts = {
-  Electronics: [
-    {
-      id: 1,
-      name: "Laptop",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 800,
-    },
-    {
-      id: 2,
-      name: "Smartphone",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 500,
-    },
-    {
-      id: 3,
-      name: "Headphones",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 150,
-    },
-  ],
-  Clothing: [
-    {
-      id: 4,
-      name: "T-Shirt",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 20,
-    },
-    {
-      id: 5,
-      name: "Jeans",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 40,
-    },
-    {
-      id: 6,
-      name: "Jacket",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 80,
-    },
-  ],
-  Books: [
-    {
-      id: 7,
-      name: "Novel",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 15,
-    },
-    {
-      id: 8,
-      name: "Textbook",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 50,
-    },
-    {
-      id: 9,
-      name: "Magazine",
-      image:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-      price: 10,
-    },
-  ],
-};
+import { getCategoryAndProduct } from "../../redux/state/category/Action";
+import { useDispatch, useSelector } from "react-redux";
 
 const CategoryPage = () => {
   const { category } = useParams();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState(
-    category || "Electronics"
+  const dispatch = useDispatch();
+  const categories = useSelector(
+    (state) => state.category.categoryAndProduct || []
   );
-  const [sortedProducts, setSortedProducts] = useState(
-    mockProducts[selectedCategory]?.length
-      ? [...mockProducts[selectedCategory]]
-      : []
-  );
-
+  useEffect(() => {
+    dispatch(getCategoryAndProduct(category));
+  }, [dispatch, categories.length, category]);
+  const [selectedCategory, setSelectedCategory] = useState(categories.name || "");
   const containerRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -168,18 +27,6 @@ const CategoryPage = () => {
     setSortOrder(order);
     setShowDropdown(false);
   };
-  useEffect(() => {
-    if (mockProducts[selectedCategory]) {
-      setSortedProducts(
-        [...mockProducts[selectedCategory]].sort((a, b) =>
-          sortOrder === "asc" ? a.price - b.price : b.price - a.price
-        )
-      );
-    } else {
-      setSortedProducts([]);
-    }
-  }, [selectedCategory, sortOrder]);
-
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 200) {
@@ -196,28 +43,23 @@ const CategoryPage = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
   return (
     <div className="max-w-5xl mx-auto p-4 flex flex-row flex-wrap">
       {/* Global Check: If categories or products are empty */}
-      {!mockCategories ||
-      mockCategories.length === 0 ||
-      !sortedProducts ||
-      sortedProducts.length === 0 ? (
+      {categories.length > 0 ? (
         <div className="w-full flex flex-col items-center justify-center min-h-screen">
           <LazyImage src={emptyCategory} alt="Empty" className="w-48 h-48" />
-
         </div>
       ) : (
         <>
           {/* Left Sidebar - Categories */}
           <div className="w-1/4 min-w-[4rem] border-r p-4 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
             <ul className="flex flex-col w-full">
-              {mockCategories.map((cat, index) => (
-                <div key={cat.id}>
+              {categories?.subcategories?.map((cat, index) => (
+                <div key={cat._id}>
                   <li
                     className={`p-2 cursor-pointer rounded flex flex-col items-left md:items-center relative md:flex-row w-full ${
                       selectedCategory === cat.name
@@ -244,7 +86,7 @@ const CategoryPage = () => {
                       </span>
                     </div>
                   </li>
-                  {index !== mockCategories.length - 1 && (
+                  {index !== categories.length - 1 && (
                     <hr className="border-gray-300 my-2" />
                   )}
                 </div>
@@ -315,16 +157,11 @@ const CategoryPage = () => {
 
             {/* Sorted Product List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {sortedProducts.map((product, index) => (
-                <ProductTile
-                  key={index}
-                  image={product.image}
-                  name={product.name}
-                  quantity={30}
-                  price={product.price}
-                  onClick={() => handleProductClick(product.id)}
-                />
-              ))}
+              {categories?.subcategories?.flatMap((subcategory) =>
+                subcategory.products?.map((product, index) => (
+                  <ProductTile key={product._id || index} product={product} onClick={()=>handleProductClick(product._id)} />
+                ))
+              )}
             </div>
           </div>
 

@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import emptyProduct from "../../images/emptyProduct.jpg";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
+import { getProductById } from "../../redux/state/product/Action";
+import { useDispatch, useSelector } from "react-redux";
 const ProductPage = () => {
   const { productId } = useParams();
+  const dispatch = useDispatch();
   const [count, setCount] = useState(0);
+  const product = useSelector((state) => state.product.product);
+
+
   const handleAdd = (e) => {
     e.stopPropagation();
     setCount(1);
@@ -21,80 +27,11 @@ const ProductPage = () => {
   };
   
 
-  const mockProducts = {
-    Electronics: [
-      {
-        id: 1,
-        name: "Laptop",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 800,
-      },
-      {
-        id: 2,
-        name: "Smartphone",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 500,
-      },
-      {
-        id: 3,
-        name: "Headphones",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 150,
-      },
-    ],
-    Clothing: [
-      {
-        id: 4,
-        name: "T-Shirt",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 20,
-      },
-      {
-        id: 5,
-        name: "Jeans",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 40,
-      },
-      {
-        id: 6,
-        name: "Jacket",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 80,
-      },
-    ],
-    Books: [
-      {
-        id: 7,
-        name: "Novel",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 15,
-      },
-      {
-        id: 8,
-        name: "Textbook",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 50,
-      },
-      {
-        id: 9,
-        name: "Magazine",
-        image:
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg",
-        price: 10,
-      },
-    ],
-  };
-  const product = Object.values(mockProducts)
-    .flat()
-    .find((p) => p.id === Number(productId));
+  useEffect(() => {
+    if (productId) {
+      dispatch(getProductById(productId));
+    }
+  }, [dispatch, productId]);
 
   if (!product) {
     return (
@@ -112,11 +49,6 @@ const ProductPage = () => {
     );
   }
 
-  // Find the category of the product
-  const category = Object.keys(mockProducts).find((category) =>
-    mockProducts[category].some((p) => p.id === product.id)
-  );
-
   return (
     <div className="p-6">
     <div className="flex flex-col lg:flex-row items-start lg:space-x-6">
@@ -124,27 +56,27 @@ const ProductPage = () => {
       {/* Breadcrumbs - Now at the Top in Mobile View */}
       <div className="mb-4 text-sm text-gray-600 w-full lg:hidden text-left">
         <Link to="/" className="text-blue-500 hover:underline">Home</Link> &gt;{" "}
-        <Link to={`/category/${category}`} className="text-blue-500 hover:underline">{category}</Link> &gt;{" "}
-        <span className="text-gray-900">{product.name}</span>
+        <Link to={`/category/${product?.category.id}`} className="text-blue-500 hover:underline">{product?.category.name}</Link> &gt;{" "}
+        <span className="text-gray-900">{product?.name}</span>
       </div>
   
       {/* Left Section (Product Image & Details) */}
       <div className="w-full lg:w-1/2 p-4 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
         <LazyImage
-          src={product.image}
-          alt={product.name}
+          src={product?.image}
+          alt={product?.name}
           className="w-full max-h-96 object-contain rounded-lg"
         />
         <div className="mt-4 p-2 border-t">
           <h2 className="text-xl font-semibold">Product Details</h2>
-          <h5 className="text-xl font-semibold">{product.name}</h5>
+          <h5 className="text-xl font-semibold">{product?.name}</h5>
           <p className="text-gray-700 mt-2">
-            Price: ${product.price}
+            Price: ${product?.price}
             <br />
             <br />
             Description:
             <br />
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit...
+            {product?.description}
           </p>
         </div>
       </div>
@@ -152,18 +84,18 @@ const ProductPage = () => {
       {/* Right Section (Product Details & Reviews) */}
       <div className="w-full lg:w-1/2">
         {/* Breadcrumbs for Larger Screens */}
-        <div className="mb-4 text-sm text-gray-600 hidden lg:block">
+        <div className="mb-4 text-sm text-gray-600 hidden lg:block text-left">
           <Link to="/" className="text-blue-500 hover:underline">Home</Link> &gt;{" "}
-          <Link to={`/category/${category}`} className="text-blue-500 hover:underline">{category}</Link> &gt;{" "}
-          <span className="text-gray-900">{product.name}</span>
+          <Link to={`/category/${product?.category._id}`} className="text-blue-500 hover:underline">{product?.category?.name}</Link> &gt;{" "}
+          <span className="text-gray-900">{product?.name}</span>
         </div>
   
         {/* Product Details Section */}
         <div className="p-6 border-b">
-          <h2 className="text-2xl font-bold">{product.name}</h2>
-          <p className="text-lg text-gray-700 mt-2">Category: {category}</p>
+          <h2 className="text-2xl font-bold">{product?.name}</h2>
+          <p className="text-lg text-gray-700 mt-2">Category: {product?.category?.name}</p>
           <div className="flex items-center justify-between space-x-4">
-            <p className="text-xl font-semibold mt-4">Price: ${product.price}</p>
+            <p className="text-xl font-semibold mt-4">Price: ${product?.price}</p>
             {count === 0 ? (
               <button
                 onClick={handleAdd}
