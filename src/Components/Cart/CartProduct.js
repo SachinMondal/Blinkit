@@ -3,8 +3,8 @@ import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 
 const CartProduct = ({ item, onQuantityChange }) => {
-  const [quantity, setQuantity] = useState(item.qty);
-
+  const [quantity, setQuantity] = useState(item.variantDetails.qty);
+  const price=item.variantDetails.price;
   const handleIncrease = () => {
     const newQty = quantity + 1;
     setQuantity(newQty);
@@ -20,17 +20,17 @@ const CartProduct = ({ item, onQuantityChange }) => {
   };
 
   // Product total price
-  const itemTotal = item.price * quantity;
+  const itemTotal = price * quantity;
 
   return (
     <div className="border rounded-lg shadow-sm bg-white p-4 w-72 h-40">
       {/* Product Details */}
       <div className="flex items-center space-x-3">
-        <LazyImage src={item.image} alt={item.name} className="w-14 h-14 rounded-md object-contain" />
+        <LazyImage src={item.productId.image} alt={item.productId.name} className="w-14 h-14 rounded-md object-contain" />
 
         <div className="flex-1">
-          <h3 className="text-sm font-semibold">{item.name}</h3>
-          <p className="text-xs text-gray-600">₹{item.price} each</p>
+          <h3 className="text-sm font-semibold">{item.productId.name}</h3>
+          <p className="text-xs text-gray-600">₹{item.variantDetails.price} each</p>
         </div>
 
         {/* Quantity Control */}
