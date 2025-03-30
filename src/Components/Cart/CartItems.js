@@ -6,7 +6,7 @@ import LazyImage from "../utils/LazyLoading/LazyLoading";
 const CartItem = ({ max = 3 }) => {
   const location = useLocation(); 
   const { cartItems } = useSelector((state) => state.cart);
-  if (!cartItems || cartItems.length === 0 || location.pathname === "/cart") return null;
+  if (!cartItems || cartItems.length === 0 || location.pathname === "/cart" || location.pathname==='/profile') return null;
   return (
     <div className="transform -translate-x-1/2 hover:animate-pulse">
       <button className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-full shadow-md hover:bg-gray-100 transition">

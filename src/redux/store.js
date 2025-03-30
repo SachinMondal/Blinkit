@@ -6,6 +6,7 @@ import { categoryReducer } from "./state/category/Reducer";
 import {productReducer} from "./state/product/Reducer";
 import { bannerReducer } from "./state/home/Reducer";
 import { cartReducer } from "./state/cart/Reducer";
+import addressReducer from "./state/address/Reducer";
 const persistConfig = {
   key: "auth",
   storage, 
@@ -20,6 +21,7 @@ export const store = configureStore({
     product: productReducer,
     banner:bannerReducer,
     cart: cartReducer, 
+    address: addressReducer
   },
 });
 
