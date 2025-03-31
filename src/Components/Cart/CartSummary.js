@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllAddresses } from "../../redux/state/address/Action";
-
+import { createOrder } from "../../redux/state/order/Action";
+import { clearCart } from "../../redux/state/cart/Action";
 const CartSummary = ({ cartItems }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const addresses = useSelector((state) => state.address.addresses);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  
   useEffect(() => {
     dispatch(getAllAddresses());
   }, [dispatch]);
@@ -19,7 +21,6 @@ const CartSummary = ({ cartItems }) => {
     return <p className="text-center text-gray-500">Cart is empty.</p>;
   }
 
-  // Extracting values from cartItems
   const totalItemPrice = cartItems.totalCartAmount || 0;
   const cartSize = cartItems.totalCartSize || 0;
   const discount = cartItems.totalCartDiscountAmount || 0;
@@ -36,6 +37,19 @@ const CartSummary = ({ cartItems }) => {
     setIsAddressModalOpen(true);
   };
 
+  const handleFinalPlaceOrder = async () => {
+    if (!selectedAddress) {
+      console.error("No address selected");
+      return;
+    }
+    setIsPlacingOrder(true);
+    await dispatch(createOrder(cartItems, selectedAddress));
+    setIsPlacingOrder(false);
+    setIsAddressModalOpen(false);
+    setIsSuccessModalOpen(true);
+    dispatch(clearCart());
+  };
+
   return (
     <>
       <div className="border rounded-lg shadow-sm bg-white p-4 w-80 right-0">
@@ -45,11 +59,11 @@ const CartSummary = ({ cartItems }) => {
             <span>Subtotal:</span> <span>₹{totalItemPrice}</span>
           </p>
           <p className="flex justify-between">
-            <span>Discount:</span>{" "}
+            <span>Discount:</span>
             <span className="text-green-500">- ₹{discount}</span>
           </p>
           <p className="flex justify-between">
-            <span>Subtotal after Discount:</span>{" "}
+            <span>Subtotal after Discount:</span>
             <span>₹{discountedTotal}</span>
           </p>
           <p className="flex justify-between">
@@ -74,16 +88,13 @@ const CartSummary = ({ cartItems }) => {
       {isAddressModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-          <button
-        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-        onClick={() => setIsAddressModalOpen(false)}
-      >
-        ✖
-      </button>
-            <h2 className="text-xl font-semibold mb-4">
-              Select Delivery Address
-            </h2>
-
+            <button
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+              onClick={() => setIsAddressModalOpen(false)}
+            >
+              ✖
+            </button>
+            <h2 className="text-xl font-semibold mb-4">Select Delivery Address</h2>
             {addresses.length > 0 ? (
               <ul>
                 {addresses.map((addr) => (
@@ -96,38 +107,21 @@ const CartSummary = ({ cartItems }) => {
                     }`}
                     onClick={() => handleSelectAddress(addr)}
                   >
-                    <div className="grid grid-cols-12 gap-2 md:gap-4 items-center">
-                      {/* Address Icon */}
-                      <div className="col-span-1 flex justify-center items-start">
-                        <i className="fa-solid fa-house-user text-base md:text-xl text-gray-600"></i>
-                      </div>
-
-                      {/* Address Details */}
-                      <div className="col-span-9">
-                        <p className="font-bold">
-                          {addr.firstName} {addr.lastName}
-                        </p>
-                        <p className="text-gray-600">
-                          {addr.streetAddress}, {addr.city}, {addr.state},{" "}
-                          {addr.zipCode}
-                        </p>
-                        <p className="text-gray-500 text-sm">
-                          Mobile: {addr.mobile}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="font-bold">
+                      {addr.firstName} {addr.lastName}
+                    </p>
+                    <p className="text-gray-600">
+                      {addr.streetAddress}, {addr.city}, {addr.state}, {addr.zipCode}
+                    </p>
+                    <p className="text-gray-500 text-sm">Mobile: {addr.mobile}</p>
                   </li>
                 ))}
               </ul>
             ) : (
               <p className="text-gray-500">No saved addresses.</p>
             )}
-
             <div className="flex justify-between mt-4">
-              <button
-                className="bg-gray-500 text-white px-4 py-2 rounded-md"
-                onClick={() => navigate("/profile")}
-              >
+              <button className="bg-gray-500 text-white px-4 py-2 rounded-md" onClick={() => navigate("/profile")}>
                 Add New Address
               </button>
               <button
@@ -135,22 +129,29 @@ const CartSummary = ({ cartItems }) => {
                   selectedAddress ? "" : "opacity-50 cursor-not-allowed"
                 }`}
                 disabled={!selectedAddress}
+                onClick={handleFinalPlaceOrder}
               >
-                Confirm & Place Order
+                {isPlacingOrder ? "Placing Order..." : "Confirm & Place Order"}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-        <h3 className="text-lg font-semibold">Cancellation Policy</h3>
-        <p className="text-gray-600 text-sm mt-2">
-          You can cancel your order within 30 minutes of placing it. After that,
-          a cancellation fee may apply. For further details, please refer to our
-          full cancellation policy.
-        </p>
-      </div>
+      {isSuccessModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-semibold text-center text-green-600">🎉 Order Placed Successfully! 🎉</h2>
+            <p className="text-center mt-2">Thank you for your purchase.</p>
+            <button
+              className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+              onClick={() => { setIsSuccessModalOpen(false); navigate("/profile"); }}
+            >
+              View Orders
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

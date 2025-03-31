@@ -5,9 +5,11 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../images/logo.png"
 import { getCategoriesAndSubCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchCart } from "../../redux/state/cart/Action";
 export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin }) {
   const dispatch=useDispatch();
   const categories = useSelector((state) => state.category.categories);
+  const cartSum=useSelector((state)=>state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -57,6 +59,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
     }
     handleCategoryClick(categoryName);
   };
+  useEffect(()=>{
+    dispatch(fetchCart());
+  },[dispatch,cartSum.length]);
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
@@ -173,7 +178,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
                   className="relative p-2 rounded-full transition"
                 >
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
-                    17
+                    {cartSum.data.totalCartSize}
                   </span>
                   <i className="fa-solid fa-cart-shopping"></i>
                 </Link>

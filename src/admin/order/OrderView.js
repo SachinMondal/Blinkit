@@ -1,44 +1,54 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
+import { getOrderById, updateOrder } from "../../redux/state/order/Action";
 
 const OrderView = () => {
-  const { id } = useParams(); // Get Order ID from URL
-  const [order, setOrder] = useState({
-    id: id,
-    customer: "John Doe",
-    email: "johndoe@example.com",
-    phone: "+1 234 567 890",
-    address: "123 Main St, New York, NY",
-    orderDate: "March 20, 2025 | 12:30 PM",
-    status: "Pending",
-    items: [
-      { name: "Apples", quantity: 2, price: 5.0 },
-      { name: "Milk", quantity: 1, price: 3.5 },
-      { name: "Bread", quantity: 1, price: 2.0 },
-    ],
-    discount: 2.0,
-    deliveryCharge: 3.0,
-  });
-
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const order = useSelector((state) => state.order.order) || {};
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loadingReject, setLoadingReject] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
 
-  const totalPrice = order.items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
-  );
-  const totalAmount = totalPrice - order.discount + order.deliveryCharge;
+  useEffect(() => {
+    dispatch(getOrderById(id));
+  }, [dispatch, id]);
 
-  // Function to update order status
-  const updateStatus = () => {
-    let newStatus = order.status === "Pending" ? "Shipped" : "Delivered";
-    setOrder({ ...order, status: newStatus });
+  const getNextStatus = (currentStatus) => {
+    switch (currentStatus) {
+      case "PENDING":
+        return "SHIPPED";
+      case "SHIPPED":
+        return "DELIVERED";
+      case "REJECTED":
+        return "PENDING";
+      default:
+        return null;
+    }
+  };
+
+  const updateStatus = async () => {
+    const newStatus = getNextStatus(order.orderStatus);
+    if (!newStatus) return;
+
+    setLoadingUpdate(true);
+    await dispatch(updateOrder(order._id, { orderStatus: newStatus }));
+    setLoadingUpdate(false);
+  };
+
+  const handleReject = async () => {
+    setLoadingReject(true);
+    await dispatch(updateOrder(order._id, { orderStatus: "REJECTED" }));
+    setLoadingReject(false);
+    setShowRejectModal(false);
   };
 
   return (
     <div className="p-4 md:p-8 w-full max-w-3xl mx-auto">
       {/* Back Button */}
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold">Order #{order.id}</h1>
+        <h1 className="text-xl font-bold">Order #{order._id}</h1>
         <Link to="/admin/orders" className="text-blue-500 hover:underline">
           ← Back to Orders
         </Link>
@@ -47,25 +57,27 @@ const OrderView = () => {
       {/* Customer Details */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-4">
         <h2 className="text-lg font-semibold">Customer Details</h2>
+        <p className="text-gray-700 font-medium text-xl">
+          Status: {loadingUpdate ? "Updating..." : order.orderStatus}
+        </p>
+
         <div className="mt-2 flex items-center justify-between">
-          {/* Customer Name and Phone */}
           <div>
             <p className="text-gray-700 font-medium text-xl">
-              {order.customer}
+              {order.user?.name}
             </p>
-            <p className="text-gray-500">{order.phone}</p>
+            <p className="text-gray-500">{order.user?.mobileNo}</p>
           </div>
 
-          {/* Call & Message Buttons */}
           <div className="flex items-center space-x-2 ml-auto">
             <a
-              href={`tel:${order.phone}`}
+              href={`tel:${order.user?.mobileNo}`}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center"
             >
               Call
             </a>
             <a
-              href={`sms:${order.phone}`}
+              href={`sms:${order.user?.mobileNo}`}
               className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex items-center justify-center"
             >
               Message
@@ -73,11 +85,20 @@ const OrderView = () => {
           </div>
         </div>
 
+        {/* Delivery Address */}
         <div className="mt-4">
           <h3 className="text-gray-600 font-medium">Delivery Address</h3>
-          <p className="text-gray-800">{order.address}</p>
+          {Array.isArray(order.shippingAddress) ? (
+            order.shippingAddress.map((addr, index) => (
+              <p key={index} className="text-gray-800">
+                {addr.firstName} {addr.lastName}, {addr.street}, {addr.city},{" "}
+                {addr.state}, {addr.zipCode}
+              </p>
+            ))
+          ) : (
+            <p className="text-gray-500">No shipping address available</p>
+          )}
         </div>
-
         <div className="mt-4">
           <h3 className="text-gray-600 font-medium">Order Date & Time</h3>
           <p className="text-gray-800">{order.orderDate}</p>
@@ -88,7 +109,7 @@ const OrderView = () => {
       <div className="bg-white p-4 rounded-lg shadow-md md:mb-12 mb-16">
         <h2 className="text-lg font-semibold">Order Summary</h2>
         <div className="mt-2 border-t pt-2">
-          {order.items.map((item, index) => (
+          {order?.orderItems?.map((item, index) => (
             <div key={index} className="flex justify-between py-2 border-b">
               <div>
                 <p className="text-gray-700">{item.name}</p>
@@ -101,42 +122,53 @@ const OrderView = () => {
           ))}
         </div>
 
-        {/* Pricing Breakdown */}
         <div className="mt-4 text-sm text-gray-700">
           <div className="flex justify-between py-1">
             <p>Subtotal:</p>
-            <p>${totalPrice.toFixed(2)}</p>
+            <p>${order.subTotal?.toFixed(2)}</p>
           </div>
           <div className="flex justify-between py-1">
             <p>Discount:</p>
-            <p className="text-green-600">-${order.discount.toFixed(2)}</p>
+            <p className="text-green-600">
+              -${order.discount?.toFixed(2) || 0}
+            </p>
           </div>
           <div className="flex justify-between py-1">
             <p>Delivery Charges:</p>
-            <p>${order.deliveryCharge.toFixed(2)}</p>
+            <p>${order.deliveryCharge?.toFixed(2) || 10}</p>
           </div>
           <hr className="my-2" />
           <div className="flex justify-between font-semibold text-lg">
             <p>Total Amount:</p>
-            <p>${totalAmount.toFixed(2)}</p>
+            <p>${order.totalPrice?.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
       {/* Action Buttons */}
       <div className="fixed bottom-0 left-0 w-full bg-white p-4 flex justify-between shadow-md">
-        <button
-          onClick={() => setShowRejectModal(true)}
-          className="bg-red-500 text-white py-2 px-6 rounded-lg"
-        >
-          Reject
-        </button>
-        <button
-          onClick={updateStatus}
-          className="bg-green-500 text-white py-2 px-6 rounded-lg"
-        >
-          Accept
-        </button>
+        {order.orderStatus !== "DELIVERED" && (
+          <>
+            <button
+              onClick={() => setShowRejectModal(true)}
+              className="bg-red-500 text-white py-2 px-6 rounded-lg"
+              disabled={loadingReject}
+            >
+              {loadingReject ? "Rejecting..." : "Reject"}
+            </button>
+            <button
+              onClick={updateStatus}
+              className="bg-green-500 text-white py-2 px-6 rounded-lg"
+              disabled={loadingUpdate}
+            >
+              {loadingUpdate
+                ? "Updating..."
+                : order.orderStatus === "REJECTED"
+                ? "Accept"
+                : getNextStatus(order.orderStatus)}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Reject Modal */}
@@ -155,13 +187,11 @@ const OrderView = () => {
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  setShowRejectModal(false);
-                  // Handle rejection logic here
-                }}
+                onClick={handleReject}
                 className="bg-red-500 text-white py-2 px-4 rounded-lg"
+                disabled={loadingReject}
               >
-                Confirm Reject
+                {loadingReject ? "Rejecting..." : "Confirm Reject"}
               </button>
             </div>
           </div>

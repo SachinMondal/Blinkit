@@ -6,15 +6,16 @@ import {
   deleteBanner,
 } from "../../redux/state/home/Action";
 import { useDispatch, useSelector } from "react-redux";
+import { getAllOrdersForAdmin } from "../../redux/state/order/Action";
 
 const Dashboard = () => {
-  const [orders, setOrders] = useState([]);
   const [deliveryTimes, setDeliveryTimes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const [altText, setAltText] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const dispatch = useDispatch();
   const banners = useSelector((state) => state.banner.banners || []);
+  const orders = useSelector((state) => state.order.adminOrders || []);
   useEffect(() => {
     dispatch(getBanners());
   }, [dispatch, banners.length]);
@@ -56,7 +57,10 @@ const Dashboard = () => {
       [orderId]: value,
     }));
   };
-
+   useEffect(()=>{
+    dispatch(getAllOrdersForAdmin());
+   },[dispatch]);
+   const filteredOrders = orders.filter((order) => order.orderStatus !== "Pending");
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Product Stats */}
@@ -87,7 +91,7 @@ const Dashboard = () => {
         {orders.length > 0 ? (
           <div className="max-h-60 overflow-y-auto w-full">
             <ul className="divide-y divide-gray-200">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <li
                   key={order.id}
                   className="flex justify-between items-center p-3"
@@ -95,7 +99,9 @@ const Dashboard = () => {
                   <div>
                     <h4 className="font-semibold">{order.customer}</h4>
                     <p className="text-gray-500">
-                      {order.items} items - {order.status}
+                      {order?.orderItems?.map((o)=>{
+                        return `${o.name} x ${o.quantity}`
+                      })} items - {order.orderStatus}
                     </p>
                   </div>
                   <span className="text-gray-700">{order.amount}</span>

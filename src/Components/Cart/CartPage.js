@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchCart, updateCartItem } from "../../redux/state/cart/Action"; 
+import { fetchCart, updateCart } from "../../redux/state/cart/Action"; 
 import CartProduct from "./CartProduct";
 import CartSummary from "./CartSummary";
 import CartImage from "../../images/emptycart.avif";
@@ -21,7 +21,7 @@ const Cart = () => {
   const handleQuantityChange = (productId, variantIndex, currentQty, count) => {
     const newQty = currentQty + count;
     if (newQty > 0) {
-      dispatch(updateCartItem(productId, variantIndex, currentQty, count)); 
+      dispatch(updateCart(productId, variantIndex, currentQty, count)); 
     }
   };
 
