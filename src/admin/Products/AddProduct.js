@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fetchCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,8 +16,12 @@ const AddProduct = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const categories = useSelector((state) => state.category.categories || []);
+const [isNextDisabled,setIsNextDisabled]=useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState({});
+  useEffect(() => {
+      setIsNextDisabled(Object.keys(error).length > 0);
+    }, [error]);
   const [formData, setFormData] = useState({
     category: "",
     categoryName: "",
@@ -25,18 +29,38 @@ const AddProduct = () => {
     productName: "",
     productDescription: "",
     weight: "",
-    shelfLife: "",
+    stock: "",
     quantities: [{ qty: "", price: "", discountPrice: "", unit: "g" }],
     vegNonVeg: "",
     size: "",
     packerDetails: "",
     brand: "",
     variantSize: "",
+    returnPolicy: "",
+    manufacturerAddress: "",
+    marketerAddress: "",
+    countryOfOrigin: "",
+    customerCare: "",
+    seller: "",
+    disclaimer: "",
+    details: [{ key: "", value: "" }],
   });
+
+  useEffect(() => {
+    let imageUrl = null;
+    if (formData.image && typeof formData.image !== "string") {
+      imageUrl = URL.createObjectURL(formData.image);
+      setFormData((prev) => ({ ...prev, imageUrl: imageUrl }));
+    }
+
+    return () => {
+      if (imageUrl) URL.revokeObjectURL(imageUrl);
+    };
+  }, [formData.image]);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    const numericFields = ["weight", "price", "mrp"];
+    const numericFields = ["weight", "price", "discountPrice","qty","stock"];
 
     if (numericFields.includes(name)) {
       if (value === "" || !/^\d+(\.\d{0,2})?$/.test(value)) {
@@ -63,13 +87,49 @@ const AddProduct = () => {
     }
   };
 
-  // Handle dynamic quantity-price pairs
-  const handleQtyChange = (e, index) => {
+  const handleQtyChange = (e, index, field = null) => {
     const { name, value } = e.target;
     const updatedQuantities = [...formData.quantities];
-    updatedQuantities[index] = { ...updatedQuantities[index], [name]: value };
+
+    if (field === "customUnit") {
+      updatedQuantities[index].customUnit = value;
+    } else {
+      updatedQuantities[index][name] = value;
+      if (name === "unit" && value !== "custom") {
+        delete updatedQuantities[index].customUnit;
+      }
+    }
+
     setFormData({ ...formData, quantities: updatedQuantities });
   };
+
+  const handleDetailChange = (e, index) => {
+    const { name, value } = e.target;
+    const updatedDetails = [...formData.details];
+    updatedDetails[index][name] = value;
+    setFormData((prev) => ({
+      ...prev,
+      details: updatedDetails,
+    }));
+  };
+  
+
+  const addDetail = () => {
+    setFormData({
+      ...formData,
+      details: [
+        ...formData.details,
+        { key: "", value: "" }
+      ],
+    });
+  };
+  
+  const removeDetail = (index) => {
+   const updatedDetails = formData.details.filter((_,i)=>i!==index);
+   setFormData({ ...formData, details: updatedDetails});
+    
+  };
+  
 
   useEffect(() => {
     if (location.state) {
@@ -80,6 +140,10 @@ const AddProduct = () => {
       }));
     }
   }, [location.state]);
+
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const addQty = () => {
     setFormData({
@@ -96,15 +160,60 @@ const AddProduct = () => {
     setFormData({ ...formData, quantities: updatedQuantities });
   };
 
-  // Fetch categories on mount
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-
-  const nextStep = () => setStep((prev) => prev + 1);
+  const handleNext = () => {
+    if (validateFields(step)) {
+      setStep((prev) => prev + 1);
+    }
+  };
   const prevStep = () => setStep((prev) => prev - 1);
-  const handleSubmit = () =>
-    navigate("/admin/products/summary", { state: formData });
+
+  const handleSubmit = () => {
+    const sanitizedFormData = { ...formData };
+    delete sanitizedFormData.image;
+    
+    navigate("/admin/products/summary", { state: sanitizedFormData });
+    
+
+  };
+  
+  
+  const validateFields = useCallback(
+    (step) => {
+      let newErrors = {};
+  
+      if (step === 1) {
+        if (!formData.categoryName)
+          newErrors.categoryName = "Category Name is required";
+        if (!formData.productName.trim())
+          newErrors.productName = "Product Name is required";
+        if (!formData.productDescription.trim())
+          newErrors.productDescription = "Description is required";
+        if (!formData.image) newErrors.image = "Product Image is required";
+      } else if (step === 2) {
+        if (!formData.weight) newErrors.weight = "Weight is required";
+        if (!formData.stock) newErrors.stock = "Stock is required";
+        if (formData.quantities.length === 0)
+          newErrors.quantities = "Variants are required";
+        if (!formData.vegNonVeg)
+          newErrors.vegNonVeg = "Veg/Non-Veg is required";
+      } else if (step === 4) {
+        if (!formData.customerCare)
+          newErrors.customerCare = "Customer Care is required";
+        if (!formData.returnPolicy)
+          newErrors.returnPolicy = "Return Policy is required";
+      }
+  
+      setError(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [formData]
+  );
+  
+
+  useEffect(() => {
+    validateFields(step);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, step]);
 
   return (
     <div className="w-full min-h-screen px-4 sm:px-12 py-10">
@@ -153,7 +262,7 @@ const AddProduct = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block font-semibold mb-1 text-sm">
-                Category
+                Category*
               </label>
               <select
                 name="category"
@@ -163,7 +272,7 @@ const AddProduct = () => {
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat._id}>
+                  <option key={cat._id} value={cat._id}>
                     {cat.name}
                   </option>
                 ))}
@@ -171,7 +280,7 @@ const AddProduct = () => {
             </div>
             <div>
               <label className="block font-semibold mb-1 text-sm">
-                Product Image
+                Product Image*
               </label>
               <input
                 type="file"
@@ -181,21 +290,18 @@ const AddProduct = () => {
               />
               {formData.image && (
                 <div>
-                  <LazyImage
-                    src={
-                      typeof formData.image === "string"
-                        ? formData.image
-                        : URL.createObjectURL(formData.image)
-                    }
-                    alt="Product"
-                    width="100"
-                  />
+                <LazyImage
+  src={formData.previewImage || formData.image}
+  alt="Product"
+  className="w-20 h-20 object-contain"
+/>
+
                 </div>
               )}
             </div>
             <div>
               <label className="block font-semibold mb-1 text-sm">
-                Product Name
+                Product Name*
               </label>
               <input
                 name="productName"
@@ -206,7 +312,7 @@ const AddProduct = () => {
             </div>
             <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
-                Product Description
+                Product Description*
               </label>
               <textarea
                 name="productDescription"
@@ -221,7 +327,7 @@ const AddProduct = () => {
         {step === 2 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block font-semibold mb-1 text-sm">Weight</label>
+              <label className="block font-semibold mb-1 text-sm">Weight*</label>
               <input
                 name="weight"
                 value={formData.weight}
@@ -233,12 +339,10 @@ const AddProduct = () => {
               )}
             </div>
             <div>
-              <label className="block font-semibold mb-1 text-sm">
-                Shelf Life
-              </label>
+              <label className="block font-semibold mb-1 text-sm">Stock</label>
               <input
-                name="shelfLife"
-                value={formData.shelfLife}
+                name="stock"
+                value={formData.stock}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
               />
@@ -247,9 +351,9 @@ const AddProduct = () => {
             {/* ✅ Net Qty & Price List */}
             <div className="col-span-2">
               <label className="block font-semibold mb-1 text-sm">
-                Net Qty, Price & Discount
+                Variants (Net Qty, Unit, Price, Discount Price)*
               </label>
-              {formData.quantities?.map((item, index) => (
+              {formData?.quantities?.map((item, index) => (
                 <div key={index} className="flex gap-2 items-center">
                   {/* ✅ Quantity Input */}
                   <input
@@ -262,6 +366,7 @@ const AddProduct = () => {
                   />
 
                   {/* ✅ Unit Dropdown (g/kg) */}
+        
                   <select
                     name="unit"
                     value={item.unit || "g"}
@@ -271,7 +376,21 @@ const AddProduct = () => {
                     <option value="g">g</option>
                     <option value="kg">kg</option>
                     <option value="unit">unit</option>
+                    <option value="custom">Other</option>{" "}
+      
                   </select>
+
+                  {/* ✅ Custom Unit Input (Only Show When "Other" is Selected) */}
+                  {item.unit === "custom" && (
+                    <input
+                      type="text"
+                      name="customUnit"
+                      value={item.customUnit || ""}
+                      onChange={(e) => handleQtyChange(e, index, "customUnit")}
+                      className="border p-2 rounded w-24 text-sm"
+                      placeholder="Enter Unit"
+                    />
+                  )}
 
                   {/* ✅ Price Input */}
                   <input
@@ -316,7 +435,7 @@ const AddProduct = () => {
 
             <div>
               <label className="block font-semibold mb-1 text-sm">
-                Veg/Non-Veg
+                Veg/Non-Veg*
               </label>
               <select
                 name="vegNonVeg"
@@ -345,20 +464,165 @@ const AddProduct = () => {
                 className="border p-2 rounded w-full text-sm"
               />
             </div>
+
+            {/* ✅ Dynamic Key-Value Pairs */}
+            <div className="col-span-2">
+              <label className="block font-semibold mb-1 text-sm">
+                Product Details
+              </label>
+              {formData.details?.map((item, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  {/* ✅ Key Input */}
+                  <input
+                    type="text"
+                    name="key"
+                    value={item.key || ""}
+                    onChange={(e) => handleDetailChange(e, index)}
+                    className="border p-2 rounded w-1/2 text-sm"
+                    placeholder="Enter Key"
+                  />
+
+                  {/* ✅ Value Input */}
+                  <input
+                    type="text"
+                    name="value"
+                    value={item.value || ""}
+                    onChange={(e) => handleDetailChange(e, index)}
+                    className="border p-2 rounded w-1/2 text-sm"
+                    placeholder="Enter Value"
+                  />
+
+                  {/* ❌ Remove Button */}
+                  <button
+                    type="button"
+                    onClick={() => removeDetail(index)}
+                    className="text-red-500 text-xl"
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+
+              {/* ➕ Add More Button */}
+              <button
+                type="button"
+                onClick={addDetail}
+                className="bg-blue-500 text-white px-3 py-1 rounded text-sm mt-2"
+              >
+                + Add More
+              </button>
+            </div>
           </div>
         )}
 
         {step === 4 && (
-          <div>
-            <label className="block font-semibold mb-1 text-sm">
-              Size / Free Size
-            </label>
-            <input
-              name="variantSize"
-              value={formData.variantSize}
-              onChange={handleChange}
-              className="border p-2 rounded w-full text-sm"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* ✅ Size / Free Size */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Size / Free Size
+              </label>
+              <input
+                name="variantSize"
+                value={formData.variantSize}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+              />
+            </div>
+
+            {/* ✅ Return Policy */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Return Policy*
+              </label>
+              <textarea
+                name="returnPolicy"
+                value={formData.returnPolicy}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="3"
+              ></textarea>
+            </div>
+
+            {/* ✅ Manufacturer Address */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Manufacturer Address
+              </label>
+              <textarea
+                name="manufacturerAddress"
+                value={formData.manufacturerAddress}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="2"
+              ></textarea>
+            </div>
+
+            {/* ✅ Marketer Address */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Marketer Address
+              </label>
+              <textarea
+                name="marketerAddress"
+                value={formData.marketerAddress}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="2"
+              ></textarea>
+            </div>
+
+            {/* ✅ Country of Origin */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Country of Origin
+              </label>
+              <input
+                name="countryOfOrigin"
+                value={formData.countryOfOrigin}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+              />
+            </div>
+
+            {/* ✅ Customer Care Details */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Customer Care Details*
+              </label>
+              <textarea
+                name="customerCare"
+                value={formData.customerCare}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="2"
+              ></textarea>
+            </div>
+
+            {/* ✅ Seller */}
+            <div>
+              <label className="block font-semibold mb-1 text-sm">Seller</label>
+              <input
+                name="seller"
+                value={formData.seller}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+              />
+            </div>
+
+            {/* ✅ Disclaimer */}
+            <div className="col-span-2">
+              <label className="block font-semibold mb-1 text-sm">
+                Disclaimer
+              </label>
+              <textarea
+                name="disclaimer"
+                value={formData.disclaimer}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="3"
+              ></textarea>
+            </div>
           </div>
         )}
       </div>
@@ -380,10 +644,22 @@ const AddProduct = () => {
             Cancel
           </button>
         )}
+       <>
+       {error && Object.values(error).map((errMsg, index) => (
+  <p key={index} className="text-red-500 text-sm mt-1">{errMsg}</p>
+))}
+
+       </>
         {step < 4 ? (
+         
           <button
-            onClick={nextStep}
-            className="bg-blue-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-blue-600"
+            onClick={handleNext}
+            disabled={isNextDisabled}
+            className={`px-6 py-2 rounded-lg text-white ${
+              isNextDisabled
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
             Next
           </button>

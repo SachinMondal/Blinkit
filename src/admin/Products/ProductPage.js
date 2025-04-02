@@ -56,10 +56,10 @@ const ProductsPage = () => {
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left text-gray-700 text-lg">
+            <tr className="bg-gray-100 text-center text-gray-700 text-lg ">
               <th className="p-4">Product</th>
               <th className="p-4">Category</th>
-              <th className="p-4">Price</th>
+              <th className="p-4">No of Variants</th>
               <th className="p-4">Stock</th>
               <th className="p-4 text-center">Actions</th>
             </tr>
@@ -67,12 +67,12 @@ const ProductsPage = () => {
           <tbody>
             {Array.isArray(products) && products.length > 0 ? (
               products.map((product) => (
-                <tr key={product._id} className="border-b hover:bg-gray-50">
+                <tr key={product._id} className="border-b hover:bg-gray-50 text-center">
                   <td className="p-4 text-lg">{product.name}</td>
                   <td className="p-4">
                     {typeof product.category === "object" ? product.category.name : product.category}
                   </td>
-                  <td className="p-4">{product.price}</td>
+                  <td className="p-4">{product.variants.length}</td>
                   <td className="p-4">{product.stock}</td>
                   <td className="p-4 flex justify-center space-x-4">
                     <Link to={`/admin/products/${product._id}`} className="text-blue-600 hover:underline">

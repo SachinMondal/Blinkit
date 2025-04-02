@@ -8,7 +8,7 @@ const EditProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { product, } = useSelector((state) => state.product);
+  const { product } = useSelector((state) => state.product);
   const [formData, setFormData] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -25,104 +25,106 @@ const EditProduct = () => {
   const handleChange = (e) => {
     const { name, value, type } = e.target;
     if (type === "number" && isNaN(value)) return;
-    setFormData({ ...formData, [name]: value });
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  
+  const handleDetailsChange = (index, field, value) => {
+    const updatedDetails = [...formData.details];
+    updatedDetails[index][field] = value;
+    setFormData((prev) => ({ ...prev, details: updatedDetails }));
+  };
+  
+  
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, imagePreview: reader.result, imageFile: file });
+        setFormData((prev) => ({ ...prev, imagePreview: reader.result, imageFile: file }));
       };
       reader.readAsDataURL(file);
     }
   };
   
   const handleVariantChange = (index, key, value) => {
-    if (key === "price" || key === "discountPrice" || key === "qty") {
-      if (isNaN(value)) return;
-    }
+    if (["price", "discountPrice", "qty"].includes(key) && isNaN(value)) return;
   
-    const updatedVariants = [...formData.variants];
-  
-    if (key === "image") {
-      const file = value.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          updatedVariants[index].imagePreview = reader.result;
-          updatedVariants[index].imageFile = file;
-          setFormData({ ...formData, variants: updatedVariants });
-        };
-        reader.readAsDataURL(file);
+    setFormData((prev) => {
+      const updatedVariants = [...prev.variants];
+      
+      if (key === "image") {
+        const file = value.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            updatedVariants[index].imagePreview = reader.result;
+            updatedVariants[index].imageFile = file;
+            setFormData({ ...prev, variants: updatedVariants });
+          };
+          reader.readAsDataURL(file);
+        }
+        return prev;
       }
-      return;
-    }
-  
-    updatedVariants[index][key] = value;
-    setFormData({ ...formData, variants: updatedVariants });
-  };
-  
-  const addVariant = () => {
-    setFormData({
-      ...formData,
-      variants: [...formData.variants, { price: "", discountPrice: "", qty: "", unit: "" }],
+      
+      updatedVariants[index][key] = value;
+      return { ...prev, variants: updatedVariants };
     });
   };
   
-  const removeVariant = (index) => {
-    const updatedVariants = formData.variants.filter((_, i) => i !== index);
-    setFormData({ ...formData, variants: updatedVariants });
+  const addVariant = () => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: [...prev.variants, { price: "", discountPrice: "", qty: "", unit: "" }],
+    }));
   };
+  
+  const removeVariant = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }));
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
   
     try {
       let updatedFields = {};
-  
-      // Compare formData with product and store only changed fields
       Object.keys(formData).forEach((key) => {
         if (JSON.stringify(formData[key]) !== JSON.stringify(product[key])) {
           updatedFields[key] = formData[key];
         }
       });
   
-      // If no changes detected, prevent unnecessary API call
       if (Object.keys(updatedFields).length === 0) {
         setIsSaving(false);
         alert("No changes detected.");
         return;
       }
   
-      // Preserve unchanged fields to prevent data loss
-      updatedFields = { ...product, ...updatedFields };
-  
-      // 🔥 Fix: Only pass category ID to the backend
       if (updatedFields.category && typeof updatedFields.category === "object") {
-        updatedFields.category = updatedFields.category._id; // Ensure only ID is sent
+        updatedFields.category = updatedFields.category._id;
       }
-  
-      // Handle Image separately
-      if (formData.imageFile) {
-        updatedFields.image = formData.imageFile;
+      if (updatedFields.details) {
+        updatedFields.details = JSON.stringify(updatedFields.details);
       }
-  
-      // Ensure variants are retained properly
       if (formData.variants) {
         updatedFields.quantities = JSON.stringify(formData.variants);
       }
-  
-      console.log("Final Payload:", updatedFields);
-  
-      // Convert to FormData for API call
       const productData = new FormData();
       Object.entries(updatedFields).forEach(([key, value]) => {
-        productData.append(key, value);
+        if (key === "image" && value instanceof File) {
+          productData.append("image", value); 
+        } else {
+          productData.append(key, value);
+        }
       });
   
+      console.log("Final Payload:", updatedFields);
       await dispatch(updateProduct(id, productData));
+  
       navigate("/admin/products");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -130,6 +132,22 @@ const EditProduct = () => {
       setIsSaving(false);
     }
   };
+  
+  
+  console.log(formData)
+  
+  const handleAddDetail = () => {
+    setFormData((prev) => ({
+      ...prev,
+      details: [...prev.details, { key: "", value: "" }],
+    }));
+  };
+  
+  const handleRemoveDetail = (index) => {
+    const updatedDetails = formData.details.filter((_, i) => i !== index);
+    setFormData((prev) => ({ ...prev, details: updatedDetails }));
+  };
+  
   
   
   
@@ -193,6 +211,177 @@ const EditProduct = () => {
           />
         </div>
       </div>
+      <div>
+        <label className="block font-semibold mb-1">Product Description</label>
+        <textarea
+          name="productDescription"
+          value={formData.productDescription}
+          onChange={handleChange}
+          className="border p-3 rounded w-full focus:ring focus:ring-blue-300"
+        />
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="block font-semibold mb-1">Weight</label>
+          <input
+            type="text"
+            name="weight"
+            value={formData.weight}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Stock</label>
+          <input
+            type="number"
+            name="stock"
+            value={formData.stock}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Size</label>
+          <input
+            type="text"
+            name="size"
+            value={formData.size}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+      </div>
+
+      {/* Veg/Non-Veg Selection */}
+      <div>
+        <label className="block font-semibold mb-1">Veg/Non-Veg</label>
+        <select
+          name="vegNonVeg"
+          value={formData.vegNonVeg}
+          onChange={handleChange}
+          className="border p-3 rounded w-full"
+        >
+          <option value="">Select</option>
+          <option value="veg">Veg</option>
+          <option value="non-veg">Non-Veg</option>
+        </select>
+      </div>
+
+      {/* Packer Details, Brand, Variant Size */}
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <label className="block font-semibold mb-1">Packer Details</label>
+          <input
+            type="text"
+            name="packerDetails"
+            value={formData.packerDetails}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Brand</label>
+          <input
+            type="text"
+            name="brand"
+            value={formData.brand}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Variant Size</label>
+          <input
+            type="text"
+            name="variantSize"
+            value={formData.variantSize}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+      </div>
+
+      {/* Return Policy, Manufacturer, Marketer */}
+      <div>
+        <label className="block font-semibold mb-1">Return Policy</label>
+        <textarea
+          name="returnPolicy"
+          value={formData.returnPolicy}
+          onChange={handleChange}
+          className="border p-3 rounded w-full"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block font-semibold mb-1">Manufacturer Address</label>
+          <textarea
+            name="manufacturerAddress"
+            value={formData.manufacturerAddress}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Marketer Address</label>
+          <textarea
+            name="marketerAddress"
+            value={formData.marketerAddress}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+      </div>
+
+      {/* Country of Origin */}
+      <div>
+        <label className="block font-semibold mb-1">Country of Origin</label>
+        <input
+          type="text"
+          name="countryOfOrigin"
+          value={formData.countryOfOrigin}
+          onChange={handleChange}
+          className="border p-3 rounded w-full"
+        />
+      </div>
+
+      {/* Customer Care, Seller */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block font-semibold mb-1">Customer Care</label>
+          <input
+            type="text"
+            name="customerCare"
+            value={formData.customerCare}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+        <div>
+          <label className="block font-semibold mb-1">Seller</label>
+          <input
+            type="text"
+            name="seller"
+            value={formData.seller}
+            onChange={handleChange}
+            className="border p-3 rounded w-full"
+          />
+        </div>
+      </div>
+
+      {/* Disclaimer */}
+      <div>
+        <label className="block font-semibold mb-1">Disclaimer</label>
+        <textarea
+          name="disclaimer"
+          value={formData.disclaimer}
+          onChange={handleChange}
+          className="border p-3 rounded w-full"
+        />
+      </div>
+
+
 
       {/* Product Variants */}
       <div className="mt-4">
@@ -274,6 +463,41 @@ const EditProduct = () => {
         </button>
       </div>
 
+      <div>
+        <h2 className="text-xl font-semibold mb-3">Additional Details</h2>
+        {formData.details.map((detail, index) => (
+          <div key={index} className="grid grid-cols-2 gap-4 mb-2">
+            <input
+              type="text"
+              placeholder="Key"
+              value={detail.key}
+              onChange={(e) => handleDetailsChange(index, "key", e.target.value)}
+              className="border p-3 rounded w-full"
+            />
+            <input
+              type="text"
+              placeholder="Value"
+              value={detail.value}
+              onChange={(e) => handleDetailsChange(index, "value", e.target.value)}
+              className="border p-3 rounded w-full"
+            />
+            <button
+              type="button"
+              onClick={() => handleRemoveDetail(index)}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={handleAddDetail}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg mt-2"
+        >
+          Add More Details
+        </button>
+      </div>
       {/* Action Buttons */}
       <div className="mt-6 flex justify-between">
         <button

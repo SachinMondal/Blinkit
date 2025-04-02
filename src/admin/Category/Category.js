@@ -55,7 +55,7 @@ const Category = () => {
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left text-gray-700 text-lg">
+            <tr className="bg-gray-100 text-center text-gray-700 text-lg">
               <th className="p-4">Category Name</th>
               <th className="p-4 hidden sm:table-cell">Description</th>
               <th className="p-4">Actions</th>
@@ -70,7 +70,7 @@ const Category = () => {
               </tr>
             ) : categories.length > 0 ? (
               categories.map((category) => (
-                <tr key={category._id} className="border-b hover:bg-gray-50">
+                <tr key={category._id} className="border-b hover:bg-gray-50 text-center">
                   <td className="p-4 text-lg">{category.name}</td>
                   <td className="p-4 hidden sm:table-cell">{category.description}</td>
                   <td className="p-4">

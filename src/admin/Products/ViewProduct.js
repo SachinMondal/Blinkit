@@ -51,7 +51,7 @@ const ViewProduct = () => {
             <tbody>
               <tr className="border-b">
                 <td className="p-3 font-semibold bg-gray-100">Category</td>
-                <td className="p-3">{product?.category?.name || "N/A"}</td>
+                <td className="p-3">{product?.category?.value || "N/A"}</td>
               </tr>
               <tr className="border-b">
                 <td className="p-3 font-semibold bg-gray-100">Type</td>
@@ -80,20 +80,24 @@ const ViewProduct = () => {
                 <td className="p-3">{product?.weight || "N/A"}</td>
               </tr>
               <tr className="border-b">
-                <td className="p-3 font-semibold bg-gray-100">Created At</td>
-                <td className="p-3">
-                  {product?.createdAt
-                    ? new Date(product.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </td>
+                <td className="p-3 font-semibold bg-gray-100">Manufacturer</td>
+                <td className="p-3">{product?.manufacturerAddress?.address || "N/A"}</td>
               </tr>
-              <tr>
-                <td className="p-3 font-semibold bg-gray-100">Last Updated</td>
-                <td className="p-3">
-                  {product?.updatedAt
-                    ? new Date(product.updatedAt).toLocaleDateString()
-                    : "N/A"}
-                </td>
+              <tr className="border-b">
+                <td className="p-3 font-semibold bg-gray-100">Marketer</td>
+                <td className="p-3">{product?.marketerAddress?.address || "N/A"}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-3 font-semibold bg-gray-100">Customer Care</td>
+                <td className="p-3">{product?.customerCare || "N/A"}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-3 font-semibold bg-gray-100">Seller</td>
+                <td className="p-3">{product?.seller || "N/A"}</td>
+              </tr>
+              <tr className="border-b">
+                <td className="p-3 font-semibold bg-gray-100">Disclaimer</td>
+                <td className="p-3">{product?.disclaimer || "N/A"}</td>
               </tr>
             </tbody>
           </table>
@@ -124,6 +128,31 @@ const ViewProduct = () => {
               </table>
             ) : (
               <p className="text-gray-500">No variants available.</p>
+            )}
+          </div>
+
+          {/* Additional Details Section (Table Format) */}
+          <div className="mt-6">
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">Additional Details</h3>
+            {product?.details?.length > 0 ? (
+              <table className="w-full border border-gray-300 mt-2">
+                <thead>
+                  <tr className="bg-gray-200">
+                    <th className="p-3">Key</th>
+                    <th className="p-3">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {product.details.map((detail, index) => (
+                    <tr key={index} className="border-b">
+                      <td className="p-3 font-semibold bg-gray-100">{detail.key}</td>
+                      <td className="p-3">{detail.value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-gray-500">No additional details available.</p>
             )}
           </div>
         </div>

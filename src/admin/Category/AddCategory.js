@@ -1,14 +1,24 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { addCategory, fetchCategories } from "../../redux/state/category/Action";
+import {
+  addCategory,
+  fetchCategories,
+} from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 import { CircularProgress } from "@mui/material";
 
 const AddCategory = () => {
   const navigate = useNavigate();
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const [step, setStep] = useState(1);
+  const [isNextDisabled, setIsNextDisabled] = useState(true);
+  const { loading, error } = useSelector((state) => state.category);
+  const [errors, setErrors] = useState({});
   const categories = useSelector((state) => state.category.categories || []);
+
+  useEffect(() => {
+    setIsNextDisabled(Object.keys(errors).length > 0);
+  }, [errors]);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -17,54 +27,108 @@ const AddCategory = () => {
     parentCategory: "",
     seoTitle: "",
     seoDescription: "",
-    isVisible: true,
+    isVisible: false,
+    isHomePageVisible: false,
+    status: "active",
+    discountPercentage: "",
+    tags: "",
+    isFeatured: false,
+    isBestseller: false,
+    isSpecial: false,
+    isNew: false,
+    isSale: false,
   });
-  const { loading, error } = useSelector((state) => state.category);
-  const handleNext = () => setStep((prev) => prev + 1);
+  const validateFields = useCallback(
+    (step) => {
+      let newErrors = {};
+
+      if (step === 1) {
+        if (!formData.name.trim()) newErrors.name = "Category Name is required";
+        if (!formData.description.trim())
+          newErrors.description = "Description is required";
+        if (!formData.image) newErrors.image = "Category Image is required";
+      } else if (step === 2) {
+        if (Object.keys(formData.attributes).length === 0)
+          newErrors.attributes = "Attributes are required";
+      }
+
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    },
+    [formData.attributes, formData.description, formData.image, formData.name]
+  );
+
+  useEffect(() => {
+    validateFields(step);
+  }, [formData, step]);
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
   const handleBack = () => setStep((prev) => prev - 1);
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updatedFormData = { ...prev, [name]: value };
+      validateFields(step);
+      return updatedFormData;
     });
   };
 
   const handleImageUpload = (e) => {
-    setFormData({ ...formData, image: e.target.files[0] });
+    setFormData((prev) => {
+      const updatedFormData = { ...prev, image: e.target.files[0] };
+      validateFields(step);
+      return updatedFormData;
+    });
   };
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+
   const handleSubmit = async () => {
+    if (!validateFields(3)) return "error";
+
     try {
+      console.log("Form Data:", formData);
+
       const categoryData = new FormData();
       categoryData.append("name", formData.name);
       categoryData.append("description", formData.description);
       categoryData.append("seoTitle", formData.seoTitle);
       categoryData.append("seoDescription", formData.seoDescription);
-      categoryData.append("isVisible", formData.isVisible ? "true" : "false"); 
-  
-      // ✅ Fix: Ensure ID is passed instead of name
+      categoryData.append("isVisible", formData.isVisible ? "true" : "false");
+      categoryData.append(
+        "isHomePageVisible",
+        formData.isHomePageVisible?"true" : "false"
+      );
+      categoryData.append("status", formData.status);
+      categoryData.append("discountPercentage", formData.discountPercentage);
+      categoryData.append("tags", formData.tags);
+      categoryData.append("isFeatured", formData.isFeatured ? "true" : "false");
+      categoryData.append(
+        "isBestSeller",
+        formData.isBestseller ? "true" : "false"
+      );
+      categoryData.append("isSpecial", formData.isSpecial ? "true" : "false");
+      categoryData.append("isNew", formData.isNew? "true" : "false");
+      categoryData.append(
+        "isSale",
+        formData.isSale ?"true" : "false"
+      );
+
       if (formData.parentCategory) {
-        categoryData.append("parentCategory", formData.parentCategory); // This is now an ID
+        categoryData.append("parentCategory", formData.parentCategory);
       }
-  
+
       if (formData.image) categoryData.append("image", formData.image);
-  
+
       Object.entries(formData.attributes).forEach(([key, value]) => {
         categoryData.append(`attributes[${key}]`, value);
       });
-  
       await dispatch(addCategory(categoryData));
       navigate("/admin/category");
     } catch (error) {
       console.error(error);
     }
   };
-  
-  
-  
+
   const handleAttribute = (e) => {
     setFormData({
       ...formData,
@@ -99,6 +163,12 @@ const AddCategory = () => {
       return { ...prev, attributes: updatedAttributes };
     });
   };
+  const handleNext = () => {
+    if (validateFields(step)) {
+      setStep((prev) => prev + 1);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen px-6 sm:px-12 py-10">
       {/* Title */}
@@ -128,7 +198,7 @@ const AddCategory = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
           <div>
             <label className="block text-lg font-medium text-gray-700">
-              Category Name
+              Category Name*
             </label>
             <input
               type="text"
@@ -142,7 +212,7 @@ const AddCategory = () => {
 
           <div>
             <label className="block text-lg font-medium text-gray-700">
-              Description
+              Description*
             </label>
             <textarea
               name="description"
@@ -155,7 +225,7 @@ const AddCategory = () => {
 
           <div className="sm:col-span-2">
             <label className="block text-lg font-medium text-gray-700">
-              Category Image
+              Category Image*
             </label>
             <input
               type="file"
@@ -168,19 +238,18 @@ const AddCategory = () => {
 
       {/* Step 2: Attributes */}
       {step === 2 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           {/* Attributes Section */}
           <div>
-            <label className="block text-sm sm:text-lg font-medium text-gray-700">
-              Attributes
+            <label className="block text-sm md:text-lg font-medium text-gray-700">
+              Attributes*
             </label>
-
             <div className="flex flex-col gap-2">
               {Object.entries(formData.attributes).map(
                 ([key, value], index) => (
                   <div
                     key={index}
-                    className="flex flex-wrap sm:flex-nowrap gap-2 items-center"
+                    className="flex flex-wrap md:flex-nowrap gap-2 items-center"
                   >
                     {/* Attribute Key */}
                     <input
@@ -190,7 +259,7 @@ const AddCategory = () => {
                       onChange={(e) =>
                         handleAttributeChange(index, e.target.value, value)
                       }
-                      className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                      className="flex-1 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
                     />
                     {/* Attribute Value */}
                     <input
@@ -200,7 +269,7 @@ const AddCategory = () => {
                       onChange={(e) =>
                         handleAttributeChange(index, key, e.target.value)
                       }
-                      className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
+                      className="flex-1 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
                     />
                     {/* Remove Button */}
                     <button
@@ -213,11 +282,10 @@ const AddCategory = () => {
                 )
               )}
             </div>
-
             {/* Add Attribute Button */}
             <button
               onClick={handleAddAttribute}
-              className="mt-3 px-4 py-2 text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50 w-full sm:w-auto"
+              className="mt-3 px-4 py-2 text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50 w-full md:w-auto"
             >
               + Add Attribute
             </button>
@@ -225,24 +293,69 @@ const AddCategory = () => {
 
           {/* Parent Category Section */}
           <div>
-  <label className="block text-sm sm:text-lg font-medium text-gray-700">
-    Parent Category
-  </label>
-  <select
-    name="parentCategory"
-    value={formData.parentCategory}
-    onChange={handleChange}
-    className="w-full mt-2 p-2 sm:p-3 border border-gray-300 rounded-lg text-sm"
-  >
-    <option value="">None</option>
-    {categories.map((category) => (
-      <option key={category._id} value={category._id}>
-        {category.name} 
-      </option>
-    ))}
-  </select>
-</div>
+            <label className="block text-sm md:text-lg font-medium text-gray-700">
+              Parent Category*
+            </label>
+            <select
+              name="parentCategory"
+              value={formData.parentCategory}
+              onChange={handleChange}
+              className="w-full mt-2 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="">None</option>
+              {categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
+          {/* Discount Percentage */}
+          <div>
+            <label className="block text-sm md:text-lg font-medium text-gray-700">
+              Discount Percentage
+            </label>
+            <input
+              type="number"
+              name="discountPercentage"
+              value={formData.discountPercentage}
+              onChange={handleChange}
+              placeholder="Enter discount percentage"
+              className="w-full mt-2 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-sm md:text-lg font-medium text-gray-700">
+              Status
+            </label>
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="w-full mt-2 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {/* Tags */}
+          <div className="md:col-span-2">
+            <label className="block text-sm md:text-lg font-medium text-gray-700">
+              Tags (comma separated)
+            </label>
+            <input
+              type="text"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              placeholder="Enter tags (e.g., organic, fresh, vegan)"
+              className="w-full mt-2 p-2 md:p-3 border border-gray-300 rounded-lg text-sm"
+            />
+          </div>
         </div>
       )}
 
@@ -256,7 +369,7 @@ const AddCategory = () => {
             <input
               type="text"
               name="seoTitle"
-              placeholder="SEO title for search engines"
+              placeholder="SEO title for search engines (comma separated)"
               value={formData.seoTitle}
               onChange={handleChange}
               className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
@@ -276,17 +389,36 @@ const AddCategory = () => {
             />
           </div>
 
-          <div className="sm:col-span-2 flex items-center">
-            <input
-              type="checkbox"
-              name="isVisible"
-              checked={formData.isVisible}
-              onChange={handleChange}
-              className="w-5 h-5 mr-2"
-            />
-            <span className="text-lg text-gray-700">Make Category Visible</span>
+          <div className="sm:col-span-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-4">
+            {[
+              { name: "isCategory", label: "Make Category Visible in Nav" },
+              { name: "isHomePageVisible", label: "Show in HomePage" },
+              { name: "isBestseller", label: "Mark as Best Seller" },
+              { name: "isSpecial", label: "Mark as Special" },
+              { name: "isNew", label: "Mark as New" },
+              { name: "isSale", label: "Mark in Sale" },
+            ].map((item, index) => (
+              <label
+                key={index}
+                className="flex items-center space-x-3 p-3 border rounded-lg shadow-sm hover:bg-gray-100 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  name={item.name}
+                  checked={formData[item.name]}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-blue-500 border-gray-300 focus:ring-blue-500 rounded"
+                />
+                <span className="text-gray-800 text-sm sm:text-base">
+                  {item.label}
+                </span>
+              </label>
+            ))}
           </div>
         </div>
+      )}
+      {errors.name && (
+        <p className="text-red-500 text-sm mt-1">{errors.name}</p>
       )}
 
       {/* Navigation Buttons */}
@@ -302,7 +434,12 @@ const AddCategory = () => {
         {step < 3 ? (
           <button
             onClick={handleNext}
-            className="px-6 py-3 text-lg font-medium bg-blue-500 text-white rounded-lg w-full sm:w-auto"
+            disabled={isNextDisabled}
+            className={`px-6 py-2 rounded-lg text-white ${
+              isNextDisabled
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
           >
             Next
           </button>
@@ -311,7 +448,11 @@ const AddCategory = () => {
             onClick={handleSubmit}
             className="px-6 py-3 text-lg font-medium bg-green-500 text-white rounded-lg w-full sm:w-auto"
           >
-            {loading ? <CircularProgress size={24} className="text-white" /> :"Submit"} 
+            {loading ? (
+              <CircularProgress size={24} className="text-white" />
+            ) : (
+              "Submit"
+            )}
             {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
           </button>
         )}
