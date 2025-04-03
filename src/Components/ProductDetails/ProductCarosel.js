@@ -13,6 +13,10 @@ const ProductCarousel = ({ products }) => {
     navigate(`/product/${productId}`);
   };
 
+  
+  
+  
+
   return (
     <div className="relative px-4 mt-6 lg:max-w-5xl w-full">
       {Object.entries(products).map(([categoryName, categoryData]) => {

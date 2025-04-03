@@ -6,7 +6,7 @@ const CategoryTile = ({ image, name, discount ,onClick}) => {
     <div className="relative rounded-lg overflow-hidden shadow-sm w-[140px] cursor-pointer" onClick={onClick}>
       {/* Discount Tag */}
       {discount && (
-        <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-md">
+        <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-md z-40">
           {discount}% OFF
         </span>
       )}

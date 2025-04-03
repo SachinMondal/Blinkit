@@ -8,12 +8,14 @@ import { getCategoryAndProduct } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 
 const CategoryPage = () => {
-  const { category } = useParams();
+  const  {parentCategory}  = useParams();
+  const category=parentCategory;
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const categories = useSelector(
     (state) => state.category.categoryAndProduct || []
   );
+  console.log(categories);
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
   }, [dispatch, categories.length, category]);
@@ -157,12 +159,15 @@ const CategoryPage = () => {
 
             {/* Sorted Product List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {categories?.subcategories?.flatMap((subcategory) =>
-                subcategory.products?.map((product, index) => (
-                  <ProductTile key={product._id || index} product={product} onClick={()=>handleProductClick(product._id)} />
-                ))
-              )}
-            </div>
+  {categories?.subcategories?.flatMap((subcategory) =>
+    Array.isArray(subcategory.products)
+      ? subcategory.products.map((product, index) => (
+          <ProductTile key={product._id || index} product={product} onClick={() => handleProductClick(product._id)} />
+        ))
+      : []
+  )}
+</div>
+
           </div>
 
           {/* Scroll to Top Button */}

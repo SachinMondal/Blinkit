@@ -25,7 +25,7 @@ const ProductTile = ({ product, onClick }) => {
   useEffect(() => {
 
   }, [cartItems, selectedVariant, product._id]);
-console.log(cartItems);
+
   useEffect(() => {
     if (!selectedVariant) return;
     

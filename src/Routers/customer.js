@@ -1,7 +1,7 @@
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux"; 
-import { fetchUserInfo } from "../redux/state/auth/Action"; // Import user fetch action
+import { fetchUserInfo } from "../redux/state/auth/Action"; 
 import HomePage from "../customer/Home/HomePage";
 import SignUp from "../customer/auth/SignUp";
 import CategoryPage from "../Components/CategoryDetails/CategoryPage";
@@ -28,7 +28,7 @@ function Customer() {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false); // Admin state
+  const [isAdmin, setIsAdmin] = useState(false);
   const footerRef = useRef(null);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
 
@@ -98,7 +98,7 @@ function Customer() {
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<HomePage userLocation={userLocation} />} />
-        <Route path="/:category/:category" element={<CategoryPage />} />
+        <Route path="/:parentCategory/:category" element={<CategoryPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/categoryviewAll/:category" element={<ViewAll />} />
 

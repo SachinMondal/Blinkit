@@ -17,10 +17,12 @@ const HomePage = () => {
   const category = useSelector((state) => state.category.categories);
   const data = useSelector((state) => state.product.categories);
   const loading = useSelector((state) => state.product.loading);
-  const banners = useSelector((state) => state.banner.banners||[]);
-  useEffect(()=>{
+  const banners = useSelector((state) => state.banner.banners || []);
+
+  useEffect(() => {
     dispatch(getBanners());
-  },[dispatch,banners.length]);
+  }, [dispatch]);
+
   useEffect(() => {
     if (!category.length) {
       dispatch(getCategoryProduct());
@@ -29,14 +31,15 @@ const HomePage = () => {
 
   useEffect(() => {
     if (!data.length) {
-     dispatch(getCategoryProduct());
+      dispatch(getCategoryProduct());
     }
   }, [dispatch, data.length]);
 
-  const handleCategoryClick = (category) => {
-    navigate(`/category/${category}`);
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/category/${categoryId}`);
   };
 
+  // Unique Categories for Slider
   const uniqueCategories = category.reduce((acc, item) => {
     if (!acc.find((cat) => cat.name === item.name)) {
       acc.push(item);
@@ -44,8 +47,22 @@ const HomePage = () => {
     return acc;
   }, []);
 
+  // Function to filter categories dynamically
+  const filterCategories = (condition) => 
+    Object.entries(data || {})
+      .filter(([_, category]) => category?.categoryDetails?.[condition])
+      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
 
+  // Sections based on category details
+  const filteredSections = {
+    topCategories: filterCategories("isParent") || filterCategories("isHomePageVisible"),
+    featured: filterCategories("isFeatured"),
+    newArrivals: filterCategories("isNew"),
+    onSale: filterCategories("isSale"),
+    special: filterCategories("isSpecial"),
+  };
 
+  // Slider Settings
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -73,7 +90,6 @@ const HomePage = () => {
     ],
   };
 
-
   return (
     <>
       {loading ? (
@@ -85,7 +101,7 @@ const HomePage = () => {
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           <Slider {...sliderSettings}>
-            {banners && banners?.data?.map((img, index) => (
+            {banners?.data?.map((img, index) => (
               <div key={index} className="flex justify-center max-w-7xl mx-auto px-4">
                 <LazyImage
                   src={img.image}
@@ -95,7 +111,6 @@ const HomePage = () => {
               </div>
             ))}
           </Slider>
-
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">
             <Slider {...categorySliderSettings}>
               {uniqueCategories.map((item) => (
@@ -111,9 +126,13 @@ const HomePage = () => {
           </div>
 
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">
-            <div className="flex gap-6 mt-3">
-              <ProductCarousel products={data} />
-            </div>
+            {Object.entries(filteredSections).map(([sectionName, products]) => (
+              Object.keys(products).length > 0 && (
+                <div key={sectionName} className="flex gap-6 mt-8">
+                  <ProductCarousel title={sectionName.replace(/([A-Z])/g, " $1").trim()} products={products} />
+                </div>
+              )
+            ))}
           </div>
         </div>
       )}

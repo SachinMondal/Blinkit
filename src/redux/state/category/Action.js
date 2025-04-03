@@ -150,7 +150,7 @@ export const getCategoriesAndSubCategories= ()=>async (dispatch, getState)=>{
   }
 }
 
-export const getCategoryAndProduct=(categoryId)=>async(dispatch,getState)=>{
+export const getCategoryAndProduct=(categoryId)=>async(dispatch)=>{
   try{
     dispatch({type:CATEGORY_AND_PRODUCT_REQUEST});
     const data = await axios.get(`${API_URL}/api/category/subAndProd/${categoryId}`);

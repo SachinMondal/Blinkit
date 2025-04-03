@@ -73,6 +73,7 @@ export const getProductById = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_PRODUCT_BY_ID_REQUEST });
     const  data  = await axios.get(`${API_URL}/api/product/${id}`);
+    console.log(data);
     dispatch({ type: GET_PRODUCT_BY_ID_SUCCESS, payload: data.data.data });
   } catch (error) {
     dispatch({

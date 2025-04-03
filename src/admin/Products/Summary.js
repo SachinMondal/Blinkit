@@ -26,16 +26,24 @@ const Summary = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+
+    // ✅ Ensure custom unit replaces "custom" before submitting
+    const updatedQuantities = formData.quantities.map((item) => ({
+        ...item,
+        unit: item.unit === "custom" ? item.customUnit : item.unit, // Replace "custom" with customUnit value
+    }));
+
     const formattedData = {
-      ...formData,
-      quantities: JSON.stringify(formData.quantities), 
-      details: JSON.stringify(formData.details), 
+        ...formData,
+        quantities: JSON.stringify(updatedQuantities), 
+        details: JSON.stringify(formData.details), 
     };
-      await dispatch(addProduct(formattedData));
-      navigate("/admin/products");
-      setLoading(false);
-    
-  };
+
+    await dispatch(addProduct(formattedData));
+    navigate("/admin/products");
+    setLoading(false);
+};
+
 
   return (
     <div className="w-full min-h-screen px-4 sm:px-8 py-10 flex flex-col items-center bg-gray-100">

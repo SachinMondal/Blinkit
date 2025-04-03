@@ -2,14 +2,19 @@ import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
 import SignUp from "../../customer/auth/SignUp";
 import { Link, useNavigate } from "react-router-dom";
-import Logo from "../../images/logo.png"
+import Logo from "../../images/logo.png";
 import { getCategoriesAndSubCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../../redux/state/cart/Action";
-export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin }) {
-  const dispatch=useDispatch();
+export default function Navbar({
+  isLoggedIn,
+  location,
+  setLocationModal,
+  isAdmin,
+}) {
+  const dispatch = useDispatch();
   const categories = useSelector((state) => state.category.categories);
-  const cartSum=useSelector((state)=>state.cart.cart);
+  const cartSum = useSelector((state) => state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -42,9 +47,9 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
- useEffect(()=>{
-  dispatch(getCategoriesAndSubCategories());
- })
+  useEffect(() => {
+    dispatch(getCategoriesAndSubCategories());
+  });
   const [activeCategory, setActiveCategory] = useState(null);
 
   const handleCategoryClick = (categoryName) => {
@@ -53,15 +58,15 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
   const handleCategorySelection = (categoryName) => {
     if (selectedCategory === categoryName) {
       setSelectedCategory("");
-      navigate("/"); 
+      navigate("/");
     } else {
-      setSelectedCategory(categoryName); 
+      setSelectedCategory(categoryName);
     }
     handleCategoryClick(categoryName);
   };
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(fetchCart());
-  },[dispatch,cartSum.length]);
+  }, [dispatch, cartSum.length]);
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
@@ -178,7 +183,7 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
                   className="relative p-2 rounded-full transition"
                 >
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
-                    {cartSum?.data?.totalCartSize||0}
+                    {cartSum?.data?.totalCartSize || 0}
                   </span>
                   <i className="fa-solid fa-cart-shopping"></i>
                 </Link>
@@ -195,7 +200,6 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
                     SignUp/Login
                   </Button>
                 )}
-            
               </div>
             </>
           )}
@@ -212,57 +216,64 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
         className={`container max-w-5xl xl:max-w-6xl mx-auto flex space-x-6 transition-all duration-300 ${
           isMobile ? "overflow-x-auto p-2 whitespace-nowrap scrollbar-hide" : ""
         } ${
-          isSticky && isMobile ? "fixed top-0 left-0 w-full bg-white shadow-md z-40" : ""
+          isSticky && isMobile
+            ? "fixed top-0 left-0 w-full bg-white shadow-md z-40"
+            : ""
         }`}
       >
         {isMobile
           ? categories
-          ?.filter((category) => category.isVisible === true) 
-          .flatMap((category) => category.subcategories.map((sub) => sub.name)) 
-          .map((cat, idx) => (
-            <div
-              key={`${cat}-${idx}`}
-              onClick={() => handleCategorySelection(cat)}
-              className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
-                selectedCategory === cat
-                  ? "bg-green-600 border-b-4 border-green-950 text-white"
-                  : "bg-white"
-              }`}
-            >
-              <Link to={`/category/${cat}`}>{cat}</Link>
-            </div>
-          ))
-          :categories
-          .filter((category) => category.isVisible === true)
-          .map((category) => (
-            <div key={category._id} className="relative cursor-pointer group">
-              {/* Parent Category Name */}
-              <div className="inline-flex items-center">
-                <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
-                  {category.name}
-                  {category.subcategories.length > 0 && (
-                    <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
-                  )}
-                </span>
-              </div>
-          
-              {/* Subcategory Dropdown */}
-              {category.subcategories.length > 0 && (
-                <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
-                  {category.subcategories.map((sub) => (
-                    <Link
-                      key={sub._id}
-                      to={`/${category.name}/${sub.name}`} // Link structure
-                      className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
-                    >
-                      {sub.name}
-                    </Link>
-                  ))}
+              ?.filter((category) => category.isVisible === true)
+              .flatMap((category) =>
+                category.subcategories.map((sub) => sub.name)
+              )
+              .map((cat, idx) => (
+                <div
+                  key={`${cat}-${idx}`}
+                  onClick={() => handleCategorySelection(cat)}
+                  className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
+                    selectedCategory === cat
+                      ? "bg-green-600 border-b-4 border-green-950 text-white"
+                      : "bg-white"
+                  }`}
+                >
+                  <Link to={`/category/${cat}`}>{cat}</Link>
                 </div>
-              )}
-            </div>
-          ))}
-          </div>
+              ))
+          : categories
+              .filter((category) => category.isVisible === true)
+              .map((category) => (
+                <div
+                  key={category._id}
+                  className="relative cursor-pointer group"
+                >
+                  {/* Parent Category Name */}
+                  <div className="inline-flex items-center">
+                    <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
+                      {category.name}
+                      {category?.subcategories?.length > 0 && (
+                        <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
+                      )}
+                    </span>
+                  </div>
+
+                  {/* Subcategory Dropdown */}
+                  {category?.subcategories?.length > 0 && (
+                    <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
+                      {category.subcategories.map((sub) => (
+                        <Link
+                          key={sub._id}
+                          to={`/${category._id}/${sub._id}`} 
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+      </div>
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform rounded-r-xl z-44 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -278,48 +289,46 @@ export default function Navbar({ isLoggedIn, location, setLocationModal,isAdmin 
           </button>
         </div>
         <nav className="p-4 space-y-2">
-  {categories
-    .map((category, index) => (
-      <div key={index} className="border-b">
-        <p
-          className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
-          onClick={() => handleCategoryClick(category.name)}
-        >
-          {category.name}
-          <i
-            className={`fa-solid fa-chevron-down transition-transform ${
-              activeCategory === category.name ? "rotate-180" : "rotate-0"
-            }`}
-          ></i>
-        </p>
-        <ul
-          className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
-            activeCategory === category.name
-              ? "max-h-40 opacity-100"
-              : "max-h-0 opacity-0"
-          }`}
-          onClick={() => setIsSidebarOpen(false)}
-        >
-          {category.subcategories.map((cat, idx) => (
-            <li
-              key={idx}
-              className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
-            >
-              <Link to={`/${category.name}/${cat.name}`}>{cat.name}</Link>
-            </li>
+          {categories.map((category, index) => (
+            <div key={index} className="border-b">
+              <p
+                className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
+                onClick={() => handleCategoryClick(category.name)}
+              >
+                {category.name}
+                <i
+                  className={`fa-solid fa-chevron-down transition-transform ${
+                    activeCategory === category.name ? "rotate-180" : "rotate-0"
+                  }`}
+                ></i>
+              </p>
+              <ul
+                className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
+                  activeCategory === category.name
+                    ? "max-h-40 opacity-100"
+                    : "max-h-0 opacity-0"
+                }`}
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                {category?.subcategories?.map((cat, idx) => (
+                  <li
+                    key={idx}
+                    className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
+                  >
+                    <Link to={`/${category._id}/${cat._id}`}>{cat.name}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
-      </div>
-    ))}
-</nav>
+        </nav>
 
-
-        {isAdmin &&
-            <div>
-            <Link to={'/admin/admin'}>Admin</Link>
+        {isAdmin && (
+          <div>
+            <Link to={"/admin/admin"}>Admin</Link>
           </div>
-        }
-    
+        )}
+
         <SignUp isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
       </div>
     </div>

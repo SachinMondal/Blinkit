@@ -16,12 +16,12 @@ const AddProduct = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const categories = useSelector((state) => state.category.categories || []);
-const [isNextDisabled,setIsNextDisabled]=useState(true);
+  const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState({});
   useEffect(() => {
-      setIsNextDisabled(Object.keys(error).length > 0);
-    }, [error]);
+    setIsNextDisabled(Object.keys(error).length > 0);
+  }, [error]);
   const [formData, setFormData] = useState({
     category: "",
     categoryName: "",
@@ -60,7 +60,7 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    const numericFields = ["weight", "price", "discountPrice","qty","stock"];
+    const numericFields = ["weight", "price", "discountPrice", "qty", "stock"];
 
     if (numericFields.includes(name)) {
       if (value === "" || !/^\d+(\.\d{0,2})?$/.test(value)) {
@@ -92,15 +92,30 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
     const updatedQuantities = [...formData.quantities];
 
     if (field === "customUnit") {
+      // ✅ When user types in the input box, update customUnit AND keep unit as "custom"
       updatedQuantities[index].customUnit = value;
+      updatedQuantities[index].unit = "custom";
     } else {
       updatedQuantities[index][name] = value;
-      if (name === "unit" && value !== "custom") {
-        delete updatedQuantities[index].customUnit;
+
+      if (name === "unit") {
+        if (value === "custom") {
+          // ✅ Set "custom" and retain existing input (if any)
+          updatedQuantities[index].unit = "custom";
+          if (!updatedQuantities[index].customUnit) {
+            updatedQuantities[index].customUnit = "";
+          }
+        } else {
+          // ✅ If switching back to predefined, remove customUnit
+          delete updatedQuantities[index].customUnit;
+        }
       }
     }
 
+    // ✅ Update state
     setFormData({ ...formData, quantities: updatedQuantities });
+
+    console.log("Updated Quantities:", updatedQuantities);
   };
 
   const handleDetailChange = (e, index) => {
@@ -112,24 +127,18 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
       details: updatedDetails,
     }));
   };
-  
 
   const addDetail = () => {
     setFormData({
       ...formData,
-      details: [
-        ...formData.details,
-        { key: "", value: "" }
-      ],
+      details: [...formData.details, { key: "", value: "" }],
     });
   };
-  
+
   const removeDetail = (index) => {
-   const updatedDetails = formData.details.filter((_,i)=>i!==index);
-   setFormData({ ...formData, details: updatedDetails});
-    
+    const updatedDetails = formData.details.filter((_, i) => i !== index);
+    setFormData({ ...formData, details: updatedDetails });
   };
-  
 
   useEffect(() => {
     if (location.state) {
@@ -170,17 +179,14 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
   const handleSubmit = () => {
     const sanitizedFormData = { ...formData };
     delete sanitizedFormData.image;
-    
-    navigate("/admin/products/summary", { state: sanitizedFormData });
-    
 
+    navigate("/admin/products/summary", { state: sanitizedFormData });
   };
-  
-  
+
   const validateFields = useCallback(
     (step) => {
       let newErrors = {};
-  
+
       if (step === 1) {
         if (!formData.categoryName)
           newErrors.categoryName = "Category Name is required";
@@ -202,17 +208,16 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
         if (!formData.returnPolicy)
           newErrors.returnPolicy = "Return Policy is required";
       }
-  
+
       setError(newErrors);
       return Object.keys(newErrors).length === 0;
     },
     [formData]
   );
-  
 
   useEffect(() => {
     validateFields(step);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, step]);
 
   return (
@@ -290,12 +295,11 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
               />
               {formData.image && (
                 <div>
-                <LazyImage
-  src={formData.previewImage || formData.image}
-  alt="Product"
-  className="w-20 h-20 object-contain"
-/>
-
+                  <LazyImage
+                    src={formData.previewImage || formData.image}
+                    alt="Product"
+                    className="w-20 h-20 object-contain"
+                  />
                 </div>
               )}
             </div>
@@ -327,7 +331,9 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
         {step === 2 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block font-semibold mb-1 text-sm">Weight*</label>
+              <label className="block font-semibold mb-1 text-sm">
+                Weight*
+              </label>
               <input
                 name="weight"
                 value={formData.weight}
@@ -365,8 +371,6 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
                     placeholder="Qty"
                   />
 
-                  {/* ✅ Unit Dropdown (g/kg) */}
-        
                   <select
                     name="unit"
                     value={item.unit || "g"}
@@ -376,16 +380,19 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
                     <option value="g">g</option>
                     <option value="kg">kg</option>
                     <option value="unit">unit</option>
-                    <option value="custom">Other</option>{" "}
-      
+                    <option value="custom">Other</option>
                   </select>
 
-                  {/* ✅ Custom Unit Input (Only Show When "Other" is Selected) */}
+                  {/* ✅ Show Input Box Only When "custom" is Selected */}
                   {item.unit === "custom" && (
                     <input
                       type="text"
                       name="customUnit"
-                      value={item.customUnit || ""}
+                      value={
+                        item.unit !== "custom"
+                          ? item.unit
+                          : item.customUnit || ""
+                      }
                       onChange={(e) => handleQtyChange(e, index, "customUnit")}
                       className="border p-2 rounded w-24 text-sm"
                       placeholder="Enter Unit"
@@ -644,14 +651,15 @@ const [isNextDisabled,setIsNextDisabled]=useState(true);
             Cancel
           </button>
         )}
-       <>
-       {error && Object.values(error).map((errMsg, index) => (
-  <p key={index} className="text-red-500 text-sm mt-1">{errMsg}</p>
-))}
-
-       </>
+        <>
+          {error &&
+            Object.values(error).map((errMsg, index) => (
+              <p key={index} className="text-red-500 text-sm mt-1">
+                {errMsg}
+              </p>
+            ))}
+        </>
         {step < 4 ? (
-         
           <button
             onClick={handleNext}
             disabled={isNextDisabled}
