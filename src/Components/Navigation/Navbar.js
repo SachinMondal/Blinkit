@@ -223,23 +223,31 @@ export default function Navbar({
       >
         {isMobile
           ? categories
-              ?.filter((category) => category.isVisible === true)
-              .flatMap((category) =>
-                category.subcategories.map((sub) => sub.name)
-              )
-              .map((cat, idx) => (
-                <div
-                  key={`${cat}-${idx}`}
-                  onClick={() => handleCategorySelection(cat)}
-                  className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
-                    selectedCategory === cat
-                      ? "bg-green-600 border-b-4 border-green-950 text-white"
-                      : "bg-white"
-                  }`}
-                >
-                  <Link to={`/category/${cat}`}>{cat}</Link>
-                </div>
-              ))
+          ?.filter((category) => category.isVisible === true)
+          .flatMap((category) =>
+            category.subcategories.map((sub) => ({
+              categoryId: category._id, // Store the category ID
+              id: sub._id,
+              name: sub.name,
+            }))
+          )
+          .map((sub, idx) => {
+            return (
+              <div
+                key={`${sub.id}-${idx}`}
+                onClick={() => handleCategorySelection(sub.name)}
+                className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
+                  selectedCategory === sub.name
+                    ? "bg-green-600 border-b-4 border-green-950 text-white"
+                    : "bg-white"
+                }`}
+              >
+                <Link to={`/${sub.categoryId}/${sub.id}`}>{sub.name}</Link>
+              </div>
+            );
+          })
+        
+              
           : categories
               .filter((category) => category.isVisible === true)
               .map((category) => (

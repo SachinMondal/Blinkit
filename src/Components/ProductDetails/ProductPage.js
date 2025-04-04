@@ -94,7 +94,7 @@ const ProductPage = () => {
       </nav>
 
       <div className="flex flex-col lg:flex-row items-start lg:space-x-6">
-        <div className="w-full lg:w-1/2 p-4 border-r lg:h-screen lg:sticky top-0 overflow-y-auto">
+        <div className="w-full lg:w-1/2 p-4 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
           <LazyImage
             src={product?.image}
             alt={product?.name}
@@ -139,7 +139,7 @@ const ProductPage = () => {
                 <strong>Return Policy:</strong> {product?.returnPolicy || "N/A"}
               </p>
             </div>
-            <div className="p-6 border-t text-left">
+            <div className="p-6 border-t text-left mt-5">
               <h2 className="text-xl font-bold text-left">
                 Additional Information
               </h2>

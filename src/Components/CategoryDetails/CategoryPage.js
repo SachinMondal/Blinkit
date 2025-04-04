@@ -8,25 +8,30 @@ import { getCategoryAndProduct } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 
 const CategoryPage = () => {
-  const  {parentCategory}  = useParams();
-  const category=parentCategory;
+  const { parentCategory } = useParams();
+  const category = parentCategory;
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const categories = useSelector(
     (state) => state.category.categoryAndProduct || []
   );
-  console.log(categories);
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
   }, [dispatch, categories.length, category]);
-  const [selectedCategory, setSelectedCategory] = useState(categories.name || "");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const containerRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [sortOrder, setSortOrder] = useState("asc");
   const [showScrollButton, setShowScrollButton] = useState(false);
-
+  useEffect(() => {
+    if (categories?.subcategories?.length > 0) {
+      setSelectedCategory(categories.subcategories[0].name);
+    }
+  }, [categories]);
   const handleSort = (order) => {
     setSortOrder(order);
+    console.log(order);
     setShowDropdown(false);
   };
   useEffect(() => {
@@ -159,15 +164,26 @@ const CategoryPage = () => {
 
             {/* Sorted Product List */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-  {categories?.subcategories?.flatMap((subcategory) =>
-    Array.isArray(subcategory.products)
-      ? subcategory.products.map((product, index) => (
-          <ProductTile key={product._id || index} product={product} onClick={() => handleProductClick(product._id)} />
-        ))
-      : []
-  )}
-</div>
-
+              {categories?.subcategories?.flatMap((subcategory) =>
+                Array.isArray(subcategory.products)
+                  ? [...subcategory.products]
+                      .sort((a, b) => {
+                        const priceA = a.variants?.[0]?.price ?? 0;
+                        const priceB = b.variants?.[0]?.price ?? 0;
+                        return sortOrder === "asc"
+                          ? priceA - priceB
+                          : priceB - priceA;
+                      })
+                      .map((product, index) => (
+                        <ProductTile
+                          key={product._id || index}
+                          product={product}
+                          onClick={() => handleProductClick(product._id)}
+                        />
+                      ))
+                  : []
+              )}
+            </div>
           </div>
 
           {/* Scroll to Top Button */}

@@ -20,18 +20,17 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // ✅ Add to Cart (Now includes variantIndex)
-export const addToCart = (productId, variantIndex, quantity,count) => async (dispatch, getState) => {
+export const addToCart = (productId, variantIndex,count) => async (dispatch, getState) => {
     try {
         dispatch({ type: ADD_TO_CART_REQUEST });
         const token = getState().auth.token;
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        console.log(productId,variantIndex,quantity,count);
+        console.log(productId,variantIndex,count);
         const  data  = await axios.post(
             `${API_URL}/api/cart/addToCart`,
-            { productId, variantIndex, quantity,count },
+            { productId, variantIndex,count },
             config
         );
-        console.log(data)
         dispatch({ type: ADD_TO_CART_SUCCESS, payload: data.data.data });
         return data.data.success;
     } catch (error) {
@@ -40,7 +39,7 @@ export const addToCart = (productId, variantIndex, quantity,count) => async (dis
 };
 
 // ✅ Update Cart Item (Now updates a specific variant)
-export const updateCart = (productId, variantIndex, newQuantity) => async (dispatch, getState) => {
+export const updateCart = (productId, variantIndex, count) => async (dispatch, getState) => {
     try {
         dispatch({ type: UPDATE_CART_ITEM_REQUEST });
 
@@ -49,7 +48,7 @@ export const updateCart = (productId, variantIndex, newQuantity) => async (dispa
 
         const  data  = await axios.put(
             `${API_URL}/api/cart/update`,
-            { productId, variantIndex, newQuantity },
+            { productId, variantIndex, count },
             config
         );
         dispatch({ type: UPDATE_CART_ITEM_SUCCESS, payload: data.data.data });
@@ -61,20 +60,24 @@ export const updateCart = (productId, variantIndex, newQuantity) => async (dispa
 };
 
 // ✅ Remove from Cart
-export const removeFromCart = (productId) => async (dispatch, getState) => {
+export const removeFromCart = (productId, variantIndex) => async (dispatch, getState) => {
     try {
         dispatch({ type: REMOVE_FROM_CART_REQUEST });
 
         const token = getState().auth.token;
-        if (!token) throw new Error("No token found"); // Check for missing token
+        if (!token) throw new Error("No token found");
 
-        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        };
+        const  data  = await axios.post(`${API_URL}/api/cart/remove`, { productId, variantIndex }, config);
 
-        // Pass productId in the URL, not as a body
-        const  data  = await axios.delete(`${API_URL}/api/cart/remove/${productId}`, config);
-        console.log(data);
+        
 
-        dispatch({ type: REMOVE_FROM_CART_SUCCESS, payload: data.data });
+        dispatch({ type: REMOVE_FROM_CART_SUCCESS, payload: data.data.data });
         return data.data.success;
     } catch (error) {
         dispatch({ 
@@ -93,7 +96,7 @@ export const fetchCart = () => async (dispatch, getState) => {
         const token = getState().auth.token;
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        const data = await axios.get(`${API_URL}/api/cart/`, config);
+        const data = await axios.get(`${API_URL}/api/cart/`, config)
 
         dispatch({ type: FETCH_CART_SUCCESS, payload: data.data.data,payload2:data.data });
     } catch (error) {

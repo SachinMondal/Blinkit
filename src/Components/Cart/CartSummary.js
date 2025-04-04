@@ -5,6 +5,7 @@ import { getAllAddresses } from "../../redux/state/address/Action";
 import { createOrder } from "../../redux/state/order/Action";
 import { clearCart } from "../../redux/state/cart/Action";
 const CartSummary = ({ cartItems }) => {
+  console.log(cartItems);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const addresses = useSelector((state) => state.address.addresses);

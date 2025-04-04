@@ -75,7 +75,7 @@ const ProductCarousel = ({ products }) => {
             {currentSlide < Math.max(0, categoryData.products.length - settings.slidesToShow) && (
               <button
                 onClick={() => sliderRef.current.slickNext()}
-                className="absolute right-10 top-1/2 transform -translate-y-1/2 z-20 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
+                className="absolute right-36 top-1/2 transform -translate-y-1/2 z-20 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
               >
                 <i className="fa-solid fa-chevron-right"></i>
               </button>
