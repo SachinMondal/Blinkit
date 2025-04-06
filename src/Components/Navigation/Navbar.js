@@ -23,7 +23,6 @@ export default function Navbar({
   const [selectedCategory, setSelectedCategory] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
-    // Get initial position of the category list
     const categoryList = document.getElementById("category-list");
     if (categoryList) {
       setCategoryTop(categoryList.offsetTop);
@@ -66,7 +65,7 @@ export default function Navbar({
   };
   useEffect(() => {
     dispatch(fetchCart());
-  }, [dispatch, cartSum.length]);
+  }, [dispatch]);
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${

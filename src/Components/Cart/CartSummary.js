@@ -5,22 +5,20 @@ import { getAllAddresses } from "../../redux/state/address/Action";
 import { createOrder } from "../../redux/state/order/Action";
 import { clearCart } from "../../redux/state/cart/Action";
 const CartSummary = ({ cartItems }) => {
-  console.log(cartItems);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const addresses = useSelector((state) => state.address.addresses);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false );
+  
 
   useEffect(() => {
     dispatch(getAllAddresses());
   }, [dispatch]);
 
-  if (!cartItems || Object.keys(cartItems).length === 0) {
-    return <p className="text-center text-gray-500">Cart is empty.</p>;
-  }
+  
 
   const totalItemPrice = cartItems.totalCartAmount || 0;
   const cartSize = cartItems.totalCartSize || 0;
@@ -43,13 +41,23 @@ const CartSummary = ({ cartItems }) => {
       console.error("No address selected");
       return;
     }
+  
     setIsPlacingOrder(true);
     await dispatch(createOrder(cartItems, selectedAddress));
     setIsPlacingOrder(false);
     setIsAddressModalOpen(false);
-    setIsSuccessModalOpen(true);
-    dispatch(clearCart());
+    setIsSuccessModalOpen(true); // Show modal, but don't clear cart yet
   };
+
+
+  const handleViewOrders = () => {
+    navigate("/profile", { state: { active: "orders" } });
+    dispatch(clearCart()); 
+  };
+  
+
+  
+
 
   return (
     <>
@@ -146,7 +154,7 @@ const CartSummary = ({ cartItems }) => {
             <p className="text-center mt-2">Thank you for your purchase.</p>
             <button
               className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
-              onClick={() => { setIsSuccessModalOpen(false); navigate("/profile"); }}
+              onClick={handleViewOrders}
             >
               View Orders
             </button>

@@ -6,7 +6,10 @@ import {
   deleteBanner,
 } from "../../redux/state/home/Action";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllOrdersForAdmin } from "../../redux/state/order/Action";
+import {
+  getAllOrdersForAdmin,
+  updateOrder,
+} from "../../redux/state/order/Action";
 
 const Dashboard = () => {
   const [deliveryTimes, setDeliveryTimes] = useState({});
@@ -38,17 +41,16 @@ const Dashboard = () => {
     formData.append("image", selectedImage.file);
     formData.append("alt", altText);
 
-    await dispatch(uploadBanner(formData)); // Upload image
-    dispatch(getBanners()); // Fetch updated banners
-
-    setSelectedImage(null); // Clear preview
+    await dispatch(uploadBanner(formData));
+    dispatch(getBanners());
+    setSelectedImage(null);
     setAltText("");
     setIsUploading(false);
   };
 
   const handleDeleteBanner = async (id) => {
-    await dispatch(deleteBanner(id)); // Delete banner
-    dispatch(getBanners()); // Fetch updated banners
+    await dispatch(deleteBanner(id));
+    dispatch(getBanners());
   };
 
   const handleDeliveryTimeChange = (orderId, value) => {
@@ -56,35 +58,20 @@ const Dashboard = () => {
       ...prev,
       [orderId]: value,
     }));
+    dispatch(
+      updateOrder(orderId, { deliveryTime: value, orderStatus: "ACCEPTED" })
+    );
   };
-   useEffect(()=>{
+
+  useEffect(() => {
     dispatch(getAllOrdersForAdmin());
-   },[dispatch]);
-   const filteredOrders = orders.filter((order) => order.orderStatus !== "Pending");
+  }, [dispatch, orders]);
+  const filteredOrders = orders.filter(
+    (order) => order.orderStatus !== "Pending"
+  );
+
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {/* Product Stats */}
-      <div className="bg-white p-5 rounded-lg shadow flex items-center space-x-4">
-        <i className="fa-brands fa-product-hunt text-4xl text-blue-500"></i>
-        <div>
-          <h3 className="text-xl font-semibold">Total Products</h3>
-          <p className="text-gray-500">250</p>
-        </div>
-      </div>
-      <div className="bg-white p-5 rounded-lg shadow flex items-center space-x-4">
-        <i className="fa-solid fa-cart-shopping text-4xl text-green-500"></i>
-        <div>
-          <h3 className="text-xl font-semibold">Total Orders</h3>
-          <p className="text-gray-500">1,200</p>
-        </div>
-      </div>
-      <div className="bg-white p-5 rounded-lg shadow flex items-center space-x-4">
-        <i className="fa-solid fa-user text-4xl text-purple-500"></i>
-        <div>
-          <h3 className="text-xl font-semibold">Total Customers</h3>
-          <p className="text-gray-500">850</p>
-        </div>
-      </div>
       {/* Live Orders */}
       <div className="bg-white p-5 rounded-lg shadow col-span-1 md:col-span-2 lg:col-span-3 min-h-[250px] flex flex-col items-center justify-center">
         <h3 className="text-xl font-semibold mb-4">Live Orders</h3>
@@ -93,33 +80,63 @@ const Dashboard = () => {
             <ul className="divide-y divide-gray-200">
               {filteredOrders.map((order) => (
                 <li
-                  key={order.id}
-                  className="flex justify-between items-center p-3"
+                  key={order._id}
+                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 gap-2"
                 >
                   <div>
-                    <h4 className="font-semibold">{order.customer}</h4>
+                    <h4 className="font-semibold">{order.user.name}</h4>
                     <p className="text-gray-500">
-                      {order?.orderItems?.map((o)=>{
-                        return `${o.name} x ${o.quantity}`
-                      })} items - {order.orderStatus}
+                      {order?.orderItems
+                        ?.map((o) => `${o.productId.name} x ${o.quantity}`)
+                        .join(", ")}{" "}
+                      items - {order.orderStatus}
                     </p>
                   </div>
-                  <span className="text-gray-700">{order.amount}</span>
-                  <select
-                    value={deliveryTimes[order.id] || ""}
-                    onChange={(e) =>
-                      handleDeliveryTimeChange(order.id, e.target.value)
-                    }
-                    className="ml-4 p-2 border rounded bg-gray-100 text-sm"
-                  >
-                    <option value="" disabled>
-                      Select Time
-                    </option>
-                    <option value="30 mins">30 mins</option>
-                    <option value="1 hour">1 hour</option>
-                    <option value="2 hours">2 hours</option>
-                    <option value="custom">Custom</option>
-                  </select>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <span className="text-gray-700">{order.subtotalPrice}</span>
+
+                    <select
+                      value={
+                        deliveryTimes[order._id] || order.deliveryTime || ""
+                      }
+                      onChange={(e) =>
+                        handleDeliveryTimeChange(order._id, e.target.value)
+                      }
+                      className="p-2 border rounded bg-gray-100 text-sm"
+                    >
+                      <option value="" disabled>
+                        Select Time
+                      </option>
+
+                      {["10 mins", "20 mins", "30 mins","1 Hour"].map((time) => (
+                        <option key={time} value={time}>
+                          {time}
+                        </option>
+                      ))}
+
+                      {order.deliveryTime &&
+                        !["30 mins", "1 hour", "2 hours"].includes(
+                          order.deliveryTime
+                        ) && (
+                          <option value={order.deliveryTime}>
+                            {order.deliveryTime}
+                          </option>
+                        )}
+
+                      <option value="custom">Custom</option>
+                    </select>
+
+                    {deliveryTimes[order._id] === "custom" && (
+                      <input
+                        type="text"
+                        placeholder="Enter custom time"
+                        className="p-2 border rounded text-sm"
+                        onBlur={(e) =>
+                          handleDeliveryTimeChange(order._id, e.target.value)
+                        }
+                      />
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

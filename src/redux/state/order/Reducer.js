@@ -46,21 +46,38 @@ const orderReducer = (state = initialState, action) => {
     case FETCH_ADMIN_ORDERS_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
-    // Get Order by ID (Fix: Assign to `order` instead of `adminOrders`)
+    // Get Order by ID
     case GET_ORDER_BY_ID_REQUEST:
       return { ...state, loading: true, error: null };
     case GET_ORDER_BY_ID_SUCCESS:
-      return { ...state, loading: false, order: action.payload }; // ✅ Fixed here
+      return { ...state, loading: false, order: action.payload };
     case GET_ORDER_BY_ID_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
     // Create Order
     case CREATE_ORDER_REQUEST:
-      return { ...state, loading: true, error: null };
+      return { 
+        ...state, 
+        loading: true, 
+        success: false,  // Reset success before creating order
+        error: null 
+      };
+
     case CREATE_ORDER_SUCCESS:
-      return { ...state, loading: false, success: true, order: action.payload };
+      return { 
+        ...state, 
+        loading: false, 
+        success: true, 
+        order: action.payload 
+      };
+
     case CREATE_ORDER_FAILURE:
-      return { ...state, loading: false, error: action.payload };
+      return { 
+        ...state, 
+        loading: false, 
+        success: false,  // Ensure success resets on failure
+        error: action.payload 
+      };
 
     // Delete Order
     case DELETE_ORDER_REQUEST:
@@ -70,14 +87,16 @@ const orderReducer = (state = initialState, action) => {
     case DELETE_ORDER_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
-    // Update Order
+    // Update Order (Fix: Maintain immutability)
     case UPDATE_ORDER_REQUEST:
       return { ...state, loading: true, error: null };
+
     case UPDATE_ORDER_SUCCESS:
       return {
         ...state,
-        orders: state.orders.map((o) =>
-          o._id === action.payload._id ? action.payload : o
+        loading: false,
+        orders: state.orders.map((order) =>
+          order._id === action.payload._id ? { ...action.payload } : order
         ),
       };
 

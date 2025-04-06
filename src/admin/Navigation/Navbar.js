@@ -6,7 +6,6 @@ const Navbar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
 
-  // Prevent body scrolling when menu is open
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");

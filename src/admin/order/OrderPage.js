@@ -1,40 +1,40 @@
 import { useEffect, useState } from "react";
-import OrderTile from "./OrderTile"; // Importing OrderTile Component
+import OrderTile from "./OrderTile";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import { getAllOrdersForAdmin } from "../../redux/state/order/Action";
 import { useDispatch, useSelector } from "react-redux";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
-  const orders = useSelector((state) => state.order.adminOrders);
+  const orders = useSelector((state) => state.order.adminOrders || []);
   const [selectedTab, setSelectedTab] = useState("All");
 
   useEffect(() => {
     dispatch(getAllOrdersForAdmin());
   }, [dispatch]);
 
-  // ✅ Corrected Tabs List
   const tabs = [
     { label: "All", status: "All" },
     { label: "New Order", status: "PENDING" },
     { label: "Accepted Order", status: "ACCEPTED" },
-    { label: "Processing Order", status: "PROCESSING" },
+    { label: "Shipping Order", status: "SHIPPED" },
     { label: "Delivered Order", status: "DELIVERED" },
+    { label: "Cancelled Order", status: "CANCEL" },
+    { label: "Rejected Order", status: "REJECT" },
   ];
 
-  // ✅ Filter Orders Based on Status
   const filteredOrders =
     selectedTab === "All"
       ? orders
-      : orders.filter((order) => order.orderStatus.toUpperCase() === selectedTab);
+      : orders.filter(
+          (order) => order.orderStatus?.toUpperCase() === selectedTab
+        );
 
   return (
     <div className="flex flex-col overflow-hidden mx-auto w-full md:max-w-7xl px-4">
-      {/* Sticky Scrollable Tab Bar */}
+      {/* Sticky Tabs */}
       <div className="fixed top-16 bg-white border-b w-full z-10">
         <h1 className="text-xl font-semibold p-4">Orders</h1>
-
-        {/* Scrollable Tabs */}
         <div className="flex overflow-x-auto scrollbar-hide border-b pb-2 space-x-4">
           {tabs.map((tab) => (
             <button
@@ -54,8 +54,10 @@ const OrdersPage = () => {
 
       {/* Orders Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-28">
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => <OrderTile key={order.id} order={order} />)
+        {filteredOrders && filteredOrders.length > 0 ? (
+          filteredOrders.map((order) => (
+            <OrderTile key={order._id} order={order} />
+          ))
         ) : (
           <div className="col-span-full text-center p-10">
             <LazyImage

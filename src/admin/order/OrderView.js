@@ -18,31 +18,39 @@ const OrderView = () => {
   const getNextStatus = (currentStatus) => {
     switch (currentStatus) {
       case "PENDING":
+        return "ACCEPTED";
+      case "ACCEPTED":
         return "SHIPPED";
       case "SHIPPED":
         return "DELIVERED";
-      case "REJECTED":
-        return "PENDING";
+      case "DELIVERED":
+      case "REJECT":
+      case "CANCEL":
+        return null; 
       default:
         return null;
     }
   };
+  
 
   const updateStatus = async () => {
     const newStatus = getNextStatus(order.orderStatus);
     if (!newStatus) return;
-
+  
     setLoadingUpdate(true);
-    await dispatch(updateOrder(order._id, { orderStatus: newStatus }));
+    await dispatch(updateOrder(id, { orderStatus: newStatus }));
+    await dispatch(getOrderById(id)); 
     setLoadingUpdate(false);
   };
-
+  
   const handleReject = async () => {
     setLoadingReject(true);
-    await dispatch(updateOrder(order._id, { orderStatus: "REJECTED" }));
+    await dispatch(updateOrder(order._id, { orderStatus: "REJECT" }));
+    await dispatch(getOrderById(id));
     setLoadingReject(false);
     setShowRejectModal(false);
   };
+  
 
   return (
     <div className="p-4 md:p-8 w-full max-w-3xl mx-auto">
@@ -54,7 +62,6 @@ const OrderView = () => {
         </Link>
       </div>
 
-      {/* Customer Details */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-4">
         <h2 className="text-lg font-semibold">Customer Details</h2>
         <p className="text-gray-700 font-medium text-xl">
@@ -85,67 +92,67 @@ const OrderView = () => {
           </div>
         </div>
 
-        {/* Delivery Address */}
         <div className="mt-4">
           <h3 className="text-gray-600 font-medium">Delivery Address</h3>
-          {Array.isArray(order.shippingAddress) ? (
-            order.shippingAddress.map((addr, index) => (
-              <p key={index} className="text-gray-800">
-                {addr.firstName} {addr.lastName}, {addr.street}, {addr.city},{" "}
-                {addr.state}, {addr.zipCode}
-              </p>
-            ))
+          {order.shippingAddress ? (
+            <p className="text-gray-800">
+              {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+              ,<br />
+              {order.shippingAddress.streetAddress},{" "}
+              {order.shippingAddress.city}, {order.shippingAddress.state},{" "}
+              {order.shippingAddress.zipCode}
+            </p>
           ) : (
             <p className="text-gray-500">No shipping address available</p>
           )}
         </div>
         <div className="mt-4">
           <h3 className="text-gray-600 font-medium">Order Date & Time</h3>
-          <p className="text-gray-800">{order.orderDate}</p>
+          <p className="text-gray-800">
+            {new Date(order.createdAt).toLocaleString()}
+          </p>
         </div>
+        <p className="text-sm text-gray-500 mt-1">
+          Delivery Time: {order.deliveryTime || "Not specified"}
+        </p>
       </div>
 
-      {/* Order Details */}
       <div className="bg-white p-4 rounded-lg shadow-md md:mb-12 mb-16">
         <h2 className="text-lg font-semibold">Order Summary</h2>
         <div className="mt-2 border-t pt-2">
           {order?.orderItems?.map((item, index) => (
             <div key={index} className="flex justify-between py-2 border-b">
               <div>
-                <p className="text-gray-700">{item.name}</p>
+                <p className="text-gray-700">
+                  {item.name || item.productId?.name}
+                </p>
                 <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
               </div>
               <p className="text-gray-900 font-semibold">
-                ${(item.price * item.quantity).toFixed(2)}
+                ₹{(item.subtotalPrice * item.quantity).toFixed(2)}
               </p>
             </div>
           ))}
         </div>
-
         <div className="mt-4 text-sm text-gray-700">
           <div className="flex justify-between py-1">
             <p>Subtotal:</p>
-            <p>${order.subTotal?.toFixed(2)}</p>
+            <p>₹{order.totalCartAmount?.toFixed(2)}</p>
           </div>
           <div className="flex justify-between py-1">
             <p>Discount:</p>
             <p className="text-green-600">
-              -${order.discount?.toFixed(2) || 0}
+              -₹{order.totalCartDiscountAmount?.toFixed(2) || 0}
             </p>
-          </div>
-          <div className="flex justify-between py-1">
-            <p>Delivery Charges:</p>
-            <p>${order.deliveryCharge?.toFixed(2) || 10}</p>
           </div>
           <hr className="my-2" />
           <div className="flex justify-between font-semibold text-lg">
             <p>Total Amount:</p>
-            <p>${order.totalPrice?.toFixed(2)}</p>
+            <p>₹{order.totalCartDiscountedPrice?.toFixed(2)}</p>
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="fixed bottom-0 left-0 w-full bg-white p-4 flex justify-between shadow-md">
         {order.orderStatus !== "DELIVERED" && (
           <>
@@ -171,7 +178,6 @@ const OrderView = () => {
         )}
       </div>
 
-      {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">

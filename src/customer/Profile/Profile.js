@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Modal } from "../../Components/AddressModalComponent/AddressModal";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import OrderModel from "../../Components/OrderModel/OrderModel";
 import PersonalInfo from "../../Components/PersonalInfo/PersonalInfo";
 import emptyAddress from "../../images/emptyAddress.png";
@@ -15,7 +15,9 @@ import {
 import { fetchOrders } from "../../redux/state/order/Action";
 const Profile = () => {
   const dispatch = useDispatch();
-  const [activeSection, setActiveSection] = useState("personalInfo");
+  const location=useLocation();
+  const activeTab = location.state?.active;
+  const [activeSection, setActiveSection] = useState(activeTab?activeTab:"personalInfo");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -170,7 +172,7 @@ const Profile = () => {
                         <div className="col-span-2 flex justify-end relative">
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); // Prevent event bubbling
+                              e.stopPropagation(); 
                               setMenuOpen(
                                 menuOpen === addr._id ? null : addr._id
                               );
@@ -208,7 +210,7 @@ const Profile = () => {
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center min-h-[300px] p-5 rounded-md">
-                    <img
+                    <LazyImage
                       src={emptyAddress}
                       alt="Empty Address"
                       className="w-40 h-40 object-contain mb-3"
@@ -220,7 +222,6 @@ const Profile = () => {
                 )}
               </ul>
 
-              {/* Delete Confirmation Modal */}
               {deleteConfirm && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
                   <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
@@ -263,30 +264,70 @@ const Profile = () => {
 
               {loading ? (
                 <p>Loading orders...</p>
-              ) : orders.length > 0 ? (
+              ) : orders?.length > 0 ? (
                 orders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="grid grid-cols-12 items-center py-3 border-b border-gray-300"
-                  >
-                    <div className="col-span-1 flex justify-center">
-                      <i className="fa-solid fa-bowl-food text-base md:text-xl text-gray-600"></i>
-                    </div>
-                    <div className="col-span-6 text-left">
-                      <p className="font-bold">
-                        {order.id|| null} - ₹{order.totalPrice} | Ordered on:{" "}
-                        {order.orderDate} {order.time}
+                  <div key={order._id} className="mb-6">
+                    <div className="py-3">
+                      <p className="font-bold text-left mb-1">
+                        Order ID: {order._id}
                       </p>
-                      <p className="text-gray-500">{order.orderStatus}</p>
+                      <p className="text-gray-500 text-left mb-1">
+                        Ordered on:{" "}
+                        {new Date(order.createdAt).toLocaleDateString()}{" "}
+                        {new Date(order.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      <p className="text-gray-500 text-left mb-1 capitalize">
+                        Status: {order.orderStatus?.toLowerCase() || "pending"}
+                      </p>
+                      <p className="font-semibold text-left mb-4">
+                        Total Amount: ₹{order.totalCartDiscountedPrice}
+                      </p>
+                      <p className="font-semibold text-left mb-4">
+                        Delivery Time: {order.deliveryTime==="Pending"?"Waiting from Admin...":order.deliveryTime}
+                      </p>
                     </div>
-                    <div className="col-span-5 flex justify-end">
-                      <button
-                        className="text-green-600 font-semibold hover:underline"
-                        onClick={() => setSelectedOrder(order)}
+
+                    {order.orderItems?.map((item) => (
+                      <div
+                        key={item._id}
+                        className="grid grid-cols-12 items-center py-3 border-b border-gray-300"
                       >
-                        View Details
-                      </button>
-                    </div>
+                        <div className="col-span-2 flex justify-center">
+                          <LazyImage
+                            src={item.productId.image}
+                            alt={item.productId.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        </div>
+
+                        <div className="col-span-7 text-left">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-bold">Name: {item.productId.name}</p>
+                              <p className="text-sm text-gray-400 mt-1">
+                                Weight: {item?.variantDetails?.qty}
+                                {item?.variantDetails?.unit}
+                              </p>
+                            </div>
+                            <div className="text-sm font-semibold mt-1">
+                              x {item.quantity}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="col-span-3 text-right">
+                          <button
+                            className="text-green-600 font-semibold hover:underline"
+                            onClick={() => setSelectedOrder(order)}
+                          >
+                            View Details
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ))
               ) : (
