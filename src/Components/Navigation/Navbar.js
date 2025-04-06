@@ -94,14 +94,13 @@ export default function Navbar({
         setShowDropdown(false);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
-  
+
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
@@ -379,27 +378,39 @@ export default function Navbar({
                 );
               })
           : categories
-          .filter((category) => category.isVisible)
-          .map((category) => (
-            <div key={category._id} className="relative cursor-pointer group">
-              {/* Parent Category Name */}
-              <div className="inline-flex items-center">
-                <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
-                  <Link to={`/categoryviewAll/${category._id}`}>
-                    {category.name}
-                  </Link>
+              .filter((category) => category.isVisible)
+              .map((category) => (
+                <div
+                  key={category._id}
+                  className="relative cursor-pointer group"
+                >
+                  {/* Parent Category Name */}
+                  <div className="inline-flex items-center">
+                    <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
+                      <Link to={`/categoryviewAll/${category._id}`}>
+                        {category.name}
+                      </Link>
+                      {category?.subcategories?.length > 0 && (
+                        <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
+                      )}
+                    </span>
+                  </div>
                   {category?.subcategories?.length > 0 && (
-                    <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
+                    <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
+                      {category.subcategories.map((sub) => (
+                        <Link
+                          key={sub._id}
+                          to={`/${category._id}/${sub._id}`}
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
+                        >
+                          {sub.name}
+                        </Link>
+                      ))}
+                    </div>
                   )}
-                </span>
-              </div>
-      
-        
-             
-            </div>
-          ))}
-  
-        </div>
+                </div>
+              ))}
+      </div>
       <div
         className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg transform rounded-r-xl z-50 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
