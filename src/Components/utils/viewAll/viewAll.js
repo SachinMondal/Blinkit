@@ -21,7 +21,7 @@ const ViewAll = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto flex gap-8 flex-col overflow-hidden">
+    <div className="p-6 max-w-5xl mx-auto flex gap-2 flex-col overflow-hidden">
       <div className="text-sm text-gray-600 text-left">
         <Link to="/" className="text-blue-500 hover:underline">
           Home
