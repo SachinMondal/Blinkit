@@ -92,7 +92,6 @@ const AddProduct = () => {
     const updatedQuantities = [...formData.quantities];
 
     if (field === "customUnit") {
-      // ✅ When user types in the input box, update customUnit AND keep unit as "custom"
       updatedQuantities[index].customUnit = value;
       updatedQuantities[index].unit = "custom";
     } else {
@@ -100,22 +99,16 @@ const AddProduct = () => {
 
       if (name === "unit") {
         if (value === "custom") {
-          // ✅ Set "custom" and retain existing input (if any)
           updatedQuantities[index].unit = "custom";
           if (!updatedQuantities[index].customUnit) {
             updatedQuantities[index].customUnit = "";
           }
         } else {
-          // ✅ If switching back to predefined, remove customUnit
           delete updatedQuantities[index].customUnit;
         }
       }
     }
-
-    // ✅ Update state
     setFormData({ ...formData, quantities: updatedQuantities });
-
-    console.log("Updated Quantities:", updatedQuantities);
   };
 
   const handleDetailChange = (e, index) => {
@@ -178,8 +171,6 @@ const AddProduct = () => {
 
   const handleSubmit = () => {
     const sanitizedFormData = { ...formData };
-    delete sanitizedFormData.image;
-
     navigate("/admin/products/summary", { state: sanitizedFormData });
   };
 

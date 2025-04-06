@@ -27,19 +27,18 @@ const HomePage = () => {
     if (!category.length) {
       dispatch(getCategoryProduct());
     }
-  }, [dispatch, category.length]);
+  }, [category.length, dispatch]);
 
   useEffect(() => {
     if (!data.length) {
       dispatch(getCategoryProduct());
     }
-  }, [dispatch, data.length]);
+  }, [data.length, dispatch]);
 
   const handleCategoryClick = (categoryId) => {
     navigate(`/category/${categoryId}`);
   };
 
-  // Unique Categories for Slider
   const uniqueCategories = category.reduce((acc, item) => {
     if (!acc.find((cat) => cat.name === item.name)) {
       acc.push(item);
@@ -47,22 +46,38 @@ const HomePage = () => {
     return acc;
   }, []);
 
-  // Function to filter categories dynamically
-  const filterCategories = (condition) => 
-    Object.entries(data || {})
-      .filter(([_, category]) => category?.categoryDetails?.[condition])
-      .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {});
-
-  // Sections based on category details
   const filteredSections = {
-    topCategories: filterCategories("isParent") || filterCategories("isHomePageVisible"),
-    featured: filterCategories("isFeatured"),
-    newArrivals: filterCategories("isNew"),
-    onSale: filterCategories("isSale"),
-    special: filterCategories("isSpecial"),
+    featured: {},
+    newArrivals: {},
+    onSale: {},
+    special: {},
+    topCategories: {},
+    bestSeller:{},
   };
 
-  // Slider Settings
+  Object.entries(data || {}).forEach(([key, category]) => {
+    const details = category?.categoryDetails || {};
+
+    if (details?.isFeatured) {
+      filteredSections.featured[key] = category;
+    }
+    if (details?.newArrivals) {
+      filteredSections.newArrivals[key] = category;
+    }
+    if (details?.isSale) {
+      filteredSections.onSale[key] = category;
+    }
+    if (details?.isSpecial) {
+      filteredSections.special[key] = category;
+    }
+    if (details?.isHomePageVisible || details?.isVisible) {
+      filteredSections.topCategories[key] = category;
+    }
+    if (details?.isBestSeller || details?.isVisible) {
+      filteredSections.bestSeller[key] = category;
+    }
+  });
+
   const sliderSettings = {
     dots: true,
     infinite: true,
@@ -82,11 +97,26 @@ const HomePage = () => {
     autoplaySpeed: 2500,
     cssEase: "linear",
     responsive: [
-      { breakpoint: 1280, settings: { slidesToShow: Math.min(uniqueCategories.length, 5.5) } },
-      { breakpoint: 1024, settings: { slidesToShow: Math.min(uniqueCategories.length, 4) } },
-      { breakpoint: 640, settings: { slidesToShow: Math.min(uniqueCategories.length, 2.8) } },
-      { breakpoint: 425, settings: { slidesToShow: Math.min(uniqueCategories.length, 2) } },
-      { breakpoint: 320, settings: { slidesToShow: Math.min(uniqueCategories.length, 1.5) } },
+      {
+        breakpoint: 1280,
+        settings: { slidesToShow: Math.min(uniqueCategories.length, 5.5) },
+      },
+      {
+        breakpoint: 1024,
+        settings: { slidesToShow: Math.min(uniqueCategories.length, 4) },
+      },
+      {
+        breakpoint: 640,
+        settings: { slidesToShow: Math.min(uniqueCategories.length, 2.8) },
+      },
+      {
+        breakpoint: 425,
+        settings: { slidesToShow: Math.min(uniqueCategories.length, 2) },
+      },
+      {
+        breakpoint: 320,
+        settings: { slidesToShow: Math.min(uniqueCategories.length, 1.5) },
+      },
     ],
   };
 
@@ -102,7 +132,10 @@ const HomePage = () => {
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           <Slider {...sliderSettings}>
             {banners?.data?.map((img, index) => (
-              <div key={index} className="flex justify-center max-w-7xl mx-auto px-4">
+              <div
+                key={index}
+                className="flex justify-center max-w-7xl mx-auto px-4"
+              >
                 <LazyImage
                   src={img.image}
                   alt={img.alt}
@@ -111,6 +144,7 @@ const HomePage = () => {
               </div>
             ))}
           </Slider>
+
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">
             <Slider {...categorySliderSettings}>
               {uniqueCategories.map((item) => (
@@ -125,14 +159,26 @@ const HomePage = () => {
             </Slider>
           </div>
 
-          <div className="w-full max-w-7xl mx-auto mt-4 px-4">
-            {Object.entries(filteredSections).map(([sectionName, products]) => (
-              Object.keys(products).length > 0 && (
-                <div key={sectionName} className="flex gap-6 mt-8">
-                  <ProductCarousel title={sectionName.replace(/([A-Z])/g, " $1").trim()} products={products} />
-                </div>
-              )
-            ))}
+          <div className="flex flex-col gap-8">
+            {Object.entries(filteredSections).map(
+              ([sectionName, sectionObject]) =>
+                Object.entries(sectionObject).map(([key, categoryData]) => {
+                  if (!categoryData?.products?.length) return null;
+
+                  return (
+                    <ProductCarousel
+                      key={categoryData.categoryId}
+                      title={
+                        sectionName === "HomePageVisible"
+                          ? categoryData?.categoryDetails?.name || key
+                          : sectionName
+                      }
+                      products={categoryData.products}
+                      categoryId={categoryData.categoryId}
+                    />
+                  );
+                })
+            )}
           </div>
         </div>
       )}

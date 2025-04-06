@@ -12,7 +12,6 @@ const ViewAll = () => {
   const navigate = useNavigate();
 
   const { name, subcategories } = useSelector((state) => state.category.categoryAndProduct);
-console.log(subcategories)
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
   }, [category, dispatch]);
@@ -23,7 +22,6 @@ console.log(subcategories)
 
   return (
     <div className="p-6 max-w-5xl mx-auto flex gap-8 flex-col overflow-hidden">
-      {/* Breadcrumb Navigation */}
       <div className="text-sm text-gray-600 text-left">
         <Link to="/" className="text-blue-500 hover:underline">
           Home

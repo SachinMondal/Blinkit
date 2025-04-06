@@ -21,6 +21,9 @@ import {
   GET_PRODUCTS_CATEGORY_REQUEST,
   GET_PRODUCTS_CATEGORY_SUCCESS,
   GET_PRODUCTS_CATEGORY_FAILURE,
+  SEARCH_PRODUCT_FAILURE,
+  SEARCH_PRODUCT_SUCCESS,
+  SEARCH_PRODUCT_REQUEST,
 } from "./ActionType";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL 
@@ -39,9 +42,11 @@ const getAuthHeaders = (getState, isFormData = false) => {
 export const addProduct = (productData) => async (dispatch, getState) => {
   try {
     dispatch({ type: ADD_PRODUCT_REQUEST });
-    const config = getAuthHeaders(getState, true); // Set multipart/form-data
-
-    const { data } = await axios.post(`${API_URL}/api/product/add`, productData, config);
+    const token = getState().auth?.token;
+    const { data } = await axios.post(`${API_URL}/api/product/add`, productData,{ headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    }});
 
 
     dispatch({ type: ADD_PRODUCT_SUCCESS, payload: data });
@@ -103,8 +108,11 @@ export const getProductsByCategory = (categoryId) => async (dispatch, getState) 
 export const updateProduct = (id, productData) => async (dispatch, getState) => {
   try {
     dispatch({ type: UPDATE_PRODUCT_REQUEST });
-    const config = getAuthHeaders(getState, true); 
-    const data  = await axios.put(`${API_URL}/api/product/update/${id}`, productData, config)
+    const token = getState().auth?.token;
+    const data  = await axios.put(`${API_URL}/api/product/update/${id}`, productData, { headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    }});
 
     dispatch({ type: UPDATE_PRODUCT_SUCCESS, payload: data });
   } catch (error) {
@@ -145,3 +153,22 @@ export const getCategoryProduct=()=>async(dispatch ,getState)=>{
     });
   }
 }
+export const searchProducts = (query) => async (dispatch) => {
+  try {
+    dispatch({ type: SEARCH_PRODUCT_REQUEST });
+
+    const data= await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/product/search?q=${query}`
+    );
+    console.log(data);
+    dispatch({
+      type: SEARCH_PRODUCT_SUCCESS,
+      payload: data.data.data,
+    });
+  } catch (error) {
+    dispatch({
+      type: SEARCH_PRODUCT_FAILURE,
+      payload: error.response?.data?.message || "Product search failed",
+    });
+  }
+};

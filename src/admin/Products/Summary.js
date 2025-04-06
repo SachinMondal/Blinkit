@@ -23,14 +23,14 @@ const Summary = () => {
       );
     }
   }, [formData.image]);
-
+console.log(formData);
   const handleSubmit = async () => {
     setLoading(true);
 
-    // ✅ Ensure custom unit replaces "custom" before submitting
+    
     const updatedQuantities = formData.quantities.map((item) => ({
         ...item,
-        unit: item.unit === "custom" ? item.customUnit : item.unit, // Replace "custom" with customUnit value
+        unit: item.unit === "custom" ? item.customUnit : item.unit, 
     }));
 
     const formattedData = {

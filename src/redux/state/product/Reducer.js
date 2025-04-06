@@ -20,14 +20,20 @@ import {
   GET_PRODUCTS_CATEGORY_REQUEST,
   GET_PRODUCTS_CATEGORY_SUCCESS,
   GET_PRODUCTS_CATEGORY_FAILURE,
+  SEARCH_PRODUCT_FAILURE,
+  SEARCH_PRODUCT_SUCCESS,
+  SEARCH_PRODUCT_REQUEST,
 } from "./ActionType";
 
 const initialState = {
   products: [],
   product: null,
-  categories: [],  // ✅ Added missing categories
+  searchResult:[],
+  categories: [],  
   loading: false,
   error: null,
+  searchLoading: false,
+  searchError: null,
 };
 
 export const productReducer = (state = initialState, action) => {
@@ -91,6 +97,14 @@ export const productReducer = (state = initialState, action) => {
     case DELETE_PRODUCT_FAILURE:
       return { ...state, loading: false, error: action.payload };
 
+      case SEARCH_PRODUCT_REQUEST:
+      return { ...state, searchLoading: true, searchError: null };
+
+    case SEARCH_PRODUCT_SUCCESS:
+      return { ...state, searchLoading: false, searchResult: action.payload };
+
+    case SEARCH_PRODUCT_FAILURE:
+      return { ...state, searchLoading: false, searchError: action.payload };
     default:
       return state;
   }

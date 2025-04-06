@@ -20,7 +20,7 @@ const EditCategory = () => {
     isVisible: false,
     isHomePageVisible: false,
     isSpecial: false,
-    isNew: false,
+    newArrivals: false,
     isSale: false,
     isFeatured: false,
     isBestseller: false,
@@ -49,7 +49,7 @@ const EditCategory = () => {
         isVisible: Boolean(category.isVisible), 
         isHomePageVisible: Boolean(category.isHomePageVisible),
         isSpecial: Boolean(category.isSpecial),
-        isNew: Boolean(category.isNew),
+        newArrivals: Boolean(category.newArrivals),
         isSale: Boolean(category.isSale),
         isFeatured: Boolean(category.isFeatured),
         isBestseller: Boolean(category.isBestseller),
@@ -164,7 +164,7 @@ const EditCategory = () => {
   
         {/* Feature Toggles */}
         <div className="mt-6 p-4 border rounded-lg grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {["isVisible", "isHomePageVisible", "isSpecial", "isNew", "isSale", "isFeatured", "isBestseller", "isParent"].map((key) => (
+          {["isVisible", "isHomePageVisible", "isSpecial", "newArrivals", "isSale", "isFeatured", "isBestseller", "isParent"].map((key) => (
             <label key={key} className="flex items-center">
               <input type="checkbox" name={key} checked={formData[key]} onChange={handleChange} className="mr-2" />
               {key.replace("is", "").replace(/([A-Z])/g, " $1")}

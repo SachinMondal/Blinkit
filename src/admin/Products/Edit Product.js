@@ -59,7 +59,7 @@ const EditProduct = () => {
           const reader = new FileReader();
           reader.onloadend = () => {
             updatedVariants[index].imagePreview = reader.result;
-            updatedVariants[index].imageFile = file;
+            updatedVariants[index].image = file;
             setFormData({ ...prev, variants: updatedVariants });
           };
           reader.readAsDataURL(file);

@@ -35,7 +35,7 @@ const AddCategory = () => {
     isFeatured: false,
     isBestseller: false,
     isSpecial: false,
-    isNew: false,
+    newArrivals: false,
     isSale: false,
   });
   const validateFields = useCallback(
@@ -60,7 +60,7 @@ const AddCategory = () => {
 
   useEffect(() => {
     validateFields(step);
-  }, [formData, step]);
+  }, [formData, step, validateFields]);
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
@@ -107,7 +107,7 @@ const AddCategory = () => {
         formData.isBestseller ? "true" : "false"
       );
       categoryData.append("isSpecial", formData.isSpecial ? "true" : "false");
-      categoryData.append("isNew", formData.isNew? "true" : "false");
+      categoryData.append("newArrivals", formData.newArrivals? "true" : "false");
       categoryData.append(
         "isSale",
         formData.isSale ?"true" : "false"
@@ -391,12 +391,13 @@ const AddCategory = () => {
 
           <div className="sm:col-span-2 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-4">
             {[
-              { name: "isCategory", label: "Make Category Visible in Nav" },
+              { name: "isVisible", label: "Make Category Visible in Nav" },
               { name: "isHomePageVisible", label: "Show in HomePage" },
               { name: "isBestseller", label: "Mark as Best Seller" },
               { name: "isSpecial", label: "Mark as Special" },
-              { name: "isNew", label: "Mark as New" },
+              { name: "newArrivals", label: "Mark as New" },
               { name: "isSale", label: "Mark in Sale" },
+              { name: "isFeatured", label: "Mark in Featured" },
             ].map((item, index) => (
               <label
                 key={index}

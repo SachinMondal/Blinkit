@@ -37,8 +37,6 @@ const ProductPage = () => {
     setCount(count > 1 ? count - 1 : 0);
   };
 
-  
-
   useEffect(() => {
     if (productId) {
       dispatch(getProductById(productId));
@@ -50,15 +48,14 @@ const ProductPage = () => {
     if (product?.category?._id) {
       dispatch(getCategoryAndProduct(product.category._id));
     }
-  }, [dispatch, product?.category?._id]); 
+  }, [dispatch, product?.category?._id]);
 
   const filteredProducts = Array.isArray(allProducts?.subcategories)
-  ? allProducts.subcategories
-      .flatMap(subcategory => subcategory.products)
-      .filter(p => p._id !== productId) 
-  : [];
+    ? allProducts.subcategories
+        .flatMap((subcategory) => subcategory.products)
+        .filter((p) => p._id !== productId)
+    : [];
 
-  
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
@@ -229,10 +226,10 @@ const ProductPage = () => {
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
-                        ₹{variant.price}
+                          ₹{variant.price}
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
-                        ₹{variant.discountPrice}
+                          ₹{variant.discountPrice}
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
                           {variant.qty} {variant.unit}
@@ -278,19 +275,25 @@ const ProductPage = () => {
       </div>
 
       <div className="p-4">
-  <h2 className="text-xl font-bold mb-2 mt-20 text-left">Similar Products</h2>
-  {filteredProducts.length > 0 ? (
-    <div className="flex flex-wrap gap-4">
-      {filteredProducts.map((product) => (
-        <ProductTile key={product._id} product={product} onClick={() => handleProductClick(product._id)} />
-      ))}
-    </div>
-  ) : (
-    <p className="text-center text-gray-500">No similar products available.</p>
-  )}
-</div>
-
-
+        <h2 className="text-xl font-bold mb-2 mt-20 text-left">
+          Similar Products
+        </h2>
+        {filteredProducts.length > 0 ? (
+          <div className="flex flex-wrap gap-4 sm:gap-2 ">
+            {filteredProducts.map((product) => (
+              <ProductTile
+                key={product._id}
+                product={product}
+                onClick={() => handleProductClick(product._id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">
+            No similar products available.
+          </p>
+        )}
+      </div>
     </div>
   );
 };

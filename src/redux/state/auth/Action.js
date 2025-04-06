@@ -9,7 +9,13 @@ import {
   UPDATE_PROFILE_REQUEST,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_FAIL,
-  LOGOUT
+  LOGOUT,
+  FETCH_ALL_USERS_REQUEST,
+  FETCH_ALL_USERS_SUCCESS,
+  FETCH_ALL_USERS_FAIL,
+  UPDATE_ROLE_REQUEST,
+  UPDATE_ROLE_SUCCESS,
+  UPDATE_ROLE_FAIL
 } from "./ActionType";
 
 
@@ -114,8 +120,63 @@ export const fetchUserInfo = (token) => async (dispatch) => {
   }
 };
 
+export const fetchAllUsers = () => async (dispatch, getState) => {
+  try {
+    dispatch({ type: FETCH_ALL_USERS_REQUEST });
 
-// Logout Action (Clear Redux State)
+    const { token } = getState().auth;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const  data  = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/all-users`, config)
+    dispatch({
+      type: FETCH_ALL_USERS_SUCCESS,
+      payload: data.data.users, 
+    });
+  } catch (error) {
+    dispatch({
+      type: FETCH_ALL_USERS_FAIL,
+      payload: error.response?.data?.message || "Failed to fetch users",
+    });
+  }
+};
+
+export const updateUserRole = (userId,role) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: UPDATE_ROLE_REQUEST });
+
+    const { token } = getState().auth;
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const  data  = await axios.put(
+      `${process.env.REACT_APP_BACKEND_URL}/api/auth/updateRole`,
+      { userId,role },
+      config
+    );
+    dispatch({
+      type: UPDATE_ROLE_SUCCESS,
+      payload: data.data.user, 
+    });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_ROLE_FAIL,
+      payload: error.response?.data?.message || "Failed to update role",
+    });
+  }
+};
+
+
+
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT });
 };
