@@ -23,7 +23,7 @@ const Summary = () => {
       );
     }
   }, [formData.image]);
-console.log(formData);
+
   const handleSubmit = async () => {
     setLoading(true);
 
