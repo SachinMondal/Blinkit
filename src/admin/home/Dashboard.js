@@ -65,7 +65,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersForAdmin());
-  }, [dispatch, orders]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orders.length]);
   const filteredOrders = orders.filter(
     (order) => order.orderStatus !== "Pending"
   );
