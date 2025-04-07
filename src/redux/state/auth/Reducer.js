@@ -18,6 +18,9 @@ import {
   UPDATE_ROLE_SUCCESS,
   UPDATE_ROLE_FAIL,
   LOGOUT,
+  UPDATE_USER_LOCATION_REQUEST,
+  UPDATE_USER_LOCATION_SUCCESS,
+  UPDATE_USER_LOCATION_FAIL,
 } from "./ActionType";
 
 const initialState = {
@@ -40,6 +43,7 @@ export const authReducer = (state = initialState, action) => {
     case FETCH_USER_INFO_REQUEST:
     case FETCH_ALL_USERS_REQUEST:
     case UPDATE_ROLE_REQUEST:
+    case UPDATE_USER_LOCATION_REQUEST:
       return { ...state, loading: true, error: null };
 
     // OTP
@@ -59,6 +63,7 @@ export const authReducer = (state = initialState, action) => {
     // Profile
     case UPDATE_PROFILE_SUCCESS:
     case FETCH_USER_INFO_SUCCESS:
+    case UPDATE_USER_LOCATION_SUCCESS:
       return { ...state, loading: false, user: action.payload };
 
     // All Users
@@ -82,6 +87,7 @@ export const authReducer = (state = initialState, action) => {
     case FETCH_USER_INFO_FAIL:
     case FETCH_ALL_USERS_FAIL:
     case UPDATE_ROLE_FAIL:
+    case UPDATE_USER_LOCATION_FAIL:
       return { ...state, loading: false, error: action.payload, verified: false };
 
     // Logout

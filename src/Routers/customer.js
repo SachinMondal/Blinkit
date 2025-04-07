@@ -86,7 +86,6 @@ function Customer() {
 
   return (
     <div className="App">
-      {/* Location Modal */}
       {isModalOpen && (
         <LocationModal
           onClose={() => setIsModalOpen(false)}

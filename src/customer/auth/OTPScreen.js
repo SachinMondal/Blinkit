@@ -23,7 +23,6 @@ export default function OTPModal({ email, closeModal }) {
   }, [timer]);
 
   useEffect(() => {
-    console.log("verified state changed:", verified);
     if (verified) {
       closeModal();
       setTimeout(() => navigate("/profile"), 300);
@@ -72,7 +71,7 @@ export default function OTPModal({ email, closeModal }) {
   };
 
   return (
-    <div className="w-full p-6 bg-[#F1C542] rounded-lg">
+    <div className="w-full p-6 bg-[#F1C542] rounded-lg ">
       <div className="text-xl font-semibold text-gray-900 text-center">
         Enter OTP
         <hr className="w-16 border-black mt-1 mx-auto" />
@@ -80,7 +79,7 @@ export default function OTPModal({ email, closeModal }) {
       </div>
 
       {/* OTP Inputs */}
-      <div className="flex justify-center gap-2 mt-10">
+      <div className="flex justify-center gap-2 mt-2">
         {otp.map((digit, index) => (
           <input
             key={index}

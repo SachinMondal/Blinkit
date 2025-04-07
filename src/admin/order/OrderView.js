@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link } from "react-router-dom";
 import { getOrderById, updateOrder } from "../../redux/state/order/Action";
+import AdminUserMap from "../../Components/utils/Map/AdminUserMap";
+import { fetchUserInfo } from "../../redux/state/auth/Action";
 
 const OrderView = () => {
   const { id } = useParams();
@@ -10,10 +12,18 @@ const OrderView = () => {
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
-
+  const { user = {}, token } = useSelector((state) => state.auth);
+  const isFirstRender = useRef(true);
   useEffect(() => {
     dispatch(getOrderById(id));
   }, [dispatch, id]);
+  useEffect(() => {
+      if (token && isFirstRender.current) {
+        dispatch(fetchUserInfo(token));
+        isFirstRender.current = false;
+      }
+    }, [token, dispatch]);
+    console.log(user);
 
   const getNextStatus = (currentStatus) => {
     switch (currentStatus) {
@@ -50,15 +60,18 @@ const OrderView = () => {
     setLoadingReject(false);
     setShowRejectModal(false);
   };
+  const adminLocation = {
+    lat: user?.locationPin?.coordinates?.[1],
+    lng: user?.locationPin?.coordinates?.[0],
+  };
   
-
   return (
     <div className="p-4 md:p-8 w-full max-w-3xl mx-auto">
       {/* Back Button */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Order #{order._id}</h1>
-        <Link to="/admin/orders" className="text-blue-500 hover:underline">
-          ← Back to Orders
+        <Link to="/admin/orders" className="text-white hover:underline bg-gray-700 p-2 rounded-md cursor-pointer"> 
+        Back
         </Link>
       </div>
 
@@ -104,6 +117,19 @@ const OrderView = () => {
             </p>
           ) : (
             <p className="text-gray-500">No shipping address available</p>
+          )}
+
+
+          {order?.user?.locationPin &&(
+             <div className="mt-6">
+             <h3 className="text-gray-600 font-medium mb-2">Delivery Route</h3>
+             <div className="h-64 w-full rounded-lg overflow-hidden border z-10">
+               <AdminUserMap
+                 userLocation={order.user.locationPin}
+                 adminLocation={adminLocation} 
+               />
+             </div>
+           </div>
           )}
         </div>
         <div className="mt-4">

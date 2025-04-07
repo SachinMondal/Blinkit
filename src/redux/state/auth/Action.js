@@ -15,20 +15,25 @@ import {
   FETCH_ALL_USERS_FAIL,
   UPDATE_ROLE_REQUEST,
   UPDATE_ROLE_SUCCESS,
-  UPDATE_ROLE_FAIL
+  UPDATE_ROLE_FAIL,
+  UPDATE_USER_LOCATION_REQUEST,
+  UPDATE_USER_LOCATION_SUCCESS,
+  UPDATE_USER_LOCATION_FAIL,
 } from "./ActionType";
-
 
 // Send OTP
 export const sendOTP = (email) => async (dispatch) => {
   try {
     dispatch({ type: SEND_OTP_REQUEST });
 
-    const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/send-otp`, { email });
+    const { data } = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/auth/send-otp`,
+      { email }
+    );
 
     dispatch({
       type: SEND_OTP_SUCCESS,
-      payload: data.message, // "OTP sent successfully"
+      payload: data.message,
     });
   } catch (error) {
     dispatch({
@@ -84,9 +89,9 @@ export const updateProfile = (userData) => async (dispatch, getState) => {
     // ✅ Corrected object format
     const { data } = await axios.put(
       `${process.env.REACT_APP_BACKEND_URL}/api/auth/update`,
-      { 
-        mobileNo: userData.mobileNo, 
-        name: userData.name 
+      {
+        mobileNo: userData.mobileNo,
+        name: userData.name,
       },
       config
     );
@@ -132,10 +137,13 @@ export const fetchAllUsers = () => async (dispatch, getState) => {
       },
     };
 
-    const  data  = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/all-users`, config)
+    const data = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/auth/all-users`,
+      config
+    );
     dispatch({
       type: FETCH_ALL_USERS_SUCCESS,
-      payload: data.data.users, 
+      payload: data.data.users,
     });
   } catch (error) {
     dispatch({
@@ -145,7 +153,7 @@ export const fetchAllUsers = () => async (dispatch, getState) => {
   }
 };
 
-export const updateUserRole = (userId,role) => async (dispatch, getState) => {
+export const updateUserRole = (userId, role) => async (dispatch, getState) => {
   try {
     dispatch({ type: UPDATE_ROLE_REQUEST });
 
@@ -158,14 +166,14 @@ export const updateUserRole = (userId,role) => async (dispatch, getState) => {
       },
     };
 
-    const  data  = await axios.put(
+    const data = await axios.put(
       `${process.env.REACT_APP_BACKEND_URL}/api/auth/updateRole`,
-      { userId,role },
+      { userId, role },
       config
     );
     dispatch({
       type: UPDATE_ROLE_SUCCESS,
-      payload: data.data.user, 
+      payload: data.data.user,
     });
   } catch (error) {
     dispatch({
@@ -175,7 +183,36 @@ export const updateUserRole = (userId,role) => async (dispatch, getState) => {
   }
 };
 
-
+export const updateUserLocation =
+  ( location,latitude, longitude) => async (dispatch, getState) => {
+    try {
+      dispatch({ type: UPDATE_USER_LOCATION_REQUEST });
+      const token = getState().auth.token;
+      const data = await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/auth/location`,
+        {
+          location,
+          lat:latitude,
+          lng:longitude,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(data);
+      dispatch({
+        type: UPDATE_USER_LOCATION_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: UPDATE_USER_LOCATION_FAIL,
+        payload: error.response?.data?.message || "Failed to update location",
+      });
+    }
+  };
 
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT });

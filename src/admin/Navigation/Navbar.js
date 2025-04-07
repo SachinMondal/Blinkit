@@ -15,7 +15,7 @@ const Navbar = () => {
   }, [isOpen]);
 
   return (
-    <div className="flex flex-col mt-12">
+    <div className="flex flex-col mt-12 z-50">
       {/* Top Navbar */}
       <nav className="bg-[#F1C542] text-white shadow-md fixed top-0 left-0 w-full h-16 z-50 px-6 flex items-center justify-between">
         {/* Logo */}

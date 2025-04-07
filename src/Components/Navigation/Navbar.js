@@ -141,7 +141,7 @@ export default function Navbar({
                   ) : (
                     <Button
                       onClick={() => setIsModalOpen(true)}
-                      className="bg-primary text-black px-4 py-2 rounded-lg"
+                      className=" text-black px-4 py-2 rounded-lg"
                     >
                       SignUp/Login
                     </Button>
@@ -150,9 +150,22 @@ export default function Navbar({
                 <div className="">
                   <p className="text-black font-bold text-left">
                     Delivery in 15 min
+                    <button
+                        onClick={() => setLocationModal(true)}
+                        className="ml-1 text-gray-600 hover:text-black"
+                      >
+                        <i className="fas fa-pen text-xs"></i>
+                      </button>
                   </p>
                   {location ? (
-                    <p className="font-semibold">{location}</p>
+                    <div className="relative w-60 overflow-hidden h-6">
+                      <div className="overflow-hidden w-full h-full">
+                        <p className="whitespace-nowrap animate-marquee text-sm font-medium text-gray-800">
+                          {location}
+                        </p>
+                      </div>
+       
+                    </div>
                   ) : (
                     <button
                       onClick={() => setLocationModal(true)}
@@ -237,9 +250,22 @@ export default function Navbar({
                   <img src={Logo} alt="brand" className="w-12 h-12" />
                 </Link>
                 <div className="flex flex-col text-white text-sm items-start ml-5">
-                  <p className="text-black font-bold">Delivery in 15 min</p>
+                  <p className="text-black font-bold">Delivery in 15 min
+                  <button
+                        onClick={() => setLocationModal(true)}
+                        className="ml-1 text-gray-600 hover:text-black"
+                      >
+                        <i className="fas fa-pen text-xs"></i>
+                      </button>
+                  </p>
                   {location ? (
-                    <p className="font-semibold">{location}</p>
+                    <div className="relative w-60 border-red-800 overflow-hidden h-6">
+                      <div className="overflow-hidden w-full h-full">
+                        <p className="whitespace-nowrap animate-marquee text-sm font-medium text-gray-800">
+                          {location}
+                        </p>
+                      </div>
+                    </div>
                   ) : (
                     <button
                       onClick={() => setLocationModal(true)}
@@ -326,7 +352,7 @@ export default function Navbar({
                 ) : (
                   <Button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-primary text-black px-4 py-2 rounded-lg"
+                    className=" text-black px-4 py-2 rounded-lg"
                   >
                     SignUp/Login
                   </Button>

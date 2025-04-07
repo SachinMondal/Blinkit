@@ -52,35 +52,31 @@ const HomePage = () => {
     onSale: {},
     special: {},
     topCategories: {},
-    bestSeller:{},
+    bestSeller: {},
   };
-
+  
   Object.entries(data || {}).forEach(([key, category]) => {
     const details = category?.categoryDetails || {};
-
+  
+    // Assign based on priority
     if (details?.isFeatured) {
       filteredSections.featured[key] = category;
-    }
-    if (details?.newArrivals) {
+    } else if (details?.newArrivals) {
       filteredSections.newArrivals[key] = category;
-    }
-    if (details?.isSale) {
+    } else if (details?.isSale) {
       filteredSections.onSale[key] = category;
-    }
-    if (details?.isSpecial) {
+    } else if (details?.isSpecial) {
       filteredSections.special[key] = category;
-    }
-    if (details?.isHomePageVisible || details?.isVisible) {
+    } else if (details?.isHomePageVisible || details?.isVisible) {
       filteredSections.topCategories[key] = category;
-    }
-    if (details?.isBestSeller || details?.isVisible) {
+    } else if (details?.isBestSeller || details?.isVisible) {
       filteredSections.bestSeller[key] = category;
     }
   });
-
+  
   const sliderSettings = {
     dots: true,
-    infinite: true,
+    infinite: banners?.data?.length > 1,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -131,18 +127,21 @@ const HomePage = () => {
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           <Slider {...sliderSettings}>
-            {banners?.data?.map((img, index) => (
-              <div
-                key={index}
-                className="flex justify-center max-w-7xl mx-auto px-4"
-              >
-                <LazyImage
-                  src={img.image}
-                  alt={img.alt}
-                  className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
-                />
-              </div>
-            ))}
+          {banners?.data
+  ?.filter((img) => img?.image)
+  .map((img, index) => (
+    <div
+      key={index}
+      className="flex justify-center max-w-7xl mx-auto px-4"
+    >
+      <LazyImage
+        src={img.image}
+        alt={img.alt || "Banner"}
+        className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
+      />
+    </div>
+))}
+
           </Slider>
 
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">

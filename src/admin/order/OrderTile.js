@@ -10,7 +10,9 @@ const OrderTile = ({ order }) => {
     (state) => state.orders?.find((o) => o._id === order._id) || order
   );
 
-  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState(order.deliveryTime || "");
+  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState(
+    order.deliveryTime || ""
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
   const [loadingAccept, setLoadingAccept] = useState(false);
@@ -61,14 +63,14 @@ const OrderTile = ({ order }) => {
   };
 
   const handleDeliveryTimeChange = (value) => {
-    if (order.orderStatus !== "PENDING") return; 
+    if (order.orderStatus !== "PENDING") return;
     setSelectedDeliveryOption(value);
-  
+
     if (value !== "") {
       dispatch(updateOrder(order._id, { deliveryTime: value }));
     }
   };
-  
+
   return (
     <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-3 transition hover:shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto">
       <div className="flex justify-between items-center">
@@ -87,33 +89,42 @@ const OrderTile = ({ order }) => {
 
       <p className="text-gray-600 text-sm truncate pl-4 flex items-center">
         <i className="fa-solid fa-hand-holding-dollar mr-2"></i>
-        {order?.orderItems?.map((o) => `${o.productId.name} x ${o.quantity}`).join(", ")}
+        {order?.orderItems
+          ?.map((o) => `${o.productId.name} x ${o.quantity}`)
+          .join(", ")}
       </p>
 
       <select
-  value={selectedDeliveryOption}
-  onChange={(e) => handleDeliveryTimeChange(e.target.value)}
-  className={`mt-2 w-full p-2 border rounded-md text-sm focus:outline-none 
-    ${order.orderStatus !== "PENDING" ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}`}
-  disabled={order.orderStatus !== "PENDING"}
->
-  <option value="" disabled>Select Delivery Option</option>
-  {["same-day", "1-day", "2-days", "3-days"].map((option) => (
-    <option key={option} value={option}>
-      {option.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-    </option>
-  ))}
-  {selectedDeliveryOption &&
-    !["same-day", "1-day", "2-days", "3-days"].includes(selectedDeliveryOption) && (
-      <option value={selectedDeliveryOption}>
-        {selectedDeliveryOption.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
-      </option>
-    )}
-  <option value="custom">Custom</option>
-</select>
-
-
-
+        value={selectedDeliveryOption}
+        onChange={(e) => handleDeliveryTimeChange(e.target.value)}
+        className={`mt-2 w-full p-2 border rounded-md text-sm focus:outline-none 
+    ${
+      order.orderStatus !== "PENDING"
+        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+        : ""
+    }`}
+        disabled={order.orderStatus !== "PENDING"}
+      >
+        <option value="" disabled>
+          Select Delivery Option
+        </option>
+        {["same-day", "1-day", "2-days", "3-days"].map((option) => (
+          <option key={option} value={option}>
+            {option.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+          </option>
+        ))}
+        {selectedDeliveryOption &&
+          !["same-day", "1-day", "2-days", "3-days"].includes(
+            selectedDeliveryOption
+          ) && (
+            <option value={selectedDeliveryOption}>
+              {selectedDeliveryOption
+                .replace("-", " ")
+                .replace(/\b\w/g, (l) => l.toUpperCase())}
+            </option>
+          )}
+        <option value="custom">Custom</option>
+      </select>
 
       {selectedDeliveryOption === "custom" && (
         <input
@@ -147,9 +158,13 @@ const OrderTile = ({ order }) => {
               Reject
             </button>
             <button
-              className="text-green-500 font-medium hover:underline text-center"
+              className={`text-green-500 font-medium hover:underline text-center ${
+                !selectedDeliveryOption || loadingAccept
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
+              }`}
               onClick={handleAccept}
-              disabled={loadingAccept}
+              disabled={!selectedDeliveryOption || loadingAccept}
             >
               {loadingAccept ? "Accepting..." : "Accept"}
             </button>

@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OTPModal from "./OTPScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { sendOTP } from "../../redux/state/auth/Action";
-
+import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
+import login from "../../images/login.webp";
 export default function SignUp({ isOpen, setIsOpen }) {
   const dispatch = useDispatch();
   const { loading, error, otpSent } = useSelector((state) => state.auth);
@@ -47,7 +48,7 @@ export default function SignUp({ isOpen, setIsOpen }) {
           <div className="fixed md:absolute bottom-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 w-full md:w-1/2 max-h-[25rem] overflow-y-auto bg-white shadow-xl rounded-t-2xl md:rounded-lg flex flex-col md:flex-row transition-transform duration-500 ease-in-out">
             {/* Left Section (Hidden on Mobile) */}
             <div className="hidden md:flex w-2/5 bg-gray-200 items-center justify-center rounded-lg">
-              <span className="text-black font-bold">Left</span>
+              <LazyImage src={login} alt="login " className="" />
             </div>
 
             {/* Right Section */}

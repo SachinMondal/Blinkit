@@ -130,7 +130,7 @@ const CartSummary = ({ cartItems }) => {
               <p className="text-gray-500">No saved addresses.</p>
             )}
             <div className="flex justify-between mt-4">
-              <button className="bg-gray-500 text-white px-4 py-2 rounded-md" onClick={() => navigate("/profile")}>
+              <button className="bg-gray-500 text-white px-4 py-2 rounded-md" onClick={() => navigate("/profile",{ state: { active: "address" }} )}>
                 Add New Address
               </button>
               <button
