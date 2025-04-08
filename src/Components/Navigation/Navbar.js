@@ -158,7 +158,7 @@ export default function Navbar({
                       </button>
                   </p>
                   {location ? (
-                    <div className="relative w-60 overflow-hidden h-6">
+                    <div className="relative w-full md:w-20 overflow-hidden h-6">
                       <div className="overflow-hidden w-full h-full">
                         <p className="whitespace-nowrap animate-marquee text-sm font-medium text-gray-800">
                           {location}
@@ -212,7 +212,6 @@ export default function Navbar({
                               onClick={() => {
                                 setQuery(item.name);
                                 setShowDropdown(false);
-                                console.log("K");
                               }}
                             >
                               <LazyImage
@@ -247,7 +246,7 @@ export default function Navbar({
                   to={"/"}
                   className="text-white text-lg font-semibold cursor-pointer"
                 >
-                  <img src={Logo} alt="brand" className="w-12 h-12" />
+                  <LazyImage src={Logo} alt="brand" className="w-12 h-12" />
                 </Link>
                 <div className="flex flex-col text-white text-sm items-start ml-5">
                   <p className="text-black font-bold">Delivery in 15 min
@@ -259,7 +258,7 @@ export default function Navbar({
                       </button>
                   </p>
                   {location ? (
-                    <div className="relative w-60 border-red-800 overflow-hidden h-6">
+                    <div className="relative w-20 md:w-40 overflow-hidden h-6">
                       <div className="overflow-hidden w-full h-full">
                         <p className="whitespace-nowrap animate-marquee text-sm font-medium text-gray-800">
                           {location}
@@ -277,7 +276,7 @@ export default function Navbar({
                 </div>
               </div>
 
-              <div ref={searchRef} className="relative w-full sm:w-96">
+              <div ref={searchRef} className="relative w-full ml-0 lg:-ml-20 sm:w-96">
                 {/* Search Input */}
                 <div className="bg-white rounded-md px-3 py-2 flex items-center w-full sticky top-0 z-40 shadow-sm">
                   <i className="fa-solid fa-magnifying-glass text-gray-500"></i>
@@ -315,7 +314,6 @@ export default function Navbar({
                             onClick={() => {
                               setQuery(item.name);
                               setShowDropdown(false);
-                              console.log("K");
                             }}
                           >
                             <LazyImage
