@@ -36,6 +36,7 @@ const HomePage = () => {
   }, [data.length, dispatch]);
 
   const handleCategoryClick = (categoryId) => {
+    console.log(categoryId)
     navigate(`/category/${categoryId}`);
   };
 
@@ -54,10 +55,10 @@ const HomePage = () => {
     topCategories: {},
     bestSeller: {},
   };
-  
+
   Object.entries(data || {}).forEach(([key, category]) => {
     const details = category?.categoryDetails || {};
-  
+
     // Assign based on priority
     if (details?.isFeatured) {
       filteredSections.featured[key] = category;
@@ -73,7 +74,7 @@ const HomePage = () => {
       filteredSections.bestSeller[key] = category;
     }
   });
-  
+
   const sliderSettings = {
     dots: true,
     infinite: banners?.data?.length > 1,
@@ -127,38 +128,37 @@ const HomePage = () => {
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           <Slider {...sliderSettings}>
-          {banners?.data
-  ?.filter((img) => img?.image)
-  .map((img, index) => (
-    <div
-      key={index}
-      className="flex justify-center max-w-7xl mx-auto px-4"
-    >
-      <LazyImage
-        src={img.image}
-        alt={img.alt || "Banner"}
-        className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
-      />
-    </div>
-))}
-
+            {banners?.data
+              ?.filter((img) => img?.image)
+              .map((img, index) => (
+                <div
+                  key={index}
+                  className="flex justify-center max-w-7xl mx-auto px-4"
+                >
+                  <LazyImage
+                    src={img.image}
+                    alt={img.alt || "Banner"}
+                    className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
+                  />
+                </div>
+              ))}
           </Slider>
 
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">
             <Slider {...categorySliderSettings}>
               {uniqueCategories.map((item) => (
                 <CategoryTile
-                  key={item.id || item.name}
+                  key={item._id || item.name}
                   image={item.image}
                   name={item.name}
-                  discount={40}
+                  discount={10}
                   onClick={() => handleCategoryClick(item._id)}
                 />
               ))}
             </Slider>
           </div>
 
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
             {Object.entries(filteredSections).map(
               ([sectionName, sectionObject]) =>
                 Object.entries(sectionObject).map(([key, categoryData]) => {

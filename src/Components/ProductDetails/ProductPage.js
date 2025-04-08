@@ -7,48 +7,163 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCategoryAndProduct } from "../../redux/state/category/Action";
 import { Link } from "react-router-dom";
 import ProductTile from "./ProductTile";
+import {
+  addToCart,
+  fetchCart,
+  removeFromCart,
+} from "../../redux/state/cart/Action";
 const ProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const [count, setCount] = useState(0);
-  const product = useSelector((state) => state.product.product);
-  const allProducts = useSelector((state) => state.category.categoryAndProduct);
+  const [loading, setLoading] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState(null);
 
-  useEffect(() => {
-    if (product?.variants?.length > 0) {
-      setSelectedVariant(product.variants[0]);
-    }
-  }, [product]);
+  const product = useSelector((state) => state.product.product);
+  const cart = useSelector((state) => state.cart.cartItems);
+  const allProducts = useSelector(
+    (state) => state.category.categoryAndProduct
+  );
 
-  const handleAdd = (e) => {
-    e.stopPropagation();
-    setCount(1);
-  };
-
-  const handleIncrease = (e) => {
-    e.stopPropagation();
-    if (count < 3) setCount(count + 1);
-  };
-
-  const handleDecrease = (e) => {
-    e.stopPropagation();
-    setCount(count > 1 ? count - 1 : 0);
-  };
-
+  // Fetch product by ID
   useEffect(() => {
     if (productId) {
       dispatch(getProductById(productId));
     }
   }, [dispatch, productId]);
 
-  // Fetch category and product data once product is available
+  // Fetch related category products
   useEffect(() => {
     if (product?.category?._id) {
       dispatch(getCategoryAndProduct(product.category._id));
     }
   }, [dispatch, product?.category?._id]);
+
+  // Set default variant on product load
+  useEffect(() => {
+    if (product?.variants?.length > 0) {
+      setSelectedVariant(product.variants[0]);
+    }
+  }, [product]);
+
+  // Update variant & count from cart if present
+  useEffect(() => {
+    if (!product || !cart || !product?.variants?.length) return;
+
+    const cartItem = cart.find((item) => {
+      const itemProductId =
+        typeof item.product === "object" ? item.product._id : item.product;
+      return itemProductId === product._id;
+    });
+
+    if (cartItem) {
+      const variant = product.variants[cartItem.variantIndex];
+      setSelectedVariant(variant);
+      setCount(cartItem.quantity);
+    } else {
+      setSelectedVariant(product.variants[0]);
+      setCount(0);
+    }
+  }, [cart, product]);
+
+  const handleVariantChange = (variant) => {
+    setSelectedVariant(variant);
+
+    const variantIndex = product.variants.findIndex(
+      (v) => v._id === variant._id
+    );
+    const cartItem = cart.find(
+      (item) =>
+        item.product === product._id && item.variantIndex === variantIndex
+    );
+
+    setCount(cartItem ? cartItem.quantity : 0);
+  };
+
+  const handleAdd = async (e) => {
+    e.stopPropagation();
+    if (!selectedVariant) return;
+
+    const variantIndex = product.variants.findIndex(
+      (v) => v._id === selectedVariant._id
+    );
+    if (variantIndex === -1) return;
+
+    setLoading(true);
+    try {
+      const result = await dispatch(addToCart(product._id, variantIndex, 1));
+      if (result) {
+        setCount(1);
+        dispatch(fetchCart());
+      }
+    } catch (error) {
+      console.error("Error adding to cart", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleIncrease = async (e) => {
+    e.stopPropagation();
+    if (!selectedVariant || count >= 3) return;
+
+    const variantIndex = product.variants.findIndex(
+      (v) => v._id === selectedVariant._id
+    );
+    if (variantIndex === -1) return;
+
+    setLoading(true);
+    try {
+      const result = await dispatch(
+        addToCart(product._id, variantIndex, count + 1)
+      );
+      if (result) {
+        dispatch(fetchCart());
+        setCount(count + 1);
+      }
+    } catch (error) {
+      console.error("Error updating cart", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDecrease = async (e) => {
+    e.stopPropagation();
+    if (!selectedVariant || count === 0) return;
+
+    const variantIndex = product.variants.findIndex(
+      (v) => v._id === selectedVariant._id
+    );
+    if (variantIndex === -1) return;
+
+    setLoading(true);
+    try {
+      if (count > 1) {
+        const result = await dispatch(
+          addToCart(product._id, variantIndex, count - 1)
+        );
+        if (result) {
+          dispatch(fetchCart());
+          setCount(count - 1);
+        }
+      } else {
+        const result = await dispatch(
+          removeFromCart(product._id, variantIndex)
+        );
+        if (result) {
+          dispatch(fetchCart());
+          setCount(0);
+        }
+      }
+    } catch (error) {
+      console.error("Error updating cart", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredProducts = Array.isArray(allProducts?.subcategories)
     ? allProducts.subcategories
@@ -59,7 +174,6 @@ const ProductPage = () => {
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`);
   };
-
   if (!product) {
     return (
       <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
@@ -76,7 +190,7 @@ const ProductPage = () => {
   }
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <nav className="mb-4 text-sm text-gray-600 w-full lg:hidden text-left">
+      <nav className="mb-4 ml-8 text-sm text-gray-600 w-full lg:hidden text-left">
         <Link to="/" className="text-blue-500 hover:underline">
           Home
         </Link>{" "}
@@ -95,8 +209,9 @@ const ProductPage = () => {
           <LazyImage
             src={product?.image}
             alt={product?.name}
-            className="w-full max-h-96 object-contain rounded-lg mb-14"
+            className="w-full object-contain rounded-lg mb-14"
           />
+
           <div className="mt-4 p-4 border-t text-left">
             <h2 className="text-xl font-semibold">
               Product Name: {product?.name}
@@ -172,7 +287,7 @@ const ProductPage = () => {
           </div>
         </div>
         <div className="w-full lg:w-1/2">
-          <div className="mb-4 text-sm text-gray-600 hidden lg:block text-left">
+          <div className="mb-4 ml-8 text-sm text-gray-600 hidden lg:block text-left">
             <Link to="/" className="text-blue-500 hover:underline">
               Home
             </Link>{" "}
@@ -210,10 +325,10 @@ const ProductPage = () => {
                   <tbody>
                     {product.variants.map((variant, index) => (
                       <tr
-                        key={index}
+                        key={variant._id}
                         className={
                           selectedVariant?._id === variant._id
-                            ? "bg-blue-100"
+                            ? "bg-green-100"
                             : ""
                         }
                       >
@@ -222,7 +337,7 @@ const ProductPage = () => {
                             type="radio"
                             name="variant"
                             checked={selectedVariant?._id === variant._id}
-                            onChange={() => setSelectedVariant(variant)}
+                            onChange={() => handleVariantChange(variant)}
                           />
                         </td>
                         <td className="border border-gray-300 px-4 py-2">
@@ -246,6 +361,7 @@ const ProductPage = () => {
               {count === 0 ? (
                 <button
                   onClick={handleAdd}
+                  disabled={!selectedVariant}
                   className="bg-green-500 text-white font-bold text-sm px-4 py-2 rounded-lg w-40"
                 >
                   Add To Cart

@@ -21,6 +21,7 @@ import {
   UPDATE_USER_LOCATION_REQUEST,
   UPDATE_USER_LOCATION_SUCCESS,
   UPDATE_USER_LOCATION_FAIL,
+  RESET_OTP_STATE,
 } from "./ActionType";
 
 const initialState = {
@@ -89,7 +90,14 @@ export const authReducer = (state = initialState, action) => {
     case UPDATE_ROLE_FAIL:
     case UPDATE_USER_LOCATION_FAIL:
       return { ...state, loading: false, error: action.payload, verified: false };
-
+    
+    case RESET_OTP_STATE:
+      return {
+        ...state,
+        otpSent:false,
+        error:null,
+        loading:false
+      }
     // Logout
     case LOGOUT:
       return { ...initialState };

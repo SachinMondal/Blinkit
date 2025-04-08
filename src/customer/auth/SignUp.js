@@ -3,26 +3,36 @@ import { Backdrop, Modal, Fade, Button, CircularProgress } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import OTPModal from "./OTPScreen";
 import { useDispatch, useSelector } from "react-redux";
-import { sendOTP } from "../../redux/state/auth/Action";
+import { resetOtpState, sendOTP } from "../../redux/state/auth/Action";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import login from "../../images/login.webp";
 export default function SignUp({ isOpen, setIsOpen }) {
   const dispatch = useDispatch();
-  const { loading, error, otpSent } = useSelector((state) => state.auth);
+  const { loading, otpSent } = useSelector((state) => state.auth);
   const [isFocused, setIsFocused] = useState(false);
+  const [emailError,setEmailError]=useState("");
+  const [typingTimeout,setTypingTimeout]=useState(null)
   const [inputValue, setInputValue] = useState("");
   const [isOtpScreen, setIsOtpScreen] = useState(false);
-
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   useEffect(() => {
-    if (otpSent) {
+    if (!isOpen) {
+      dispatch(resetOtpState());
+      setIsOtpScreen(false);
+      setInputValue("");
+      setIsFocused(false);
+      setAcceptedTerms(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+  useEffect(() => {
+    if (otpSent && isOpen) {
       setIsOtpScreen(true);
     }
-  }, [otpSent]);
+  }, [otpSent, isOpen]);
 
   const handleClose = () => {
     setIsOpen(false);
-    setIsOtpScreen(false);
-    setInputValue("");
   };
 
   const validateEmail = (email) => {
@@ -54,8 +64,10 @@ export default function SignUp({ isOpen, setIsOpen }) {
             {/* Right Section */}
             <div className="w-full md:w-3/5 px-6 py-6 bg-[#F1C542] rounded-r-2xl md:rounded-r-lg">
               {isOtpScreen ? (
-                <OTPModal email={inputValue} closeModal={() => setIsOpen(false)} />
-
+                <OTPModal
+                  email={inputValue}
+                  closeModal={() => setIsOpen(false)}
+                />
               ) : (
                 <>
                   {/* Header */}
@@ -65,8 +77,14 @@ export default function SignUp({ isOpen, setIsOpen }) {
                       <div className="text-xs">Using OTP</div>
                       <hr className="w-[4rem] outline-black-50" />
                     </div>
-                    <Button onClick={handleClose} className="text-black hover:text-red-700">
-                      <FontAwesomeIcon icon="fa-solid fa-xmark" className="text-lg" />
+                    <Button
+                      onClick={handleClose}
+                      className="text-black hover:text-red-700"
+                    >
+                      <FontAwesomeIcon
+                        icon="fa-solid fa-xmark"
+                        className="text-lg"
+                      />
                     </Button>
                   </div>
 
@@ -74,7 +92,9 @@ export default function SignUp({ isOpen, setIsOpen }) {
                   <div className="relative w-full mt-6">
                     <label
                       className={`absolute left-3 transition-all duration-200 px-1 ${
-                        isFocused || inputValue ? "top-[-20px] text-xs text-gray-500" : "top-2 text-gray-500"
+                        isFocused || inputValue
+                          ? "top-[-20px] text-xs text-gray-500"
+                          : "top-2 text-gray-500"
                       }`}
                     >
                       Enter Email Id
@@ -84,28 +104,63 @@ export default function SignUp({ isOpen, setIsOpen }) {
                       value={inputValue}
                       onFocus={() => setIsFocused(true)}
                       onBlur={() => setIsFocused(inputValue !== "")}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={(e) => {
+                        const value=e.target.value;
+                        setInputValue(value);
+                        if(typingTimeout) clearTimeout(typingTimeout);
+                        const timeout = setTimeout(() => {
+                          if (value.trim() === "") {
+                            setEmailError(""); 
+                          } else if (!validateEmail(value)) {
+                            setEmailError("Please enter a valid email address.");
+                          } else {
+                            setEmailError(""); 
+                          }
+                        }, 500); 
+                      
+                        setTypingTimeout(timeout);
+                      }}
+                      
                       className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
-                    {error && <p className="text-red-600 text-xs mt-1">{error}</p>}
+                    {emailError && (
+                      <p className="text-red-600 text-xs mt-1">{emailError}</p>
+                    )}
                   </div>
-
+                  <div className="mt-4 flex items-center text-sm text-black">
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={() => setAcceptedTerms(!acceptedTerms)}
+                      className="mr-2 cursor-pointer"
+                    />
+                    <span>
+                      I accept the{" "}
+                      <u className="cursor-pointer">
+                        Terms and Conditions & Privacy Policy
+                      </u>
+                      .
+                    </span>
+                  </div>
                   {/* Send OTP Button */}
                   <Button
                     className={`w-full mt-4 py-2 transition-all duration-300 ${
-                      inputValue.trim() === "" ? "bg-gray-400 text-gray-700 cursor-not-allowed" : "bg-green-500 hover:bg-green-800 text-white font-bold"
+                      inputValue.trim() === "" || !acceptedTerms
+                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-800 text-white font-bold"
                     }`}
-                    disabled={inputValue.trim() === "" || loading}
+                    disabled={inputValue.trim() === "" || loading || emailError}
                     onClick={handleSendOtp}
                   >
-                    {loading ? <CircularProgress size={24} className="text-white" /> : "Continue"}
+                    {loading ? (
+                      <CircularProgress size={24} className="text-white" />
+                    ) : (
+                      "Continue"
+                    )}
                   </Button>
 
-                  {/* Terms & Conditions */}
-                  <div className="mt-3 text-black text-center text-sm leading-6">
-                    By continuing, I accept TCP -{" "}
-                    <u className="cursor-pointer">Terms and Conditions & Privacy Policy.</u>
-                  </div>
+                 
+                 
                 </>
               )}
             </div>

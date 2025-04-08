@@ -18,7 +18,10 @@ const OrderModel = ({ order, onBack }) => {
             Order ID: <span className="text-gray-700">{order._id}</span>
           </p>
           <p className="text-gray-600">
-            Total Price:{" "}
+            Items: <span>{order.totalItems}</span>
+          </p>
+          <p className="text-gray-600">
+            Cart Amount:{" "}
             <span className="font-semibold">₹{order.totalCartAmount}</span>
           </p>
           <p className="text-gray-600">
@@ -28,13 +31,21 @@ const OrderModel = ({ order, onBack }) => {
             </span>
           </p>
           <p className="text-gray-600">
-            Final Price:{" "}
+            Discounted Cart Price:{" "}
             <span className="font-semibold text-green-600">
               ₹{order.totalCartDiscountedPrice}
             </span>
           </p>
           <p className="text-gray-600">
-            Items: <span>{order.totalItems}</span>
+            Delivery Charge:{" "}
+            <span className="font-semibold">₹{order.deliveryCharge}</span>
+          </p>
+          <p className="text-gray-600">
+            Handling Charge:{" "}
+            <span className="font-semibold">₹{order.handlingCharge}</span>
+          </p>
+          <p className="text-gray-800 font-semibold">
+            Final Price: ₹{order.finalPrice}
           </p>
           <p
             className={`text-sm font-bold px-3 py-1 rounded-full inline-block ${
@@ -49,7 +60,7 @@ const OrderModel = ({ order, onBack }) => {
             Placed on: {new Date(order.createdAt).toLocaleString()}
           </p>
           <p className="text-gray-500 text-sm">
-            deliveryTime: {order.deliveryTime}
+            Delivery Time: {order.deliveryTime}
           </p>
         </div>
       </div>

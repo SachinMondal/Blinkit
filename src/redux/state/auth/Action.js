@@ -19,6 +19,7 @@ import {
   UPDATE_USER_LOCATION_REQUEST,
   UPDATE_USER_LOCATION_SUCCESS,
   UPDATE_USER_LOCATION_FAIL,
+  RESET_OTP_STATE,
 } from "./ActionType";
 
 // Send OTP
@@ -213,6 +214,11 @@ export const updateUserLocation =
       });
     }
   };
+
+
+export const resetOtpState=()=>({
+  type:RESET_OTP_STATE,
+});
 
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT });

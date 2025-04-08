@@ -25,7 +25,6 @@ export const addToCart = (productId, variantIndex,count) => async (dispatch, get
         dispatch({ type: ADD_TO_CART_REQUEST });
         const token = getState().auth.token;
         const config = { headers: { Authorization: `Bearer ${token}` } };
-        console.log(productId,variantIndex,count);
         const  data  = await axios.post(
             `${API_URL}/api/cart/addToCart`,
             { productId, variantIndex,count },
@@ -38,7 +37,7 @@ export const addToCart = (productId, variantIndex,count) => async (dispatch, get
     }
 };
 
-// ✅ Update Cart Item (Now updates a specific variant)
+
 export const updateCart = (productId, variantIndex, count) => async (dispatch, getState) => {
     try {
         dispatch({ type: UPDATE_CART_ITEM_REQUEST });
@@ -59,7 +58,6 @@ export const updateCart = (productId, variantIndex, count) => async (dispatch, g
     }
 };
 
-// ✅ Remove from Cart
 export const removeFromCart = (productId, variantIndex) => async (dispatch, getState) => {
     try {
         dispatch({ type: REMOVE_FROM_CART_REQUEST });
@@ -96,15 +94,13 @@ export const fetchCart = () => async (dispatch, getState) => {
         const token = getState().auth.token;
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        const data = await axios.get(`${API_URL}/api/cart/`, config)
-
+        const data = await axios.get(`${API_URL}/api/cart/`, config);
         dispatch({ type: FETCH_CART_SUCCESS, payload: data.data.data,payload2:data.data });
     } catch (error) {
         dispatch({ type: FETCH_CART_FAILURE, payload: error.response?.data?.message || error.message });
     }
 };
 
-// ✅ Clear Cart
 export const clearCart = () => async (dispatch, getState) => {
     try {
         dispatch({ type: CLEAR_CART_REQUEST });

@@ -15,9 +15,11 @@ import {
 import { fetchOrders } from "../../redux/state/order/Action";
 const Profile = () => {
   const dispatch = useDispatch();
-  const location=useLocation();
+  const location = useLocation();
   const activeTab = location.state?.active;
-  const [activeSection, setActiveSection] = useState(activeTab?activeTab:"personalInfo");
+  const [activeSection, setActiveSection] = useState(
+    activeTab ? activeTab : "personalInfo"
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -54,9 +56,9 @@ const Profile = () => {
   }, [dispatch]);
 
   return (
-    <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
-      {/* Breadcrumb - Now Fixed at the Top */}
-      <nav className="w-full mb-3 text-sm text-gray-600 text-left">
+    <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-4 xl:gap-24 flex-col overflow-hidden">
+      
+      <nav className="w-full mb-3 ml-8 text-sm text-gray-600 text-left">
         <Link to="/" className="text-blue-500 hover:underline">
           Home
         </Link>{" "}
@@ -70,7 +72,8 @@ const Profile = () => {
             : " My Orders"}
         </span>
       </nav>
-      <div className="md:hidden flex justify-evenly items-center mb-3 ">
+
+      <div className="md:hidden flex justify-evenly items-center">
         <h2 className="text-lg font-bold">My Profile</h2>
         <button
           className="bg-red-500 text-white px-3 py-1 rounded-md text-sm"
@@ -79,15 +82,14 @@ const Profile = () => {
           Logout
         </button>
       </div>
-      {/* Main Layout - Flex Without Breadcrumb Impacting Layout */}
       <div className="flex flex-col md:flex-row flex-grow">
         {/* Mobile View: My Profile Heading */}
         <h2 className="text-lg md:hidden font-bold text-center mb-3 md:block hidden">
           My Profile
         </h2>
 
-        {/* Sidebar - Fixed Width */}
-        <div className="md:w-1/4 w-full md:min-w-[200px] md:border-r p-3 rounded-lg text-sm md:text-base">
+        
+        <div className="md:w-1/4 w-full md:min-w-[200px] md:border-r p-3 rounded-lg text-sm md:text-base ">
           <div className="flex md:block justify-around md:justify-start">
             <div
               className={`p-2 text-center md:text-left cursor-pointer transition-all duration-300 rounded-lg mt-3 ${
@@ -124,7 +126,7 @@ const Profile = () => {
         </div>
 
         {/* Right Content - Stays in Position */}
-        <div className="flex-1 p-3 md:p-6 rounded-lg overflow-x-hidden overflow-y-auto scrollbar-hide text-sm md:text-base text-left transition-all duration-300">
+        <div className="flex-1 p-3 md:p-6 rounded-lg overflow-x-hidden overflow-y-auto scrollbar-hide text-sm md:text-base text-left transition-all duration-300 h-screen">
           {activeSection === "personalInfo" ? (
             <PersonalInfo />
           ) : activeSection === "address" ? (
@@ -172,7 +174,7 @@ const Profile = () => {
                         <div className="col-span-2 flex justify-end relative">
                           <button
                             onClick={(e) => {
-                              e.stopPropagation(); 
+                              e.stopPropagation();
                               setMenuOpen(
                                 menuOpen === addr._id ? null : addr._id
                               );
@@ -266,65 +268,82 @@ const Profile = () => {
                 <p>Loading orders...</p>
               ) : orders?.length > 0 ? (
                 orders.map((order) => (
-                  <div key={order._id} className="mb-6">
-                    <div className="py-3">
-                      <p className="font-bold text-left mb-1">
-                        Order ID: {order._id}
-                      </p>
-                      <p className="text-gray-500 text-left mb-1">
-                        Ordered on:{" "}
-                        {new Date(order.createdAt).toLocaleDateString()}{" "}
-                        {new Date(order.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                      <p className="text-gray-500 text-left mb-1 capitalize">
-                        Status: {order.orderStatus?.toLowerCase() || "pending"}
-                      </p>
-                      <p className="font-semibold text-left mb-4">
-                        Total Amount: ₹{order.totalCartDiscountedPrice}
-                      </p>
-                      <p className="font-semibold text-left mb-4">
-                        Delivery Time: {order.deliveryTime==="Pending"?"Waiting from Admin...":order.deliveryTime}
+                  <div
+                    key={order._id}
+                    className="mb-6 border border-gray-200 rounded-lg p-4 shadow-sm"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+                      <div>
+                        <p className="font-bold text-left mb-1">Order ID: {order._id}</p>
+                        <p className="text-gray-500 text-left mb-1">
+                          Ordered on:{" "}
+                          {new Date(order.createdAt).toLocaleDateString()}{" "}
+                          {new Date(order.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        <p className="text-gray-500 text-left mb-1 capitalize">
+                          Status: {order.orderStatus?.toLowerCase() || "pending"}
+                        </p>
+                        <p className="font-semibold text-left mb-4">
+                          Delivery Time:{" "}
+                          {order.deliveryTime === "Pending"
+                            ? "Waiting from Admin..."
+                            : order.deliveryTime}
+                        </p>
+                      </div>
+              
+                      <div className="text-left md:text-right">
+                        <button
+                          className="text-green-600 font-semibold hover:underline text-sm md:text-base"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          View Details
+                        </button>
+                      </div>
+                    </div>
+              
+                    {/* Pricing Summary */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm mb-4">
+                      <p>Items: {order.totalItems}</p>
+                      <p>Cart Amount: ₹{order.totalCartAmount}</p>
+                      <p>Discount: ₹{order.totalCartDiscountAmount}</p>
+                      <p>Discounted Price: ₹{order.totalCartDiscountedPrice}</p>
+                      <p>Delivery Charge: ₹{order.deliveryCharge}</p>
+                      <p>Handling Charge: ₹{order.handlingCharge}</p>
+                      <p className="font-extrabold text-lg sm:col-span-2">
+                        Final Price: ₹{order.finalPrice}
                       </p>
                     </div>
-
+              
+                    {/* Order Items */}
                     {order.orderItems?.map((item) => (
                       <div
                         key={item._id}
-                        className="grid grid-cols-12 items-center py-3 border-b border-gray-300"
+                        className="grid grid-cols-12 items-center py-3 border-t border-gray-200"
                       >
-                        <div className="col-span-2 flex justify-center">
+                        <div className="col-span-3 sm:col-span-2 flex justify-center">
                           <LazyImage
                             src={item.productId.image}
                             alt={item.productId.name}
-                            className="w-12 h-12 object-cover rounded"
+                            className="w-14 h-14 object-cover rounded"
                           />
                         </div>
-
-                        <div className="col-span-7 text-left">
-                          <div className="flex justify-between items-start">
+              
+                        <div className="col-span-9 sm:col-span-10 text-left">
+                          <div className="flex justify-between items-start flex-wrap">
                             <div>
-                              <p className="font-bold">Name: {item.productId.name}</p>
-                              <p className="text-sm text-gray-400 mt-1">
+                              <p className="font-bold">{item.productId.name}</p>
+                              <p className="text-sm text-gray-500">
                                 Weight: {item?.variantDetails?.qty}
                                 {item?.variantDetails?.unit}
                               </p>
                             </div>
-                            <div className="text-sm font-semibold mt-1">
+                            <div className="text-sm font-semibold mt-1 sm:mt-0">
                               x {item.quantity}
                             </div>
                           </div>
-                        </div>
-
-                        <div className="col-span-3 text-right">
-                          <button
-                            className="text-green-600 font-semibold hover:underline"
-                            onClick={() => setSelectedOrder(order)}
-                          >
-                            View Details
-                          </button>
                         </div>
                       </div>
                     ))}
@@ -347,7 +366,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Add Address Modal */}
       {isModalOpen && (
         <Modal
           onClose={() => setIsModalOpen(false)}

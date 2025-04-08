@@ -30,14 +30,13 @@ const ViewAll = () => {
       </div>
 
       {/* Category Name */}
-      <h2 className="text-2xl font-bold text-gray-800 capitalize text-left">{name || "All Products"}</h2>
+      <h2 className="text-2xl font-bold text-gray-800 capitalize text-left mb-6">{name || "All Products"}</h2>
 
-      {/* Subcategories Section */}
       {Array.isArray(subcategories) && subcategories.length > 0 ? (
         subcategories.map((subcategory) => (
           <div key={subcategory._id} className="mb-8">
             {/* Subcategory Title */}
-            <h3 className="text-xl font-semibold text-gray-700 text-left">{subcategory.name}</h3>
+            <h3 className="text-xl font-semibold text-gray-700 text-left mb-6">{subcategory.name}</h3>
 
             {/* Subcategory Products */}
             {Array.isArray(subcategory.products) && subcategory.products.length > 0 ? (

@@ -1,75 +1,68 @@
-import React, { useState, useEffect } from "react";
-import LazyImage from "../utils/LazyLoading/LazyLoading";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addToCart,
-  removeFromCart,
-  fetchCart,
-} from "../../redux/state/cart/Action";
+import { useEffect, useState } from "react";
+import { fetchCart, addToCart, removeFromCart } from "../../redux/state/cart/Action";  
+import LazyImage from "../utils/LazyLoading/LazyLoading";
 
-const ProductTile = ({ product, onClick }) => {
+const ProductCard = ({ product, onClick }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.cartItems);
   const { name, image, price, discount, quantity, variants } = product;
-  const [selectedVariant, setSelectedVariant] = useState(
-    variants?.length > 0 ? variants[0] : null
-  );
+
+  const [selectedVariant, setSelectedVariant] = useState(variants?.[0] || null);
+  const [variantQuantities, setVariantQuantities] = useState({});
   const [loading, setLoading] = useState(false);
-  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    dispatch(fetchCart()); 
+    dispatch(fetchCart());
   }, [dispatch]);
 
   useEffect(() => {
-    if (!selectedVariant || !cartItems || !Array.isArray(cartItems)) return;
-  
-    const cartItem = cartItems.find((item) =>
-      item?.product?._id === product?._id &&
-      item?.variantIndex === variants?.findIndex((v) => v?._id === selectedVariant?._id)
-    );
-  
-    setCount(cartItem ? cartItem.quantity : 0);
-  }, [cartItems, selectedVariant, product?._id, variants]);
-  
+    if (!cartItems || !variants?.length || !product?._id) return;
+
+    const updatedQuantities = {};
+    cartItems.forEach((item) => {
+      const itemProductId = typeof item.product === "object" ? item.product._id : item.product;
+      if (itemProductId?.toString() === product._id?.toString()) {
+        updatedQuantities[item.variantIndex] = item.quantity;
+      }
+    });
+
+    setVariantQuantities(updatedQuantities);
+
+    if (!selectedVariant && variants.length > 0) {
+      setSelectedVariant(variants[0]);
+    }
+  }, [cartItems, product._id, selectedVariant, variants]);
+
+  const variantIndex = variants.findIndex((v) => v._id === selectedVariant?._id);
+  const count = variantQuantities[variantIndex] || 0;
 
   const handleAdd = async (e) => {
-    e.stopPropagation();
+    e?.stopPropagation?.();
     if (!selectedVariant) return;
-  
-    const variantIndex = variants.findIndex((v) => v._id === selectedVariant._id);
     if (variantIndex === -1) return;
-  
+
     setLoading(true);
     try {
       const result = await dispatch(addToCart(product._id, variantIndex, 1));
-      if (result) {
-        setCount(1);  
-        dispatch(fetchCart());
-      }
-    } catch (error) {
-      console.error("Error adding to cart", error);
+      if (result) dispatch(fetchCart());
+    } catch (err) {
+      console.error("Add error", err);
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleIncrease = async (e) => {
     e.stopPropagation();
-    if (!selectedVariant || count >= 3) return;
-
-    const variantIndex = variants.findIndex((v) => v._id === selectedVariant._id);
-    if (variantIndex === -1) return;
+    if (!selectedVariant || variantIndex === -1 || count >= 3) return;
 
     setLoading(true);
     try {
       const result = await dispatch(addToCart(product._id, variantIndex, count + 1));
-      if (result) {
-        dispatch(fetchCart());
-        setCount(count + 1);
-      }
-    } catch (error) {
-      console.error("Error updating cart", error);
+      if (result) dispatch(fetchCart());
+    } catch (err) {
+      console.error("Increase error", err);
     } finally {
       setLoading(false);
     }
@@ -77,29 +70,19 @@ const ProductTile = ({ product, onClick }) => {
 
   const handleDecrease = async (e) => {
     e.stopPropagation();
-    if (!selectedVariant || count === 0) return;
-
-    const variantIndex = variants.findIndex((v) => v._id === selectedVariant._id);
-    if (variantIndex === -1) return;
+    if (!selectedVariant || variantIndex === -1 || count === 0) return;
 
     setLoading(true);
     try {
       if (count > 1) {
         const result = await dispatch(addToCart(product._id, variantIndex, count - 1));
-        if (result) {
-          dispatch(fetchCart());
-          setCount(count - 1);
-        }
+        if (result) dispatch(fetchCart());
       } else {
         const result = await dispatch(removeFromCart(product._id, variantIndex));
-        console.log(result);
-        if (result) {
-          dispatch(fetchCart());
-          setCount(0);
-        }
+        if (result) dispatch(fetchCart());
       }
-    } catch (error) {
-      console.error("Error updating cart", error);
+    } catch (err) {
+      console.error("Decrease error", err);
     } finally {
       setLoading(false);
     }
@@ -115,8 +98,10 @@ const ProductTile = ({ product, onClick }) => {
           </span>
         )}
       </div>
+
       <div className="text-left mt-2 w-full">
         <h3 className="text-sm font-medium">{name}</h3>
+
         {variants?.length > 0 ? (
           <div className="mt-1 flex flex-col space-y-1">
             <label className="text-xs font-medium text-gray-700">Select Variant:</label>
@@ -139,6 +124,7 @@ const ProductTile = ({ product, onClick }) => {
           <p className="text-xs text-gray-500 mt-1">Quantity: {quantity || "N/A"}</p>
         )}
       </div>
+
       <div className="flex justify-between items-center w-full mt-2 h-16">
         <div>
           <p className="text-sm font-semibold text-gray-800">
@@ -148,6 +134,7 @@ const ProductTile = ({ product, onClick }) => {
             ₹{selectedVariant ? selectedVariant.price : (price * 1.2).toFixed(2)}
           </p>
         </div>
+
         {count === 0 ? (
           <button
             onClick={handleAdd}
@@ -174,4 +161,4 @@ const ProductTile = ({ product, onClick }) => {
   );
 };
 
-export default ProductTile;
+export default ProductCard;

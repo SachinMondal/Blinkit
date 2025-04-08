@@ -6,58 +6,64 @@ import { createOrder } from "../../redux/state/order/Action";
 import { clearCart } from "../../redux/state/cart/Action";
 const CartSummary = ({ cartItems }) => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const addresses = useSelector((state) => state.address.addresses);
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false );
-  
+const navigate = useNavigate();
+const addresses = useSelector((state) => state.address.addresses);
+const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+const [selectedAddress, setSelectedAddress] = useState(null);
+const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  useEffect(() => {
-    dispatch(getAllAddresses());
-  }, [dispatch]);
+useEffect(() => {
+  dispatch(getAllAddresses());
+}, [dispatch]);
 
-  
 
-  const totalItemPrice = cartItems.totalCartAmount || 0;
-  const cartSize = cartItems.totalCartSize || 0;
-  const discount = cartItems.totalCartDiscountAmount || 0;
-  const handlingCharge = 10;
-  const deliveryCharge = 40;
-  const discountedTotal = totalItemPrice - discount;
-  const finalAmount = discountedTotal + handlingCharge + deliveryCharge;
+const totalItemPrice = cartItems.totalCartAmount || 0;
+const cartSize = cartItems.totalCartSize || 0;
+const discount = cartItems.totalCartDiscountAmount || 0;
+const handlingCharge = 10;
+const deliveryCharge = 40;
+const discountedTotal = cartItems.totalCartDiscountedPrice||0;
+const finalAmount = discountedTotal + handlingCharge + deliveryCharge;
 
-  const handleSelectAddress = (address) => {
-    setSelectedAddress(address);
+const handleSelectAddress = (address) => {
+  setSelectedAddress(address);
+};
+
+const handlePlaceOrder = () => {
+  setIsAddressModalOpen(true);
+};
+
+const handleFinalPlaceOrder = async () => {
+  if (!selectedAddress) {
+    console.error("No address selected");
+    return;
+  }
+
+  setIsPlacingOrder(true);
+
+  // Merge updated price fields into cartItems
+  const finalCartPayload = {
+    ...cartItems,
+    totalCartAmount: totalItemPrice,
+    totalCartSize: cartSize,
+    totalCartDiscountAmount: discount,
+    discountedTotal,
+    finalAmount,
+    handlingCharge,
+    deliveryCharge
   };
 
-  const handlePlaceOrder = () => {
-    setIsAddressModalOpen(true);
-  };
+  await dispatch(createOrder(finalCartPayload, selectedAddress));
+  setIsPlacingOrder(false);
+  setIsAddressModalOpen(false);
+  setIsSuccessModalOpen(true);
+};
 
-  const handleFinalPlaceOrder = async () => {
-    if (!selectedAddress) {
-      console.error("No address selected");
-      return;
-    }
-  
-    setIsPlacingOrder(true);
-    await dispatch(createOrder(cartItems, selectedAddress));
-    setIsPlacingOrder(false);
-    setIsAddressModalOpen(false);
-    setIsSuccessModalOpen(true); // Show modal, but don't clear cart yet
-  };
-
-
-  const handleViewOrders = () => {
-    navigate("/profile", { state: { active: "orders" } });
-    dispatch(clearCart()); 
-  };
-  
-
-  
-
+const handleViewOrders = () => {
+  navigate("/profile", { state: { active: "orders" } });
+  dispatch(clearCart());
+};
 
   return (
     <>
@@ -69,7 +75,7 @@ const CartSummary = ({ cartItems }) => {
           </p>
           <p className="flex justify-between">
             <span>Discount:</span>
-            <span className="text-green-500">- ₹{discount}</span>
+            <span className="text-green-500">- ₹{discount<0?discount*-1:discount}</span>
           </p>
           <p className="flex justify-between">
             <span>Subtotal after Discount:</span>

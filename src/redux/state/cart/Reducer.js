@@ -76,6 +76,7 @@ export const cartReducer = (state = initialState, action) => {
             return {
                 ...state,
                 cartItems: [],
+                cart:[],
                 totalItem: 0,
                 totalQuantity: 0,
                 totalPrice: 0,
