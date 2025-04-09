@@ -70,7 +70,7 @@ const Dashboard = () => {
   const filteredOrders = orders.filter(
     (order) => order.orderStatus !== "Pending"
   );
-
+console.log(orders);
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Live Orders */}
@@ -88,7 +88,7 @@ const Dashboard = () => {
                     <h4 className="font-semibold">{order.user.name}</h4>
                     <p className="text-gray-500">
                       {order?.orderItems
-                        ?.map((o) => `${o.productId.name} x ${o.quantity}`)
+                        ?.map((o) => `${o.productId?.name} x ${o.quantity}`)
                         .join(", ")}{" "}
                       items - {order.orderStatus}
                     </p>
