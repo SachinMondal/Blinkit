@@ -31,7 +31,6 @@ export const fetchOrders = () => async (dispatch, getState) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(data.data);
     dispatch({ type: FETCH_ORDERS_SUCCESS, payload: data.data.data });
   } catch (error) {
     dispatch({

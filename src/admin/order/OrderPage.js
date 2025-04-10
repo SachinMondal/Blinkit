@@ -3,7 +3,7 @@ import OrderTile from "./OrderTile";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import { getAllOrdersForAdmin } from "../../redux/state/order/Action";
 import { useDispatch, useSelector } from "react-redux";
-
+import EmptyOrder from "../../images/emptyOrder.png";
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.order.adminOrders || []);
@@ -61,7 +61,7 @@ const OrdersPage = () => {
         ) : (
           <div className="col-span-full text-center p-10">
             <LazyImage
-              src="https://via.placeholder.com/150"
+              src={EmptyOrder}
               alt="No Orders"
               className="w-32 h-32 mb-4 mx-auto"
             />

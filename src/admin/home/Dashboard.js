@@ -16,6 +16,8 @@ const Dashboard = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [altText, setAltText] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingBannerId, setDeletingBannerId] = useState(null);
+  const [altError, setAltError] = useState("");
   const dispatch = useDispatch();
   const banners = useSelector((state) => state.banner.banners || []);
   const orders = useSelector((state) => state.order.adminOrders || []);
@@ -34,23 +36,36 @@ const Dashboard = () => {
   };
 
   const handleSubmitBanner = async () => {
-    if (!selectedImage || !altText.trim()) return;
-
+    if (!selectedImage || !altText.trim()) {
+      setAltError("Alt text is required.");
+      return;
+    }
+  
+    setAltError(""); // Clear error once it's valid
     setIsUploading(true);
+  
     const formData = new FormData();
     formData.append("image", selectedImage.file);
     formData.append("alt", altText);
-
+  
     await dispatch(uploadBanner(formData));
     dispatch(getBanners());
     setSelectedImage(null);
     setAltText("");
     setIsUploading(false);
   };
+  
 
   const handleDeleteBanner = async (id) => {
     await dispatch(deleteBanner(id));
     dispatch(getBanners());
+  };
+  const handleDeleteBannerWithAnimation = async (id) => {
+    setDeletingBannerId(id);
+    setTimeout(() => {
+      handleDeleteBanner(id);
+      setDeletingBannerId(null);
+    }, 1000);
   };
 
   const handleDeliveryTimeChange = (orderId, value) => {
@@ -65,12 +80,12 @@ const Dashboard = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersForAdmin());
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orders.length]);
   const filteredOrders = orders.filter(
     (order) => order.orderStatus !== "Pending"
   );
-console.log(orders);
+  
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Live Orders */}
@@ -109,11 +124,13 @@ console.log(orders);
                         Select Time
                       </option>
 
-                      {["10 mins", "20 mins", "30 mins","1 Hour"].map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
+                      {["10 mins", "20 mins", "30 mins", "1 Hour"].map(
+                        (time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        )
+                      )}
 
                       {order.deliveryTime &&
                         !["30 mins", "1 hour", "2 hours"].includes(
@@ -180,7 +197,7 @@ console.log(orders);
               />
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
               >
                 ✖
               </button>
@@ -195,11 +212,15 @@ console.log(orders);
               type="text"
               placeholder="Enter alt text"
               value={altText}
-              onChange={(e) => setAltText(e.target.value)}
+              onChange={(e) => {
+                setAltText(e.target.value);
+                if (e.target.value.trim()) setAltError(""); 
+              }}
               className="p-2 border rounded w-full"
             />
           </div>
         )}
+        {altError && <p className="text-red-500 text-sm mt-1">{altError}</p>}
 
         {/* Submit Button */}
         {selectedImage && (
@@ -220,11 +241,15 @@ console.log(orders);
                 <LazyImage
                   src={banner.image}
                   alt={banner.alt}
-                  className="rounded-lg shadow-lg w-full h-20"
+                  className={`rounded-lg shadow-lg w-full h-20 object-cover transition-all duration-500 ${
+                    deletingBannerId === banner._id
+                      ? "opacity-30 animate-pulse"
+                      : "opacity-100"
+                  }`}
                 />
                 <button
-                  onClick={() => handleDeleteBanner(banner._id)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                  onClick={() => handleDeleteBannerWithAnimation(banner._id)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
                 >
                   ✖
                 </button>

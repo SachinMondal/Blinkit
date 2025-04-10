@@ -6,7 +6,6 @@ import ProductTile from "./ProductTile";
 import { Link, useNavigate } from "react-router-dom";
 
 const ProductCarousel = ({ title, products, categoryId }) => {
-
   const sliderRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
@@ -17,6 +16,7 @@ const ProductCarousel = ({ title, products, categoryId }) => {
 
   if (!products || products.length === 0) return null;
 
+  const showSlider = products.length > 5;
   const slidesToShow = Math.min(products.length, 6);
 
   const settings = {
@@ -51,39 +51,47 @@ const ProductCarousel = ({ title, products, categoryId }) => {
         )}
       </div>
 
-      {/* Slider Container */}
-      <div className="relative">
-        {/* Left Button */}
-        {currentSlide > 0 && (
-          <button
-            onClick={() => sliderRef.current.slickPrev()}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
-          >
-            <i className="fa-solid fa-chevron-left"></i>
-          </button>
-        )}
+      {/* Dynamic Layout */}
+      {showSlider ? (
+        <div className="relative">
+          {/* Left Arrow */}
+          {currentSlide > 0 && (
+            <button
+              onClick={() => sliderRef.current.slickPrev()}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
+            >
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+          )}
 
-        {/* Slider */}
-        <div className="overflow-hidden">
-          <Slider ref={sliderRef} {...settings}>
-            {products.map((product, index) => (
-              <div key={index} className="px-2">
-                <ProductTile product={product} onClick={() => handleProductClick(product._id)} />
-              </div>
-            ))}
-          </Slider>
+          {/* Slider */}
+          <div className="overflow-hidden">
+            <Slider ref={sliderRef} {...settings}>
+              {products.map((product, index) => (
+                <div key={index} className="px-2">
+                  <ProductTile product={product} onClick={() => handleProductClick(product._id)} />
+                </div>
+              ))}
+            </Slider>
+          </div>
+
+          {/* Right Arrow */}
+          {currentSlide < Math.max(0, products.length - slidesToShow) && (
+            <button
+              onClick={() => sliderRef.current.slickNext()}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
+            >
+              <i className="fa-solid fa-chevron-right"></i>
+            </button>
+          )}
         </div>
-
-        {/* Right Button */}
-        {currentSlide < Math.max(0, products.length - slidesToShow) && (
-          <button
-            onClick={() => sliderRef.current.slickNext()}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-gray-200 text-gray-700 p-3 rounded-full shadow-md hover:bg-gray-300"
-          >
-            <i className="fa-solid fa-chevron-right"></i>
-          </button>
-        )}
-      </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {products.map((product, index) => (
+            <ProductTile key={index} product={product} onClick={() => handleProductClick(product._id)} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

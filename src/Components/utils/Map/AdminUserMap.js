@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Optional: Custom marker icons (fixes broken icons in some setups)
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -20,7 +20,7 @@ const AdminUserMap = ({ adminLocation, userLocation }) => {
   // Convert GeoJSON format to usable lat/lng
   const userLat = userLocation?.coordinates?.[1];
   const userLng = userLocation?.coordinates?.[0];
-console.log(adminLocation)
+
   useEffect(() => {
     const fetchRoute = async () => {
       try {

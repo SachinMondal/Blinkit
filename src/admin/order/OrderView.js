@@ -23,7 +23,6 @@ const OrderView = () => {
         isFirstRender.current = false;
       }
     }, [token, dispatch]);
-    console.log(user);
 
   const getNextStatus = (currentStatus) => {
     switch (currentStatus) {

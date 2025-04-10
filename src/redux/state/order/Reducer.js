@@ -91,14 +91,18 @@ const orderReducer = (state = initialState, action) => {
     case UPDATE_ORDER_REQUEST:
       return { ...state, loading: true, error: null };
 
-    case UPDATE_ORDER_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        orders: state.orders.map((order) =>
-          order._id === action.payload._id ? { ...action.payload } : order
-        ),
-      };
+      case UPDATE_ORDER_SUCCESS:
+        return {
+          ...state,
+          loading: false,
+          orders: state.orders.map((order) =>
+            order._id === action.payload._id ? { ...action.payload } : order
+          ),
+          adminOrders: state.adminOrders.map((order) =>
+            order._id === action.payload._id ? { ...action.payload } : order
+          ),
+        };
+      
 
     case UPDATE_ORDER_FAILURE:
       return { ...state, loading: false, error: action.payload };

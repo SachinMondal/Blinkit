@@ -325,8 +325,8 @@ const Profile = () => {
                       >
                         <div className="col-span-3 sm:col-span-2 flex justify-center">
                           <LazyImage
-                            src={item.productId.image}
-                            alt={item.productId.name}
+                            src={item?.productId?.image}
+                            alt={item?.productId?.name}
                             className="w-14 h-14 object-cover rounded"
                           />
                         </div>
@@ -334,14 +334,14 @@ const Profile = () => {
                         <div className="col-span-9 sm:col-span-10 text-left">
                           <div className="flex justify-between items-start flex-wrap">
                             <div>
-                              <p className="font-bold">{item.productId.name}</p>
+                              <p className="font-bold">{item?.productId?.name}</p>
                               <p className="text-sm text-gray-500">
                                 Weight: {item?.variantDetails?.qty}
                                 {item?.variantDetails?.unit}
                               </p>
                             </div>
                             <div className="text-sm font-semibold mt-1 sm:mt-0">
-                              x {item.quantity}
+                              x {item?.quantity}
                             </div>
                           </div>
                         </div>

@@ -28,6 +28,7 @@ export default function Navbar({
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const searchResult = useSelector((state) => state.product.searchResult);
+  
   useEffect(() => {
     const categoryList = document.getElementById("category-list");
     if (categoryList) {
@@ -61,6 +62,7 @@ export default function Navbar({
   const handleCategoryClick = (categoryName) => {
     setActiveCategory((prev) => (prev === categoryName ? null : categoryName));
   };
+  
   const handleCategorySelection = (categoryName) => {
     if (selectedCategory === categoryName) {
       setSelectedCategory("");
@@ -70,10 +72,12 @@ export default function Navbar({
     }
     handleCategoryClick(categoryName);
   };
+  
   useEffect(() => {
     dispatch(fetchCart());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
   useEffect(() => {
     const trimmedQuery = query.trim();
 
@@ -215,7 +219,6 @@ export default function Navbar({
                       {searchResult?.categories?.length > 0 ||
                       searchResult?.products?.length > 0 ? (
                         <>
-                          {/* Category Results */}
                           {searchResult.categories.length > 0 && (
                             <>
                               <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
@@ -246,8 +249,6 @@ export default function Navbar({
                               )}
                             </>
                           )}
-
-                          {/* Product Results */}
                           {searchResult.products.length > 0 && (
                             <>
                               <div className="px-3 py-1 text-left text-xs text-gray-500 font-semibold uppercase mt-2">
@@ -335,7 +336,6 @@ export default function Navbar({
                 ref={searchRef}
                 className="relative w-full ml-0 lg:-ml-20 sm:w-96"
               >
-                {/* Search Input */}
                 <div className="bg-white rounded-md px-3 py-2 flex items-center w-full sticky top-0 z-40 shadow-sm">
                   <i className="fa-solid fa-magnifying-glass text-gray-500"></i>
                   <input
@@ -359,14 +359,11 @@ export default function Navbar({
                     }}
                   />
                 </div>
-
-                {/* Dropdown */}
                 {showDropdown && query.trim().length > 0 && (
                   <div className="absolute w-full bg-white border mt-1 rounded-md max-h-60 overflow-y-auto z-50 shadow-lg">
                     {searchResult?.categories?.length > 0 ||
                     searchResult?.products?.length > 0 ? (
                       <>
-                        {/* Category Results */}
                         {searchResult.categories.length > 0 && (
                           <>
                             <div className="px-3 py-1 text-xs text-left text-gray-500 font-semibold uppercase">
@@ -395,8 +392,6 @@ export default function Navbar({
                             ))}
                           </>
                         )}
-
-                        {/* Product Results */}
                         {searchResult.products.length > 0 && (
                           <>
                             <div className="px-3 py-1 text-xs text-left text-gray-500 font-semibold uppercase mt-2">

@@ -9,8 +9,7 @@ const CartProduct = ({ item }) => {
   const price = item.subtotalPrice / item.quantity;
   
   const handleIncrease = async () => {
-    if (quantity >= 3) return; // Prevent increasing beyond 3
-
+    if (quantity >= 3) return; 
     const newQty = quantity + 1;
     setQuantity(newQty);
   
@@ -64,14 +63,14 @@ const CartProduct = ({ item }) => {
       {/* Product Details */}
       <div className="flex items-center space-x-3">
         <LazyImage
-          src={item.product?.image || "/images/default-product.jpg"}
-          alt={item.product?.name || "Unnamed Product"}
+          src={item?.product?.image || "/images/default-product.jpg"}
+          alt={item?.product?.name || "Unnamed Product"}
           className="w-14 h-14 rounded-md object-contain"
         />
 
         <div className="flex-1">
-          <h3 className="text-sm font-semibold">{item.product?.name || "Unnamed Product"}</h3>
-          <p className="text-xs text-gray-600">₹{price} each</p>
+          <h3 className="text-sm font-semibold">{item?.product?.name || "Unnamed Product"}</h3>
+          <p className="text-xs text-gray-600">₹{price} /each</p>
         </div>
 
         <div className="flex items-center space-x-1 bg-green-200 rounded-md w-16">

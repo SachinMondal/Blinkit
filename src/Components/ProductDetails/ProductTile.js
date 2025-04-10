@@ -56,37 +56,58 @@ const ProductCard = ({ product, onClick }) => {
   const handleIncrease = async (e) => {
     e.stopPropagation();
     if (!selectedVariant || variantIndex === -1 || count >= 3) return;
-
+  
+    const newQty = count + 1;
+    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
     setLoading(true);
+  
     try {
-      const result = await dispatch(addToCart(product._id, variantIndex, count + 1));
-      if (result) dispatch(fetchCart());
-    } catch (err) {
-      console.error("Increase error", err);
+      const result = await dispatch(addToCart(product._id, variantIndex, newQty));
+      if (result) {
+        dispatch(fetchCart());
+      } else {
+        setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+      }
+    } catch (error) {
+      console.error("Error updating cart", error);
+      setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
     } finally {
       setLoading(false);
     }
   };
-
+  
   const handleDecrease = async (e) => {
     e.stopPropagation();
     if (!selectedVariant || variantIndex === -1 || count === 0) return;
-
+  
+    const newQty = count - 1;
+    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
     setLoading(true);
+  
     try {
-      if (count > 1) {
-        const result = await dispatch(addToCart(product._id, variantIndex, count - 1));
-        if (result) dispatch(fetchCart());
+      if (newQty > 0) {
+        const result = await dispatch(addToCart(product._id, variantIndex, newQty));
+        if (result) {
+          dispatch(fetchCart());
+        } else {
+          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+        }
       } else {
         const result = await dispatch(removeFromCart(product._id, variantIndex));
-        if (result) dispatch(fetchCart());
+        if (result) {
+          dispatch(fetchCart());
+        } else {
+          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+        }
       }
-    } catch (err) {
-      console.error("Decrease error", err);
+    } catch (error) {
+      console.error("Error updating cart", error);
+      setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative">

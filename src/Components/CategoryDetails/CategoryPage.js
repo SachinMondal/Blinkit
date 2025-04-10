@@ -54,16 +54,15 @@ const CategoryPage = () => {
     navigate(`/product/${productId}`);
   };
   return (
-    <div className="max-w-5xl mx-auto p-4 flex flex-row flex-wrap">
-      {/* Global Check: If categories or products are empty */}
+    <div className="max-w-5xl mx-auto p-0 sm:p-4 flex flex-row flex-wrap">
+      
       {categories.length > 0 ? (
         <div className="w-full flex flex-col items-center justify-center min-h-screen">
           <LazyImage src={emptyCategory} alt="Empty" className="w-48 h-48" />
         </div>
       ) : (
         <>
-          {/* Left Sidebar - Categories */}
-          <div className="w-1/4 min-w-[4rem] border-r p-4 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
+          <div className="w-1/5 sm:w-1/4 min-w-[4rem] border-r p-2 sm:p-8 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
             <ul className="flex flex-col w-full">
               {categories?.subcategories?.map((cat, index) => (
                 <div key={cat._id}>
@@ -101,8 +100,7 @@ const CategoryPage = () => {
             </ul>
           </div>
 
-          {/* Right Side - Sorted Products */}
-          <div className="w-3/4 p-4 flex flex-col space-y-4" ref={containerRef}>
+          <div className="w-3/4 p-1 sm:p-4 flex flex-col space-y-4" ref={containerRef}>
             <div className="text-sm text-gray-600 self-start">
               <Link to="/" className="text-blue-500 hover:underline">
                 Home
@@ -113,7 +111,7 @@ const CategoryPage = () => {
               </span>
             </div>
 
-            {/* Sort Dropdown */}
+            
             <div className="flex justify-between items-center -mt-5">
               <h2 className="text-s md:text-lg font-semibold">
                 {selectedCategory} Products
@@ -163,7 +161,7 @@ const CategoryPage = () => {
             </div>
 
             {/* Sorted Product List */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8">
               {categories?.subcategories?.flatMap((subcategory) =>
                 Array.isArray(subcategory.products)
                   ? [...subcategory.products]

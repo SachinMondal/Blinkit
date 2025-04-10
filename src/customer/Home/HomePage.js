@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProduct } from "../../redux/state/product/Action.js";
 import { getBanners } from "../../redux/state/home/Action.js";
 
+
 const HomePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -36,7 +37,6 @@ const HomePage = () => {
   }, [data.length, dispatch]);
 
   const handleCategoryClick = (categoryId) => {
-    console.log(categoryId)
     navigate(`/category/${categoryId}`);
   };
 
@@ -58,8 +58,6 @@ const HomePage = () => {
 
   Object.entries(data || {}).forEach(([key, category]) => {
     const details = category?.categoryDetails || {};
-
-    // Assign based on priority
     if (details?.isFeatured) {
       filteredSections.featured[key] = category;
     } else if (details?.newArrivals) {
@@ -75,7 +73,7 @@ const HomePage = () => {
     }
   });
 
-  const sliderSettings = {
+  const bannerSliderSettings = {
     dots: true,
     infinite: banners?.data?.length > 1,
     speed: 500,
@@ -84,38 +82,27 @@ const HomePage = () => {
     autoplay: true,
     autoplaySpeed: 3000,
   };
-
-  const categorySliderSettings = {
-    infinite: uniqueCategories.length > 6,
-    speed: 800,
-    slidesToShow: Math.min(uniqueCategories.length, 6),
-    slidesToScroll: 1,
-    autoplay: uniqueCategories.length > 6,
-    autoplaySpeed: 2500,
-    cssEase: "linear",
-    responsive: [
-      {
-        breakpoint: 1280,
-        settings: { slidesToShow: Math.min(uniqueCategories.length, 5.5) },
-      },
-      {
-        breakpoint: 1024,
-        settings: { slidesToShow: Math.min(uniqueCategories.length, 4) },
-      },
-      {
-        breakpoint: 640,
-        settings: { slidesToShow: Math.min(uniqueCategories.length, 2.8) },
-      },
-      {
-        breakpoint: 425,
-        settings: { slidesToShow: Math.min(uniqueCategories.length, 2) },
-      },
-      {
-        breakpoint: 320,
-        settings: { slidesToShow: Math.min(uniqueCategories.length, 1.5) },
-      },
-    ],
+  const generateSliderSettings = (itemsLength, maxVisible = 6) => {
+    const baseSlides = Math.min(itemsLength, maxVisible);
+  
+    return {
+      infinite: itemsLength > baseSlides,
+      speed: 600,
+      slidesToShow: baseSlides,
+      slidesToScroll: 1,
+      autoplay: itemsLength > baseSlides,
+      autoplaySpeed: 2500,
+      cssEase: "linear",
+      responsive: [
+        { breakpoint: 1280, settings: { slidesToShow: Math.min(itemsLength, 5.5) } },
+        { breakpoint: 1024, settings: { slidesToShow: Math.min(itemsLength, 4) } },
+        { breakpoint: 640, settings: { slidesToShow: Math.min(itemsLength, 2.8) } },
+        { breakpoint: 425, settings: { slidesToShow: Math.min(itemsLength, 2) } },
+        { breakpoint: 320, settings: { slidesToShow: Math.min(itemsLength, 1.5) } },
+      ],
+    };
   };
+  const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
 
   return (
     <>
@@ -127,37 +114,56 @@ const HomePage = () => {
         </div>
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
-          <Slider {...sliderSettings}>
-            {banners?.data
-              ?.filter((img) => img?.image)
-              .map((img, index) => (
-                <div
-                  key={index}
-                  className="flex justify-center max-w-7xl mx-auto px-4"
-                >
-                  <LazyImage
-                    src={img.image}
-                    alt={img.alt || "Banner"}
-                    className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
-                  />
-                </div>
-              ))}
-          </Slider>
-
-          <div className="w-full max-w-7xl mx-auto mt-4 px-4">
-            <Slider {...categorySliderSettings}>
-              {uniqueCategories.map((item) => (
-                <CategoryTile
-                  key={item._id || item.name}
-                  image={item.image}
-                  name={item.name}
-                  discount={10}
-                  onClick={() => handleCategoryClick(item._id)}
-                />
-              ))}
+          {/* Banner Slider */}
+          {banners?.data?.length > 0 && (
+            <Slider {...bannerSliderSettings}>
+              {banners.data
+                .filter((img) => img?.image)
+                .map((img, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-center max-w-7xl mx-auto px-4"
+                  >
+                    <LazyImage
+                      src={img.image}
+                      alt={img.alt || "Banner"}
+                      className="w-full h-[10%] lg:h-[300px] object-cover rounded-lg"
+                    />
+                  </div>
+                ))}
             </Slider>
+          )}
+
+          {/* Category Section */}
+          <div className="w-full max-w-7xl mx-auto mt-4 px-4">
+            {uniqueCategories.length > 5 ? (
+              <Slider {...categorySliderSettings}>
+                {uniqueCategories.map((item) => (
+                  <CategoryTile
+                    key={item._id || item.name}
+                    image={item.image}
+                    name={item.name}
+                    discount={10}
+                    onClick={() => handleCategoryClick(item._id)}
+                  />
+                ))}
+              </Slider>
+            ) : (
+              <div className="flex flex-wrap gap-4">
+                {uniqueCategories.map((item) => (
+                  <CategoryTile
+                    key={item._id || item.name}
+                    image={item.image}
+                    name={item.name}
+                    discount={10}
+                    onClick={() => handleCategoryClick(item._id)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
+          {/* Product Sections */}
           <div className="flex flex-col gap-4">
             {Object.entries(filteredSections).map(
               ([sectionName, sectionObject]) =>
