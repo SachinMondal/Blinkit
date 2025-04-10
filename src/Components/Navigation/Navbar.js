@@ -28,7 +28,7 @@ export default function Navbar({
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const searchResult = useSelector((state) => state.product.searchResult);
-  
+
   useEffect(() => {
     const categoryList = document.getElementById("category-list");
     if (categoryList) {
@@ -62,7 +62,7 @@ export default function Navbar({
   const handleCategoryClick = (categoryName) => {
     setActiveCategory((prev) => (prev === categoryName ? null : categoryName));
   };
-  
+
   const handleCategorySelection = (categoryName) => {
     if (selectedCategory === categoryName) {
       setSelectedCategory("");
@@ -72,12 +72,12 @@ export default function Navbar({
     }
     handleCategoryClick(categoryName);
   };
-  
+
   useEffect(() => {
     dispatch(fetchCart());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
     const trimmedQuery = query.trim();
 
@@ -138,7 +138,13 @@ export default function Navbar({
                   </div>
 
                   {isLoggedIn ? (
-                    <div className="flex gap-6">
+                    <div className="flex gap-2">
+                      <Link to="/profile" className="text-white">
+                        <i className="fa-solid fa-circle-user text-4xl"></i>
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
                       <Link
                         to={"/cart"}
                         className="relative p-2 rounded-full transition"
@@ -148,22 +154,18 @@ export default function Navbar({
                         </span>
                         <i className="fa-solid fa-cart-shopping"></i>
                       </Link>
-                      <Link to="/profile" className="text-white">
-                        <i className="fa-solid fa-circle-user text-4xl"></i>
-                      </Link>
+                      <Button
+                        onClick={() => setIsModalOpen(true)}
+                        className=" text-black px-4 py-2 rounded-lg"
+                      >
+                        SignUp/Login
+                      </Button>
                     </div>
-                  ) : (
-                    <Button
-                      onClick={() => setIsModalOpen(true)}
-                      className=" text-black px-4 py-2 rounded-lg"
-                    >
-                      SignUp/Login
-                    </Button>
                   )}
                 </div>
                 <div className="">
                   <p className="text-black font-bold text-left">
-                    Delivery in 15 min
+                    Delivery in 15 min+
                     <button
                       onClick={() => setLocationModal(true)}
                       className="ml-1 text-gray-600 hover:text-black"
@@ -215,17 +217,17 @@ export default function Navbar({
                   </div>
 
                   {showDropdown && query.trim().length > 0 && (
-                    <div className="absolute w-full bg-white border mt-1 rounded-md max-h-60 overflow-y-auto z-50 shadow-lg">
-                      {searchResult?.categories?.length > 0 ||
-                      searchResult?.products?.length > 0 ? (
-                        <>
-                          {searchResult.categories.length > 0 && (
-                            <>
-                              <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
-                                Categories
-                              </div>
-                              {searchResult.categories.map(
-                                (category, index) => (
+                    <div className="absolute w-full bg-white border mt-1 rounded-md z-50 shadow-lg overflow-hidden">
+                      <div className="max-h-64 overflow-y-auto">
+                        {searchResult?.categories?.length > 0 ||
+                        searchResult?.products?.length > 0 ? (
+                          <>
+                            {searchResult.categories.length > 0 && (
+                              <>
+                                <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
+                                  Categories
+                                </div>
+                                {searchResult.categories.map((category) => (
                                   <Link
                                     to={`/category/${category._id}`}
                                     key={category._id}
@@ -245,8 +247,151 @@ export default function Navbar({
                                       <span>{category.name}</span>
                                     </div>
                                   </Link>
-                                )
-                              )}
+                                ))}
+                              </>
+                            )}
+                            {searchResult.products.length > 0 && (
+                              <>
+                                <div className="px-3 py-1 text-left text-xs text-gray-500 font-semibold uppercase mt-2">
+                                  Products
+                                </div>
+                                {searchResult.products.map((item) => (
+                                  <Link
+                                    to={`/product/${item._id}`}
+                                    key={item._id}
+                                  >
+                                    <div
+                                      className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+                                      onClick={() => {
+                                        setQuery(item.name);
+                                        setShowDropdown(false);
+                                      }}
+                                    >
+                                      <LazyImage
+                                        src={item.image}
+                                        alt={item.name}
+                                        className="w-8 h-8 rounded object-cover"
+                                      />
+                                      <span>{item.name}</span>
+                                    </div>
+                                  </Link>
+                                ))}
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <div className="p-2 text-gray-500">
+                            No results found
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex justify-around gap-2 items-center">
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className="text-white text-xl"
+                >
+                  <i className="fa-solid fa-bars"></i>
+                </button>
+                <Link
+                  to={"/"}
+                  className="text-white text-lg font-semibold cursor-pointer"
+                >
+                  <LazyImage src={Logo} alt="brand" className="w-12 h-12" />
+                </Link>
+                <div className="flex flex-col text-white text-sm items-start mr-2">
+                  <p className="text-black font-bold flex items-center text-xs md:text-sm">
+                    Delivery in 15 min
+                    <button
+                      onClick={() => setLocationModal(true)}
+                      className="ml-1 text-gray-600 hover:text-black"
+                    >
+                      <i className="fas fa-pen text-xs"></i>
+                    </button>
+                  </p>
+
+                  {location ? (
+                    <div className="relative w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] overflow-hidden h-6">
+                      <div className="absolute whitespace-nowrap animate-marquee font-medium text-gray-800 text-xs md:text-sm">
+                        {location}
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setLocationModal(true)}
+                      className="text-black underline text-xs md:text-sm"
+                    >
+                      Select Location
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div
+                ref={searchRef}
+                className="relative w-full ml-0 lg:-ml-20 sm:w-96"
+              >
+                <div className="bg-white rounded-md px-3 py-2 flex items-center w-full sticky top-0 z-40 shadow-sm">
+                  <i className="fa-solid fa-magnifying-glass text-gray-500"></i>
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="ml-2 outline-none w-full text-gray-800"
+                    value={query}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setQuery(value);
+                      setShowDropdown(value.trim() !== "");
+                    }}
+                    onFocus={() => {
+                      if (query.trim() !== "") setShowDropdown(true);
+                    }}
+                    onBlur={() => {
+                      setTimeout(() => setShowDropdown(false), 150);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") e.preventDefault();
+                    }}
+                  />
+                </div>
+                {showDropdown && query.trim().length > 0 && (
+                  <div className="absolute w-full bg-white border mt-1 rounded-md z-50 shadow-lg overflow-hidden">
+                    <div className="max-h-64 overflow-y-auto">
+                      {searchResult?.categories?.length > 0 ||
+                      searchResult?.products?.length > 0 ? (
+                        <>
+                          {searchResult.categories.length > 0 && (
+                            <>
+                              <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
+                                Categories
+                              </div>
+                              {searchResult.categories.map((category) => (
+                                <Link
+                                  to={`/category/${category._id}`}
+                                  key={category._id}
+                                >
+                                  <div
+                                    className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+                                    onClick={() => {
+                                      setQuery(category.name);
+                                      setShowDropdown(false);
+                                    }}
+                                  >
+                                    <LazyImage
+                                      src={category.image}
+                                      alt={category.name}
+                                      className="w-8 h-8 rounded object-cover"
+                                    />
+                                    <span>{category.name}</span>
+                                  </div>
+                                </Link>
+                              ))}
                             </>
                           )}
                           {searchResult.products.length > 0 && (
@@ -284,148 +429,11 @@ export default function Navbar({
                         </div>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="flex justify-around gap-2 items-center">
-                <button
-                  onClick={() => setIsSidebarOpen(true)}
-                  className="text-white text-xl"
-                >
-                  <i className="fa-solid fa-bars"></i>
-                </button>
-                <Link
-                  to={"/"}
-                  className="text-white text-lg font-semibold cursor-pointer"
-                >
-                  <LazyImage src={Logo} alt="brand" className="w-12 h-12" />
-                </Link>
-                <div className="flex flex-col text-white text-sm items-start ml-5">
-                  <p className="text-black font-bold">
-                    Delivery in 15 min
-                    <button
-                      onClick={() => setLocationModal(true)}
-                      className="ml-1 text-gray-600 hover:text-black"
-                    >
-                      <i className="fas fa-pen text-xs"></i>
-                    </button>
-                  </p>
-                  {location ? (
-                    <div className="relative w-20 md:w-40 overflow-hidden h-6">
-                      <div className="overflow-hidden w-full h-full">
-                        <p className="whitespace-nowrap animate-marquee text-sm font-medium text-gray-800">
-                          {location}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setLocationModal(true)}
-                      className="text-black underline"
-                    >
-                      Select Location
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <div
-                ref={searchRef}
-                className="relative w-full ml-0 lg:-ml-20 sm:w-96"
-              >
-                <div className="bg-white rounded-md px-3 py-2 flex items-center w-full sticky top-0 z-40 shadow-sm">
-                  <i className="fa-solid fa-magnifying-glass text-gray-500"></i>
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="ml-2 outline-none w-full text-gray-800"
-                    value={query}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setQuery(value);
-                      setShowDropdown(value.trim() !== "");
-                    }}
-                    onFocus={() => {
-                      if (query.trim() !== "") setShowDropdown(true);
-                    }}
-                    onBlur={() => {
-                      setTimeout(() => setShowDropdown(false), 150);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") e.preventDefault();
-                    }}
-                  />
-                </div>
-                {showDropdown && query.trim().length > 0 && (
-                  <div className="absolute w-full bg-white border mt-1 rounded-md max-h-60 overflow-y-auto z-50 shadow-lg">
-                    {searchResult?.categories?.length > 0 ||
-                    searchResult?.products?.length > 0 ? (
-                      <>
-                        {searchResult.categories.length > 0 && (
-                          <>
-                            <div className="px-3 py-1 text-xs text-left text-gray-500 font-semibold uppercase">
-                              Categories
-                            </div>
-                            {searchResult.categories.map((category, index) => (
-                              <Link
-                                to={`/category/${category._id}`}
-                                key={category._id}
-                              >
-                                <div
-                                  className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setQuery(category.name);
-                                    setShowDropdown(false);
-                                  }}
-                                >
-                                  <LazyImage
-                                    src={category.image}
-                                    alt={category.name}
-                                    className="w-8 h-8 rounded object-cover"
-                                  />
-                                  <span>{category.name}</span>
-                                </div>
-                              </Link>
-                            ))}
-                          </>
-                        )}
-                        {searchResult.products.length > 0 && (
-                          <>
-                            <div className="px-3 py-1 text-xs text-left text-gray-500 font-semibold uppercase mt-2">
-                              Products
-                            </div>
-                            {searchResult.products.map((item) => (
-                              <Link to={`/product/${item._id}`} key={item._id}>
-                                <div
-                                  className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
-                                  onClick={() => {
-                                    setQuery(item.name);
-                                    setShowDropdown(false);
-                                  }}
-                                >
-                                  <LazyImage
-                                    src={item.image}
-                                    alt={item.name}
-                                    className="w-8 h-8 rounded object-cover"
-                                  />
-                                  <span>{item.name}</span>
-                                </div>
-                              </Link>
-                            ))}
-                          </>
-                        )}
-                      </>
-                    ) : (
-                      <div className="p-2 text-gray-500">No results found</div>
-                    )}
                   </div>
                 )}
               </div>
 
-              <div className=" flex gap-8 items-center justify-center">
+              <div className=" flex gap-4 ml-2 items-center justify-center">
                 <Link
                   to={"/cart"}
                   className="relative p-2 rounded-full transition"

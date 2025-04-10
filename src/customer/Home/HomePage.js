@@ -104,6 +104,8 @@ const HomePage = () => {
   };
   const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
 
+  console.log(uniqueCategories);
+
   return (
     <>
       {loading ? (
@@ -143,7 +145,7 @@ const HomePage = () => {
                     key={item._id || item.name}
                     image={item.image}
                     name={item.name}
-                    discount={10}
+                    discount={item.discountPercentage}
                     onClick={() => handleCategoryClick(item._id)}
                   />
                 ))}
@@ -155,7 +157,7 @@ const HomePage = () => {
                     key={item._id || item.name}
                     image={item.image}
                     name={item.name}
-                    discount={10}
+                    discount={item.discountPercentage}
                     onClick={() => handleCategoryClick(item._id)}
                   />
                 ))}

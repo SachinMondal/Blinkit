@@ -71,7 +71,7 @@ export default function OTPModal({ email, closeModal }) {
   };
 
   return (
-    <div className="w-full p-6 bg-[#F1C542] rounded-lg ">
+    <div className="w-full p-6 md:p-0 bg-[#F1C542] rounded-lg md:mt-16">
       <div className="text-xl font-semibold text-gray-900 text-center">
         Enter OTP
         <hr className="w-16 border-black mt-1 mx-auto" />
@@ -89,7 +89,7 @@ export default function OTPModal({ email, closeModal }) {
             value={digit}
             onChange={(e) => handleChange(index, e.target.value)}
             onKeyDown={(e) => handleKeyDown(index, e)}
-            className="w-12 h-12 text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-12 h-12 md:w-8 md:h-8 md:text-sm text-center text-xl border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         ))}
       </div>

@@ -33,12 +33,11 @@ const ProductPage = () => {
         setIsFetchingProduct(false);
       }
     };
-  
+
     if (productId) {
       fetchProduct();
     }
   }, [dispatch, productId]);
-  
 
   useEffect(() => {
     if (product?.category?._id) {
@@ -46,13 +45,11 @@ const ProductPage = () => {
     }
   }, [dispatch, product?.category?._id]);
 
-  
   useEffect(() => {
     if (product?.variants?.length > 0) {
       setSelectedVariant(product.variants[0]);
     }
   }, [product]);
-
 
   useEffect(() => {
     if (!product || !cart || !product?.variants?.length) return;
@@ -201,7 +198,7 @@ const ProductPage = () => {
         </div>
       ) : (
         <>
-          <nav className="mb-4 ml-8 text-sm text-gray-600 w-full lg:hidden text-left overflow-hidden">
+          <nav className="mb-4 ml-4 text-sm text-gray-600 w-full lg:hidden text-left overflow-hidden">
             <Link to="/" className="text-blue-500 hover:underline">
               Home
             </Link>{" "}
@@ -216,7 +213,7 @@ const ProductPage = () => {
           </nav>
 
           <div className="flex flex-col lg:flex-row items-start lg:space-x-6">
-            <div className="w-full lg:w-1/2 p-4 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
+            <div className="w-full lg:w-1/2 p-2 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
               <LazyImage
                 src={product?.image}
                 alt={product?.name}
@@ -301,7 +298,7 @@ const ProductPage = () => {
               </div>
             </div>
             <div className="w-full lg:w-1/2">
-              <div className="mb-4 ml-8 text-sm text-gray-600 hidden lg:block text-left">
+              <div className="mb-4 text-sm text-gray-600 hidden lg:block text-left">
                 <Link to="/" className="text-blue-500 hover:underline">
                   Home
                 </Link>{" "}
@@ -314,30 +311,31 @@ const ProductPage = () => {
                 </Link>{" "}
                 &gt; <span className="text-gray-900">{product?.name}</span>
               </div>
-
               {product?.variants?.length > 0 && (
                 <div className="mt-4">
-                  <h3 className="text-xl font-bold">Select Variant:</h3>
-                  <div className="mt-2 flex flex-wrap gap-4">
-                    <table className="w-full border-collapse border border-gray-300">
+                  <h3 className="text-lg sm:text-xl font-bold">
+                    Select Variant:
+                  </h3>
+                  <div className="mt-2 overflow-x-auto">
+                    <table className="min-w-full sm:w-full border-collapse border border-gray-300 text-sm sm:text-base">
                       <thead>
                         <tr className="bg-gray-200">
-                          <th className="border border-gray-300 px-4 py-2">
+                          <th className="border border-gray-300 px-2 sm:px-4 py-2">
                             Select
                           </th>
-                          <th className="border border-gray-300 px-4 py-2">
+                          <th className="border border-gray-300 px-2 sm:px-4 py-2">
                             Price
                           </th>
-                          <th className="border border-gray-300 px-4 py-2">
+                          <th className="border border-gray-300 px-2 sm:px-4 py-2">
                             Discount
                           </th>
-                          <th className="border border-gray-300 px-4 py-2">
+                          <th className="border border-gray-300 px-2 sm:px-4 py-2">
                             Quantity
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {product.variants.map((variant, index) => (
+                        {product.variants.map((variant) => (
                           <tr
                             key={variant._id}
                             className={
@@ -346,7 +344,7 @@ const ProductPage = () => {
                                 : ""
                             }
                           >
-                            <td className="border border-gray-300 px-4 py-2 text-center">
+                            <td className="border border-gray-300 px-2 sm:px-4 py-2 text-center">
                               <input
                                 type="radio"
                                 name="variant"
@@ -354,13 +352,13 @@ const ProductPage = () => {
                                 onChange={() => handleVariantChange(variant)}
                               />
                             </td>
-                            <td className="border border-gray-300 px-4 py-2">
+                            <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               ₹{variant.price}
                             </td>
-                            <td className="border border-gray-300 px-4 py-2">
+                            <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               ₹{variant.discountPrice}
                             </td>
-                            <td className="border border-gray-300 px-4 py-2">
+                            <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               {variant.qty} {variant.unit}
                             </td>
                           </tr>
@@ -370,6 +368,7 @@ const ProductPage = () => {
                   </div>
                 </div>
               )}
+
               <div className="p-6 border-b">
                 <div className="flex items-center justify-end space-x-4 mt-6">
                   {count === 0 ? (
@@ -378,7 +377,7 @@ const ProductPage = () => {
                       disabled={!selectedVariant}
                       className="bg-green-500 text-white font-bold text-sm px-4 py-2 rounded-lg w-40"
                     >
-                      {loading?"...":"Add To Cart"}
+                      {loading ? "..." : "Add To Cart"}
                     </button>
                   ) : (
                     <div className="flex items-center bg-green-500 text-white rounded-lg w-40">

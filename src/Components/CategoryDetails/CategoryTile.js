@@ -2,10 +2,11 @@ import React from "react";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 const CategoryTile = ({ image, name, discount ,onClick}) => {
+  
   return (
     <div className="relative rounded-lg overflow-hidden shadow-sm w-[140px] cursor-pointer" onClick={onClick}>
       {discount && (
-        <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-md z-40">
+        <span className="absolute top-1 left-1 bg-red-500 text-white text-xs font-semibold px-1 py-0.5 rounded-md z-10">
           {discount}% OFF
         </span>
       )}

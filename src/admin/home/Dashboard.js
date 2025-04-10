@@ -41,7 +41,7 @@ const Dashboard = () => {
       return;
     }
   
-    setAltError(""); // Clear error once it's valid
+    setAltError(""); 
     setIsUploading(true);
   
     const formData = new FormData();
@@ -178,7 +178,7 @@ const Dashboard = () => {
 
         {/* Upload Image */}
         <div className="mb-4 flex items-center space-x-4">
-          <label className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
+          <label className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer">
             Select Image
             <input
               type="file"

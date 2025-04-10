@@ -52,7 +52,7 @@ const Settings = () => {
               {adminUsers?.map((user) => (
                 <div
                   key={user._id}
-                  className="flex items-center justify-between bg-gray-100 p-3 rounded-md"
+                  className="flex items-center justify-between bg-gray-100 p-3 rounded-md md:text-sm"
                 >
                   <span>{user.name} ({user.email})</span>
                   {user._id !== currentUser._id && (
@@ -74,7 +74,7 @@ const Settings = () => {
               {normalUsers?.map((user) => (
                 <div
                   key={user._id}
-                  className="flex items-center justify-between bg-gray-100 p-3 rounded-md"
+                  className="flex items-center justify-between bg-gray-100 p-3 rounded-md md:text-sm"
                 >
                   <span>{user.name} ({user.email})</span>
                   <button

@@ -308,7 +308,7 @@ const Profile = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1 text-sm mb-4">
                       <p>Items: {order.totalItems}</p>
                       <p>Cart Amount: ₹{order.totalCartAmount}</p>
-                      <p>Discount: ₹{order.totalCartDiscountAmount}</p>
+                      <p className="text-green-600">Discount: ₹{order.totalCartDiscountAmount}</p>
                       <p>Discounted Price: ₹{order.totalCartDiscountedPrice}</p>
                       <p>Delivery Charge: ₹{order.deliveryCharge}</p>
                       <p>Handling Charge: ₹{order.handlingCharge}</p>

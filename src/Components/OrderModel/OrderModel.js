@@ -10,7 +10,6 @@ const OrderModel = ({ order, onBack }) => {
         &larr; Back to Orders
       </button>
 
-      {/* Order Summary */}
       <div className="bg-white shadow-md p-6 rounded-lg">
         <h2 className="text-2xl font-bold mb-4">Order Details</h2>
         <div className="space-y-2">
