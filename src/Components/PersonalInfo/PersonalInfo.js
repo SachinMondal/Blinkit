@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile, fetchUserInfo } from "../../redux/state/auth/Action";
 import { User } from "lucide-react";
-
+import { persistor } from "../../redux/store";
 const PersonalInfo = () => {
   const dispatch = useDispatch();
   const { user = {}, token, loading } = useSelector((state) => state.auth);
@@ -11,11 +11,27 @@ const PersonalInfo = () => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {
-    if (token && isFirstRender.current) {
-      dispatch(fetchUserInfo(token));
-      isFirstRender.current = false;
-    }
-  }, [token, dispatch]);
+    const waitForPersist = () => {
+      if (persistor.getState().bootstrapped) {
+        if (token && isFirstRender.current) {
+          dispatch(fetchUserInfo(token));
+          isFirstRender.current = false;
+        }
+      } else {
+        const unsubscribe = persistor.subscribe(() => {
+          if (persistor.getState().bootstrapped) {
+            if (token && isFirstRender.current) {
+              dispatch(fetchUserInfo(token));
+              isFirstRender.current = false;
+            }
+            unsubscribe(); // Cleanup listener
+          }
+        });
+      }
+    };
+
+    waitForPersist();
+  }, [dispatch, token]);
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
@@ -63,7 +79,7 @@ const PersonalInfo = () => {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
               placeholder="Enter your name"
             />
           ) : (
@@ -88,7 +104,7 @@ const PersonalInfo = () => {
                 name="mobileNo"
                 value={formData.mobileNo}
                 onChange={handleChange}
-                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+                className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
                 placeholder="Enter your mobile number"
               />
             </div>
@@ -115,7 +131,7 @@ const PersonalInfo = () => {
             className={`px-6 py-2 rounded-lg font-semibold text-white ${
               editMode
                 ? "bg-green-500 hover:bg-green-600"
-                : "bg-blue-500 hover:bg-blue-600"
+                : "bg-green-500 hover:bg-green-600"
             } transition-all duration-300 disabled:opacity-50`}
             onClick={handleEdit}
             disabled={loading}

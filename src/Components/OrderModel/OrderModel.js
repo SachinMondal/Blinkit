@@ -3,15 +3,16 @@ import LazyImage from "../utils/LazyLoading/LazyLoading";
 const OrderModel = ({ order, onBack }) => {
   return (
     <div className="p-4 max-w-3xl mx-auto">
-      <button
-        className="text-blue-600 hover:underline flex items-center mb-4"
+      <div>
+      <div className="flex justify-between p-6 rounded-lg">
+        <h2 className="text-2xl font-bold mb-4">Order Details</h2>
+        <button
+        className="text-white bg-green-700 hover:underline flex items-center mb-4 p-2 rounded-md "
         onClick={onBack}
       >
-        &larr; Back to Orders
+        Back
       </button>
-
-      <div className="bg-white shadow-md p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Order Details</h2>
+      </div>
         <div className="space-y-2">
           <p className="font-semibold">
             Order ID: <span className="text-gray-700">{order._id}</span>

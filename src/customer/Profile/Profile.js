@@ -13,6 +13,7 @@ import {
   getAllAddresses,
 } from "../../redux/state/address/Action";
 import { fetchOrders } from "../../redux/state/order/Action";
+
 const Profile = () => {
   const dispatch = useDispatch();
   const location = useLocation();
@@ -145,7 +146,7 @@ const Profile = () => {
 
               <ul className="min-h-screen overflow-y-auto max-h-screen scrollbar-hide">
                 {addresses.length > 0 ? (
-                  addresses.map((addr) => (
+                  addresses.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map((addr) => (
                     <li
                       key={addr._id}
                       className="border-b p-2 md:p-3 rounded-md my-2"
@@ -267,7 +268,7 @@ const Profile = () => {
               {loading ? (
                 <p>Loading orders...</p>
               ) : orders?.length > 0 ? (
-                orders.map((order) => (
+                orders.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).map((order) => (
                   <div
                     key={order._id}
                     className="mb-6 border border-gray-200 rounded-lg p-4 shadow-sm"

@@ -101,56 +101,64 @@ const handleViewOrders = () => {
       </div>
 
       {isAddressModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-              onClick={() => setIsAddressModalOpen(false)}
-            >
-              ✖
-            </button>
-            <h2 className="text-xl font-semibold mb-4">Select Delivery Address</h2>
-            {addresses.length > 0 ? (
-              <ul>
-                {addresses.map((addr) => (
-                  <li
-                    key={addr._id}
-                    className={`p-3 border rounded-md cursor-pointer mb-2 ${
-                      selectedAddress?._id === addr._id
-                        ? "border-green-500 bg-green-100"
-                        : ""
-                    }`}
-                    onClick={() => handleSelectAddress(addr)}
-                  >
-                    <p className="font-bold">
-                      {addr.firstName} {addr.lastName}
-                    </p>
-                    <p className="text-gray-600">
-                      {addr.streetAddress}, {addr.city}, {addr.state}, {addr.zipCode}
-                    </p>
-                    <p className="text-gray-500 text-sm">Mobile: {addr.mobile}</p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No saved addresses.</p>
-            )}
-            <div className="flex justify-between mt-4">
-              <button className="bg-gray-500 text-white px-4 py-2 rounded-md" onClick={() => navigate("/profile",{ state: { active: "address" }} )}>
-                Add New Address
-              </button>
-              <button
-                className={`bg-green-500 text-white px-4 py-2 rounded-md ${
-                  selectedAddress ? "" : "opacity-50 cursor-not-allowed"
-                }`}
-                disabled={!selectedAddress}
-                onClick={handleFinalPlaceOrder}
-              >
-                {isPlacingOrder ? "Placing Order..." : "Confirm & Place Order"}
-              </button>
-            </div>
-          </div>
-        </div>
+     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-y-auto relative">
+       <button
+         className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+         onClick={() => setIsAddressModalOpen(false)}
+       >
+         ✖
+       </button>
+       <h2 className="text-xl font-semibold mb-4">Select Delivery Address</h2>
+   
+       {addresses.length > 0 ? (
+         <ul className="space-y-2 max-h-[50vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400">
+           {addresses.map((addr) => (
+             <li
+               key={addr._id}
+               className={`p-3 border rounded-md cursor-pointer ${
+                 selectedAddress?._id === addr._id
+                   ? "border-green-500 bg-green-100"
+                   : ""
+               }`}
+               onClick={() => handleSelectAddress(addr)}
+             >
+               <p className="font-bold">
+                 {addr.firstName} {addr.lastName}
+               </p>
+               <p className="text-gray-600">
+                 {addr.streetAddress}, {addr.city}, {addr.state}, {addr.zipCode}
+               </p>
+               <p className="text-gray-500 text-sm">Mobile: {addr.mobile}</p>
+             </li>
+           ))}
+         </ul>
+       ) : (
+         <p className="text-gray-500">No saved addresses.</p>
+       )}
+   
+       <div className="flex justify-between mt-4">
+         <button
+           className="bg-gray-500 text-white px-4 py-2 rounded-md"
+           onClick={() =>
+             navigate("/profile", { state: { active: "address" } })
+           }
+         >
+           Add New Address
+         </button>
+         <button
+           className={`bg-green-500 text-white px-4 py-2 rounded-md ${
+             selectedAddress ? "" : "opacity-50 cursor-not-allowed"
+           }`}
+           disabled={!selectedAddress}
+           onClick={handleFinalPlaceOrder}
+         >
+           {isPlacingOrder ? "Placing Order..." : "Confirm & Place Order"}
+         </button>
+       </div>
+     </div>
+   </div>
+   
       )}
 
       {isSuccessModalOpen && (

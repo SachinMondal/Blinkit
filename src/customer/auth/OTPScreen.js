@@ -71,7 +71,7 @@ export default function OTPModal({ email, closeModal }) {
   };
 
   return (
-    <div className="w-full p-6 md:p-0 bg-[#F1C542] rounded-lg md:mt-16">
+    <div className="w-full p-6 md:p-0 bg-[#F1C542] rounded-lg md:mt-16 lg:mt-0">
       <div className="text-xl font-semibold text-gray-900 text-center">
         Enter OTP
         <hr className="w-16 border-black mt-1 mx-auto" />
