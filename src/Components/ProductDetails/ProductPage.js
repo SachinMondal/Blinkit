@@ -12,6 +12,7 @@ import {
   fetchCart,
   removeFromCart,
 } from "../../redux/state/cart/Action";
+import ProductDetailsSkeleton from "../Skeleton/ProductDetailsSkeleton";
 const ProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -180,9 +181,7 @@ const ProductPage = () => {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {isFetchingProduct ? (
-        <div className="flex flex-1 items-center justify-center min-h-[400px] w-full">
-          <p className="text-gray-500 text-lg">Loading product...</p>
-        </div>
+        <ProductDetailsSkeleton />
       ) : !product ? (
         <div className="flex flex-1 items-center justify-center min-h-[400px] w-full overflow-hidden">
           <div className="flex flex-col items-center justify-center p-5 rounded-md">

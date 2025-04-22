@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateProfile, fetchUserInfo } from "../../redux/state/auth/Action";
 import { User } from "lucide-react";
 import { persistor } from "../../redux/store";
+import UserProfileSkeleton from "../Skeleton/UserProfileSkeleton";
 const PersonalInfo = () => {
   const dispatch = useDispatch();
   const { user = {}, token, loading } = useSelector((state) => state.auth);
@@ -60,8 +61,12 @@ const PersonalInfo = () => {
   };
 
   return (
-    
-      <div className="w-full max-w-2xl bg-white rounded-2xl p-8 md:p-10">
+    <>
+    {loading?
+      (
+        <UserProfileSkeleton />
+      ):(
+        <div className="w-full max-w-2xl bg-white rounded-2xl p-8 md:p-10">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <div className="bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-semibold shadow-md">
@@ -153,7 +158,10 @@ const PersonalInfo = () => {
           </button>
         </div>
       </div>
-    
+      )
+    }
+     
+     </>
   );
 };
 

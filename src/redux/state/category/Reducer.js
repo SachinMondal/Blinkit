@@ -25,7 +25,10 @@ import {
 const initialState = {
     categories: [],
     category: null,
-    categoryAndProduct:[],
+    categoryAndProduct: {
+        name: "",
+        subcategories: [],
+    },
     loading: false,
     error: null,
 };
@@ -39,7 +42,11 @@ export const categoryReducer = (state = initialState, action) => {
         case CATEGORY_DELETE_REQUEST:
         case CATEGORY_AND_SUBCATEGORY_REQUEST:
         case CATEGORY_AND_PRODUCT_REQUEST:
-            return { ...state, loading: true, error: null };
+            return { 
+                ...state, 
+                loading: true, 
+                error: null 
+            };
 
         case CATEGORY_LIST_SUCCESS:
             return { 
@@ -49,7 +56,11 @@ export const categoryReducer = (state = initialState, action) => {
             };
 
         case CATEGORY_DETAILS_SUCCESS:
-            return { ...state, loading: false, category: action.payload || null };
+            return { 
+                ...state, 
+                loading: false, 
+                category: action.payload || null 
+            };
 
         case CATEGORY_ADD_SUCCESS:
             return { 
@@ -66,21 +77,31 @@ export const categoryReducer = (state = initialState, action) => {
                     cat._id === action.payload._id ? action.payload : cat
                 ),
             };
-        case CATEGORY_AND_PRODUCT_SUCCESS:
-            return {...state, loading: false, categoryAndProduct: action.payload };
+
         case CATEGORY_DELETE_SUCCESS:
             return {
                 ...state,
                 loading: false,
                 categories: (state.categories || []).filter((cat) => cat._id !== action.payload),
             };
-        case CATEGORY_AND_SUBCATEGORY_SUCCESS:{
+
+        case CATEGORY_AND_SUBCATEGORY_SUCCESS:
             return {
                 ...state,
                 loading: false,
                 categories: Array.isArray(action.payload) ? action.payload : [],
             };
-        }
+
+        case CATEGORY_AND_PRODUCT_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                categoryAndProduct: {
+                    name: action.payload.name || "",
+                    subcategories: Array.isArray(action.payload.subcategories) ? action.payload.subcategories : [],
+                },
+            };
+
         case CATEGORY_LIST_FAIL:
         case CATEGORY_DETAILS_FAIL:
         case CATEGORY_ADD_FAIL:
@@ -88,7 +109,11 @@ export const categoryReducer = (state = initialState, action) => {
         case CATEGORY_DELETE_FAIL:
         case CATEGORY_AND_SUBCATEGORY_FAIL:
         case CATEGORY_AND_PRODUCT_FAIL:
-            return { ...state, loading: false, error: action.payload };
+            return { 
+                ...state, 
+                loading: false, 
+                error: action.payload 
+            };
 
         default:
             return state;

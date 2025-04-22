@@ -5,6 +5,7 @@ import CartProduct from "./CartProduct";
 import CartSummary from "./CartSummary";
 import CartImage from "../../images/emptycart.avif";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
+import CartSkeleton from "../Skeleton/CartSkeleton";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -33,9 +34,7 @@ const Cart = () => {
       )}
 
       {loading && (
-        <div className="flex justify-center items-center min-h-[400px]">
-          <p className="text-gray-500 text-lg font-semibold">Loading...</p>
-        </div>
+        <CartSkeleton />
       )}
       {!loading && (
         <div className="flex flex-col sm:flex-row gap-2 flex-wrap items-center sm:items-start justify-center sm:justify-start">

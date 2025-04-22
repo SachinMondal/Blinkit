@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Skeleton } from "@mui/material";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -9,7 +8,7 @@ import LazyImage from "../../Components/utils/LazyLoading/LazyLoading.js";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProduct } from "../../redux/state/product/Action.js";
 import { getBanners } from "../../redux/state/home/Action.js";
-
+import HomeSkeleton from "../../Components/Skeleton/HomeSkeleton.js";
 
 const HomePage = () => {
   const dispatch = useDispatch();
@@ -78,7 +77,7 @@ const HomePage = () => {
   };
   const generateSliderSettings = (itemsLength, maxVisible = 6) => {
     const baseSlides = Math.min(itemsLength, maxVisible);
-  
+
     return {
       infinite: itemsLength > baseSlides,
       speed: 600,
@@ -88,26 +87,38 @@ const HomePage = () => {
       autoplaySpeed: 2500,
       cssEase: "linear",
       responsive: [
-        { breakpoint: 1280, settings: { slidesToShow: Math.min(itemsLength, 5.5) } },
-        { breakpoint: 1024, settings: { slidesToShow: Math.min(itemsLength, 4) } },
-        { breakpoint: 640, settings: { slidesToShow: Math.min(itemsLength, 2.8) } },
-        { breakpoint: 425, settings: { slidesToShow: Math.min(itemsLength, 2) } },
-        { breakpoint: 320, settings: { slidesToShow: Math.min(itemsLength, 1.5) } },
+        {
+          breakpoint: 1280,
+          settings: { slidesToShow: Math.min(itemsLength, 5.5) },
+        },
+        {
+          breakpoint: 1024,
+          settings: { slidesToShow: Math.min(itemsLength, 4) },
+        },
+        {
+          breakpoint: 640,
+          settings: { slidesToShow: Math.min(itemsLength, 2.8) },
+        },
+        {
+          breakpoint: 425,
+          settings: { slidesToShow: Math.min(itemsLength, 2) },
+        },
+        {
+          breakpoint: 320,
+          settings: { slidesToShow: Math.min(itemsLength, 1.5) },
+        },
       ],
     };
   };
-  const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
-
-  
+  const categorySliderSettings = generateSliderSettings(
+    uniqueCategories.length,
+    6
+  );
 
   return (
     <>
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-6">
-          <Skeleton variant="rectangular" width="100%" height={300} />
-          <Skeleton variant="text" width="80%" height={40} className="mt-4" />
-          <Skeleton variant="text" width="60%" height={30} className="mt-2" />
-        </div>
+        <HomeSkeleton />
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-16 xl:gap-24 flex-col overflow-hidden">
           {/* Banner Slider */}
