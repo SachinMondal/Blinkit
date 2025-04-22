@@ -64,8 +64,16 @@ export const authReducer = (state = initialState, action) => {
     // Profile
     case UPDATE_PROFILE_SUCCESS:
     case FETCH_USER_INFO_SUCCESS:
-    case UPDATE_USER_LOCATION_SUCCESS:
       return { ...state, loading: false, user: action.payload };
+    case UPDATE_USER_LOCATION_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        user: 
+          action.payload,
+        
+      };
+    
 
     // All Users
     case FETCH_ALL_USERS_SUCCESS:

@@ -18,7 +18,7 @@ const CartItem = ({ max = 3 }) => {
         <div className="flex -space-x-2">
           {cartItems?.slice(0, max).map((item, index) => (
             <LazyImage
-              key={index}
+            key={item.product?.id || item.product?._id}
               src={item.product?.image} 
               alt={item.product?.name} 
               className="w-10 h-10 rounded-full border-2 border-white shadow-md"

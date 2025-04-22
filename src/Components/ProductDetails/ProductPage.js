@@ -227,8 +227,22 @@ const ProductPage = () => {
                 <p className="text-gray-700 mt-2">
                   Category: {product?.category?.name}
                 </p>
-                <p className="text-xl font-semibold text-green-700 mt-2">
-                  Price: ₹{selectedVariant?.price}
+                <p className="text-xl font-semibold  mt-2">
+                  Price:{" "}
+                  <span className="line-through text-gray-500">
+                    ₹
+                    {Math.floor(
+                      selectedVariant.price - selectedVariant.discountPrice
+                    )}
+                  </span>
+                  <span className="text-green-700 ml-3">
+                    ₹
+                    {Math.floor(
+                      selectedVariant.price -
+                        selectedVariant.discountPrice -
+                        selectedVariant.categoryDiscount
+                    )}
+                  </span>
                 </p>
               </div>
               <div className="p-6 border-b text-left">
@@ -356,7 +370,12 @@ const ProductPage = () => {
                               ₹{variant.price}
                             </td>
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">
-                              ₹{variant.discountPrice}
+                              ₹
+                              {Math.floor(
+                                selectedVariant.price -
+                                  selectedVariant.discountPrice -
+                                  selectedVariant.categoryDiscount
+                              )}
                             </td>
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               {variant.qty} {variant.unit}

@@ -20,22 +20,27 @@ import {
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 // ✅ Add to Cart (Now includes variantIndex)
-export const addToCart = (productId, variantIndex,count) => async (dispatch, getState) => {
+export const addToCart = (productId, variantIndex, count) => async (dispatch, getState) => {
     try {
-        dispatch({ type: ADD_TO_CART_REQUEST });
-        const token = getState().auth.token;
-        const config = { headers: { Authorization: `Bearer ${token}` } };
-        const  data  = await axios.post(
-            `${API_URL}/api/cart/addToCart`,
-            { productId, variantIndex,count },
-            config
-        );
-        dispatch({ type: ADD_TO_CART_SUCCESS, payload: data.data.data });
-        return data.data.success;
+      dispatch({ type: ADD_TO_CART_REQUEST });
+      const token = getState().auth.token;
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+  
+      await axios.post(`${API_URL}/api/cart/addToCart`, { productId, variantIndex, count }, config);
+  
+      // Now fetch full cart to update UI properly
+      const response = await axios.get(`${API_URL}/api/cart`, config);
+      
+      dispatch({ type: ADD_TO_CART_SUCCESS, payload: response.data.data });
+      return response.data.success;
     } catch (error) {
-        dispatch({ type: ADD_TO_CART_FAILURE, payload: error.response?.data?.message || error.message });
+      dispatch({
+        type: ADD_TO_CART_FAILURE,
+        payload: error.response?.data?.message || error.message
+      });
     }
-};
+  };
+  
 
 
 export const updateCart = (productId, variantIndex, count) => async (dispatch, getState) => {
@@ -51,7 +56,7 @@ export const updateCart = (productId, variantIndex, count) => async (dispatch, g
             config
         );
         dispatch({ type: UPDATE_CART_ITEM_SUCCESS, payload: data.data.data });
-        console.log(data.data.data.success);
+        
         return data.data.success;
     } catch (error) {
         dispatch({ type: UPDATE_CART_ITEM_FAILURE, payload: error.response?.data?.message || error.message });
@@ -95,6 +100,7 @@ export const fetchCart = () => async (dispatch, getState) => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         const data = await axios.get(`${API_URL}/api/cart/`, config);
+        
         dispatch({ type: FETCH_CART_SUCCESS, payload: data.data.data,payload2:data.data });
     } catch (error) {
         dispatch({ type: FETCH_CART_FAILURE, payload: error.response?.data?.message || error.message });

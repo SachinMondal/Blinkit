@@ -6,7 +6,7 @@ import { addToCart, fetchCart, removeFromCart } from "../../redux/state/cart/Act
 const CartProduct = ({ item }) => {
   const dispatch = useDispatch(); 
   const [quantity, setQuantity] = useState(item.quantity);
-  const price = item.subtotalPrice / item.quantity;
+  const price = item.subtotalDiscountedPrice / item.quantity;
   
   const handleIncrease = async () => {
     if (quantity >= 3) return; 
@@ -70,7 +70,8 @@ const CartProduct = ({ item }) => {
 
         <div className="flex-1">
           <h3 className="text-sm font-semibold">{item?.product?.name || "Unnamed Product"}</h3>
-          <p className="text-xs text-gray-600">₹{price} /each</p>
+          <p className="text-xs line-through text-gray-600">₹{Number(item.subtotalPrice).toFixed(2)} /each</p>
+          <p className="text-xs text-gray-600">₹{Number(price).toFixed(2)} /each</p>
         </div>
 
         <div className="flex items-center space-x-1 bg-green-200 rounded-md w-16">
@@ -90,7 +91,7 @@ const CartProduct = ({ item }) => {
 
       {/* Subtotal */}
       <div className="mt-3 border-t pt-2 text-sm flex justify-between font-semibold">
-        <span>Subtotal:</span> <span>₹{itemTotal}</span>
+        <span>Subtotal:</span> <span>₹{Number(itemTotal).toFixed(2)}</span>
       </div>
     </div>
   );

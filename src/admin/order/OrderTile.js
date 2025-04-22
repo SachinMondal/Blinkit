@@ -89,7 +89,7 @@ const OrderTile = ({ order }) => {
       return;
     }
 
-    setError(""); // Clear previous errors if any
+    setError(""); 
 
     const next = getNextStatus(orderStatus);
     if (!next) return;
@@ -103,7 +103,6 @@ const OrderTile = ({ order }) => {
     loadingSetter?.(true);
     await dispatch(updateOrder(order._id, { orderStatus: next }));
     loadingSetter?.(false);
-    console.log("Final deliveryTime:", selectedDeliveryOption);
   };
 
   return (

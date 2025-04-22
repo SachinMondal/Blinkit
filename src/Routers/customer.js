@@ -18,6 +18,7 @@ import PrivacyPolicy from "../customer/Privacy&Policy/PrivacyPolicy";
 import Cart from "../Components/Cart/CartPage";
 import PageNotFound from "../customer/PageNotFound/PageNotFound";
 import AboutUs from "../Components/AboutUs/Aboutus";
+import ScrollToTop from "../Components/utils/ScrollToTop/ScrollToTop";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -94,7 +95,7 @@ function Customer() {
       )}
 
       <Navbar location={userLocation} isLoggedIn={!!token} isAdmin={isAdmin} setLocationModal={setIsModalOpen} />
-
+<ScrollToTop />
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<HomePage userLocation={userLocation} />} />

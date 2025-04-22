@@ -51,7 +51,7 @@ const ViewProduct = () => {
             <tbody>
               <tr className="border-b">
                 <td className="p-3 font-semibold bg-gray-100">Category</td>
-                <td className="p-3">{product?.category?.value || "N/A"}</td>
+                <td className="p-3">{product?.category?.name || "N/A"}</td>
               </tr>
               <tr className="border-b">
                 <td className="p-3 font-semibold bg-gray-100">Type</td>
@@ -113,6 +113,8 @@ const ViewProduct = () => {
                     <th className="p-3">Unit</th>
                     <th className="p-3">Price</th>
                     <th className="p-3">Discount Price</th>
+                    <th className="p-3">Category Discount</th>
+                    <th className="p-3">Final Price</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -122,6 +124,8 @@ const ViewProduct = () => {
                       <td className="p-3">{variant.unit}</td>
                       <td className="p-3">₹{variant.price}</td>
                       <td className="p-3 text-green-600">₹{variant.discountPrice}</td>
+                      <td className="p-3 text-green-600">₹{variant.categoryDiscount}</td>
+                      <td className="p-3">₹{variant.price-(variant.categoryDiscount+variant.discountPrice)}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,18 +1,19 @@
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 const OrderModel = ({ order, onBack }) => {
+  
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div>
-      <div className="flex justify-between p-6 rounded-lg">
-        <h2 className="text-2xl font-bold mb-4">Order Details</h2>
-        <button
-        className="text-white bg-green-700 hover:underline flex items-center mb-4 p-2 rounded-md "
-        onClick={onBack}
-      >
-        Back
-      </button>
-      </div>
+        <div className="flex justify-between p-6 rounded-lg">
+          <h2 className="text-2xl font-bold mb-4">Order Details</h2>
+          <button
+            className="text-white bg-green-700 hover:underline flex items-center mb-4 p-2 rounded-md "
+            onClick={onBack}
+          >
+            Back
+          </button>
+        </div>
         <div className="space-y-2">
           <p className="font-semibold">
             Order ID: <span className="text-gray-700">{order._id}</span>
@@ -24,12 +25,25 @@ const OrderModel = ({ order, onBack }) => {
             Cart Amount:{" "}
             <span className="font-semibold">₹{order.totalCartAmount}</span>
           </p>
-          <p className="text-gray-600">
-            Discount:{" "}
-            <span className="font-semibold text-red-500">
-              ₹{order.totalCartDiscountAmount}
-            </span>
-          </p>
+          <div className="text-gray-600">
+            <p>
+              Discount:{" "}
+              <span className="font-semibold text-green-500">
+                ₹{order.totalCartDiscountAmount?.toFixed(2)}
+              </span>
+            </p>
+            <div className="ml-4 mt-1 text-sm space-y-1 text-green-500">
+              <p>
+                - Product Discount: ₹
+                {order?.productDiscount?.toFixed(2) || "0.00"}
+              </p>
+              <p>
+                - Category Discount: ₹
+                {order?.categoryDiscount?.toFixed(2) || "0.00"}
+              </p>
+            </div>
+          </div>
+
           <p className="text-gray-600">
             Discounted Cart Price:{" "}
             <span className="font-semibold text-green-600">
@@ -91,7 +105,7 @@ const OrderModel = ({ order, onBack }) => {
                       </p>
                     )}
                     <p className="text-gray-500 text-sm">
-                      ₹{item.subtotalPrice}{" "}
+                      <span className="line-through">₹{item.subtotalPrice}{" "}</span>
                       {item.subtotalDiscountedPrice !== item.subtotalPrice && (
                         <span className="text-green-600 ml-2">
                           ₹{item.subtotalDiscountedPrice}

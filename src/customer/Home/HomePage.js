@@ -5,7 +5,6 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import CategoryTile from "../../Components/CategoryDetails/CategoryTile.js";
 import ProductCarousel from "../../Components/ProductDetails/ProductCarosel.js";
-import { useNavigate } from "react-router-dom";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading.js";
 import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProduct } from "../../redux/state/product/Action.js";
@@ -13,7 +12,6 @@ import { getBanners } from "../../redux/state/home/Action.js";
 
 
 const HomePage = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const category = useSelector((state) => state.category.categories);
   const data = useSelector((state) => state.product.categories);
@@ -35,10 +33,6 @@ const HomePage = () => {
       dispatch(getCategoryProduct());
     }
   }, [data.length, dispatch]);
-
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/category/${categoryId}`);
-  };
 
   const uniqueCategories = category.reduce((acc, item) => {
     if (!acc.find((cat) => cat.name === item.name)) {
@@ -104,7 +98,7 @@ const HomePage = () => {
   };
   const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
 
-  console.log(uniqueCategories);
+  
 
   return (
     <>
@@ -146,7 +140,7 @@ const HomePage = () => {
                     image={item.image}
                     name={item.name}
                     discount={item.discountPercentage}
-                    onClick={() => handleCategoryClick(item._id)}
+                    subId={item._id}
                   />
                 ))}
               </Slider>
@@ -154,11 +148,11 @@ const HomePage = () => {
               <div className="flex flex-wrap gap-4">
                 {uniqueCategories.map((item) => (
                   <CategoryTile
-                    key={item._id || item.name}
+                    key={item.id || item.name}
                     image={item.image}
                     name={item.name}
                     discount={item.discountPercentage}
-                    onClick={() => handleCategoryClick(item._id)}
+                    subId={item._id}
                   />
                 ))}
               </div>

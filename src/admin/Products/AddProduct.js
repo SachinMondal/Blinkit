@@ -231,10 +231,10 @@ const AddProduct = () => {
             >
               {index + 1}
             </div>
-            {/* Step Label */}
+            
             <p className="text-xs sm:text-sm mt-2">{label}</p>
 
-            {/* Stepper Line */}
+            
             {index < steps.length - 1 && (
               <div
                 className={`absolute top-4 sm:top-5 left-1/2 transform -translate-x-10 
@@ -252,7 +252,7 @@ const AddProduct = () => {
         {steps[step - 1]}
       </h1>
 
-      {/* Step Content */}
+      
       <div className="bg-white p-4 sm:p-6 shadow-md rounded-lg">
         {step === 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -352,7 +352,7 @@ const AddProduct = () => {
               </label>
               {formData?.quantities?.map((item, index) => (
                 <div key={index} className="flex gap-2 items-center">
-                  {/* ✅ Quantity Input */}
+
                   <input
                     type="number"
                     name="qty"
@@ -407,7 +407,7 @@ const AddProduct = () => {
                     value={item.discountPrice || ""}
                     onChange={(e) => handleQtyChange(e, index)}
                     className="border p-2 rounded w-full sm:w-24 text-sm"
-                    placeholder="Discount Price"
+                    placeholder="Discount Percent(excluding %)"
                   />
 
                   {/* ❌ Remove Button */}

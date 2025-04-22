@@ -53,10 +53,10 @@ const EditProduct = () => {
   };
 
   const handleVariantChange = (index, key, value) => {
-    if (["price", "discountPrice", "qty"].includes(key) && isNaN(value)) return;
+    if (["price", "discount", "qty"].includes(key) && isNaN(value)) return;
   
     setFormData((prev) => {
-      const updatedVariants = [...prev.variants];
+      const updatedVariants = prev.variants.map((v) => ({ ...v }));
   
       if (key === "image") {
         const file = value.target.files[0];
@@ -72,15 +72,10 @@ const EditProduct = () => {
         return prev;
       }
   
-      // Custom logic for unit and customUnit
       if (key === "customUnit") {
-        console.log("!");
         updatedVariants[index].customUnit = value;
         updatedVariants[index].unit = "other";
-        console.log("1",updatedVariants[index].unit)
-        console.log("2",updatedVariants[index].customUnit)
       } else {
-        console.log("!!");
         updatedVariants[index][key] = value;
   
         if (key === "unit") {
@@ -93,9 +88,11 @@ const EditProduct = () => {
           }
         }
       }
+  
       return { ...prev, variants: updatedVariants };
     });
   };
+  
   
 
   const addVariant = () => {
@@ -103,7 +100,7 @@ const EditProduct = () => {
       ...prev,
       variants: [
         ...prev.variants,
-        { price: "", discountPrice: "", qty: "", unit: "" },
+        { price: "", discount: "", qty: "", unit: "" },
       ],
     }));
   };
@@ -162,7 +159,6 @@ const EditProduct = () => {
     }
   };
 
-  console.log(formData);
 
   const handleAddDetail = () => {
     setFormData((prev) => ({
@@ -450,12 +446,12 @@ const EditProduct = () => {
                       <td className="p-3 border">
                         <input
                           type="number"
-                          name="discountPrice"
-                          value={variant.discountPrice}
+                          name="discount"
+                          value={variant.discount}
                           onChange={(e) =>
                             handleVariantChange(
                               index,
-                              "discountPrice",
+                              "discount",
                               e.target.value
                             )
                           }

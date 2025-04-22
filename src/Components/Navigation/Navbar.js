@@ -15,6 +15,7 @@ export default function Navbar({
   isAdmin,
 }) {
   const dispatch = useDispatch();
+  const sideBarRef = useRef(null);
   const categories = useSelector((state) => state.category.categories);
   const cartSum = useSelector((state) => state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -28,7 +29,22 @@ export default function Navbar({
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const searchResult = useSelector((state) => state.product.searchResult);
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        sideBarRef.current &&
+        !sideBarRef.current.contains(event.target)
+      ) {
+        setIsSidebarOpen(false);
+      }
+    }
 
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIsSidebarOpen]);
   useEffect(() => {
     const categoryList = document.getElementById("category-list");
     if (categoryList) {
@@ -55,8 +71,8 @@ export default function Navbar({
 
   useEffect(() => {
     dispatch(getCategoriesAndSubCategories());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  
+  }, [dispatch]);
   const [activeCategory, setActiveCategory] = useState(null);
 
   const handleCategoryClick = (categoryName) => {
@@ -75,8 +91,7 @@ export default function Navbar({
 
   useEffect(() => {
     dispatch(fetchCart());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -165,7 +180,7 @@ export default function Navbar({
                 </div>
                 <div className="">
                   <p className="text-black font-bold text-left">
-                    Delivery in 15 min+
+                    Delivery in 15 min
                     <button
                       onClick={() => setLocationModal(true)}
                       className="ml-1 text-gray-600 hover:text-black"
@@ -540,7 +555,8 @@ export default function Navbar({
         className={`fixed top-0 left-0 h-screen w-64 bg-white shadow-lg transform rounded-r-xl z-50 transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
-      >
+        ref={sideBarRef}
+      > 
         <div className="flex justify-between items-center p-4 border-b bg-white sticky top-0 z-50">
           <h2 className="text-lg font-semibold">Menu</h2>
           <button
@@ -556,18 +572,27 @@ export default function Navbar({
             {categories.map((category, index) => (
               <div key={index} className="border-b">
                 <p
-                  className="text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2"
-                  onClick={() => handleCategoryClick(category.name)}
+                  className={`text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2 ${
+                    category.subcategories?.length ? "" : "cursor-default"
+                  }`}
+                  onClick={() =>
+                    category.subcategories?.length &&
+                    handleCategoryClick(category.name)
+                  }
                 >
                   {category.name}
-                  <i
-                    className={`fa-solid fa-chevron-down transition-transform ${
-                      activeCategory === category.name
-                        ? "rotate-180"
-                        : "rotate-0"
-                    }`}
-                  ></i>
+
+                  {category.subcategories?.length > 0 && (
+                    <i
+                      className={`fa-solid fa-chevron-down transform transition-transform duration-300 ${
+                        activeCategory === category.name
+                          ? "rotate-180"
+                          : "rotate-0"
+                      }`}
+                    ></i>
+                  )}
                 </p>
+
                 <ul
                   className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
                     activeCategory === category.name
@@ -579,7 +604,7 @@ export default function Navbar({
                   {category?.subcategories?.map((cat, idx) => (
                     <li
                       key={idx}
-                      className="text-gray-600 hover:text-blue-500 cursor-pointer py-1"
+                      className="text-gray-600 hover:text-green-500 cursor-pointer py-1"
                     >
                       <Link to={`/${category._id}/${cat._id}`}>{cat.name}</Link>
                     </li>

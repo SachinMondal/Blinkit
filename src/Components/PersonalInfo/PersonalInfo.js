@@ -24,7 +24,7 @@ const PersonalInfo = () => {
               dispatch(fetchUserInfo(token));
               isFirstRender.current = false;
             }
-            unsubscribe(); // Cleanup listener
+            unsubscribe();
           }
         });
       }
@@ -35,7 +35,11 @@ const PersonalInfo = () => {
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
-      setFormData({ name: user?.name || "", mobileNo: user?.mobileNo || "" });
+      setFormData({
+        name: user?.name || "",
+        mobileNo: user?.mobileNo || "",
+        location: user?.location || "",
+      });
     }
   }, [user]);
 

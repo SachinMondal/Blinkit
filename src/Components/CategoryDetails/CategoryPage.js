@@ -31,7 +31,6 @@ const CategoryPage = () => {
   }, [categories]);
   const handleSort = (order) => {
     setSortOrder(order);
-    console.log(order);
     setShowDropdown(false);
   };
   useEffect(() => {
@@ -184,7 +183,6 @@ const CategoryPage = () => {
             </div>
           </div>
 
-          {/* Scroll to Top Button */}
           {showScrollButton && (
             <button
               className="fixed bottom-6 right-6 bg-green-200 text-white p-3 rounded-full shadow-lg hover:bg-green-700 flex items-center"

@@ -71,7 +71,7 @@ export const updateProfile = (userData) => async (dispatch, getState) => {
   try {
     dispatch({ type: UPDATE_PROFILE_REQUEST });
 
-    const { token } = getState().auth; // Get token from Redux state
+    const { token } = getState().auth; 
 
     if (!token) {
       return dispatch({
@@ -118,7 +118,7 @@ export const fetchUserInfo = (token) => async (dispatch) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
-    console.log(data);
+    
 
     dispatch({ type: "USER_INFO_SUCCESS", payload: data });
   } catch (error) {
@@ -202,10 +202,9 @@ export const updateUserLocation =
           },
         }
       );
-      console.log(data);
       dispatch({
         type: UPDATE_USER_LOCATION_SUCCESS,
-        payload: data,
+        payload: data.data.user,
       });
     } catch (error) {
       dispatch({

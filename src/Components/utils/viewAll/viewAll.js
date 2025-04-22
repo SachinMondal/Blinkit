@@ -12,6 +12,7 @@ const ViewAll = () => {
   const navigate = useNavigate();
 
   const { name, subcategories } = useSelector((state) => state.category.categoryAndProduct);
+  
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
   }, [category, dispatch]);
@@ -21,7 +22,7 @@ const ViewAll = () => {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto flex gap-2 flex-col overflow-hidden min-h-screen">
+    <div className="p-6 max-w-7xl mx-auto flex gap-4 flex-col overflow-hidden min-h-screen">
       <div className="text-sm text-gray-600 text-left">
         <Link to="/" className="text-blue-500 hover:underline">
           Home
@@ -40,9 +41,13 @@ const ViewAll = () => {
 
             {/* Subcategory Products */}
             {Array.isArray(subcategory.products) && subcategory.products.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-1">
                 {subcategory.products.map((product) => (
-                  <ProductTile key={product._id} product={product} onClick={() => handleProductClick(product._id)} />
+                  <ProductTile
+                    key={product._id}
+                    product={product}
+                    onClick={() => handleProductClick(product._id)}
+                  />
                 ))}
               </div>
             ) : (
