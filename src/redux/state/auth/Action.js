@@ -51,10 +51,10 @@ export const verifyOTP = (email, otp, navigate) => async (dispatch) => {
       `${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-otp`,
       { email, otp }
     );
-
+localStorage.setItem("token", data.token);
     dispatch({
       type: VERIFY_OTP_SUCCESS,
-      payload: { user: data.user, token: data.token }, // Store token
+      payload: { user: data.user, token: data.token }, 
     });
 
     navigate("/profile");
@@ -220,5 +220,17 @@ export const resetOtpState=()=>({
 });
 
 export const logout = () => (dispatch) => {
+  localStorage.removeItem("token"); 
   dispatch({ type: LOGOUT });
+};
+
+
+export const loadTokenFromStorage = () => (dispatch) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    dispatch({
+      type: "LOAD_TOKEN_FROM_STORAGE",
+      payload: token,
+    });
+  }
 };

@@ -47,7 +47,7 @@ const OrderModel = ({ order, onBack }) => {
           <p className="text-gray-600">
             Discounted Cart Price:{" "}
             <span className="font-semibold text-green-600">
-              ₹{order.totalCartDiscountedPrice}
+              ₹{order.totalCartDiscountedPrice.toFixed(2)}
             </span>
           </p>
           <p className="text-gray-600">
@@ -108,7 +108,7 @@ const OrderModel = ({ order, onBack }) => {
                       <span className="line-through">₹{item.subtotalPrice}{" "}</span>
                       {item.subtotalDiscountedPrice !== item.subtotalPrice && (
                         <span className="text-green-600 ml-2">
-                          ₹{item.subtotalDiscountedPrice}
+                          ₹{item.subtotalDiscountedPrice.toFixed(2)}
                         </span>
                       )}
                     </p>

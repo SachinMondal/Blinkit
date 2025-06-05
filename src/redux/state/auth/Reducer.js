@@ -109,6 +109,13 @@ export const authReducer = (state = initialState, action) => {
     // Logout
     case LOGOUT:
       return { ...initialState };
+    
+    case "LOAD_TOKEN_FROM_STORAGE":
+  return {
+    ...state,
+    token: action.payload,
+  };
+
 
     default:
       return state;

@@ -334,7 +334,7 @@ const Profile = () => {
                             </p>
                             <p>
                               Discounted Price: ₹
-                              {order.totalCartDiscountedPrice}
+                              {order.totalCartDiscountedPrice.toFixed(2)}
                             </p>
                             <p>Delivery Charge: ₹{order.deliveryCharge}</p>
                             <p>Handling Charge: ₹{order.handlingCharge}</p>

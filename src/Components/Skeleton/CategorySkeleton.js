@@ -2,7 +2,7 @@ import React from "react";
 
 const CategorySkeleton = () => {
   return (
-    <div className="p-6 max-w-7xl mx-auto flex gap-4 flex-col overflow-hidden min-h-screen animate-pulse">
+    <div className="p-6 max-w-5xl mx-auto flex gap-4 flex-col overflow-hidden min-h-screen animate-pulse">
       {/* Breadcrumb */}
       <div className="h-4 bg-gray-300 rounded w-40"></div>
 

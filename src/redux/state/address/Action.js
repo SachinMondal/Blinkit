@@ -38,7 +38,6 @@ export const addNewAddress = (addressData,onSuccess) => async (dispatch,getState
 // Edit address
 export const editAddress = (addressId, updatedData,onSuccess) => async (dispatch,getState) => {
   try {
-    console.log(`Edit address: ${addressId}`);
     dispatch({ type: EDIT_ADDRESS_REQUEST });
     const token = getState().auth.token;
     const  data  = await axios.put(`${API_BASE_URL}/api/address/edit/${addressId}`, updatedData, {

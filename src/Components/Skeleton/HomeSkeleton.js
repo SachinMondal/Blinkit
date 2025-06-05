@@ -20,7 +20,7 @@ export default function HomeSkeleton() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 px-4">
+      <div className="flex flex-col gap-4 px-4 py-4">
         {[...Array(3)].map((_, sectionIndex) => (
           <div key={sectionIndex} className="space-y-2">
             <SkeletonBox className="w-1/3 h-6" /> 
