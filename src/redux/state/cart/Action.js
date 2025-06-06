@@ -297,10 +297,11 @@ export const fetchCart = () => async (dispatch, getState) => {
 };
 
 export const clearCart = () => async (dispatch, getState) => {
-  try {
+  const token = getState().auth.token;
+  if(token){
+ try {
     dispatch({ type: CLEAR_CART_REQUEST });
 
-    const token = getState().auth.token;
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
     await axios.delete(`${API_URL}/api/cart/clear`, config);
@@ -312,7 +313,20 @@ export const clearCart = () => async (dispatch, getState) => {
       payload: error.response?.data?.message || error.message,
     });
   }
-};
+}else{
+try{
+    localStorage.removeItem("guest_cart");
+
+      dispatch({ type: CLEAR_CART_SUCCESS });
+  }catch(error){
+    dispatch({
+      type: CLEAR_CART_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+  }
+  }
+
 
 export const mergeGuestCart = () => async (dispatch, getState) => {
   const token = getState().auth.token;
