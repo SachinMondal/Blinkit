@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../../redux/state/cart/Action";
 import { searchProducts } from "../../redux/state/product/Action";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
+import { toggleAuthModal } from "../../redux/state/ui/Action";
 export default function Navbar({
   isLoggedIn,
   location,
@@ -19,13 +20,14 @@ export default function Navbar({
   const categories = useSelector((state) => state.category.categories);
   const cartSum = useSelector((state) => state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isModalOpen=useSelector((state)=>state.ui.isAuthModalOpen);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSticky, setIsSticky] = useState(false);
   const [categoryTop, setCategoryTop] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [query, setQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+
   const searchRef = useRef(null);
   const navigate = useNavigate();
   const searchResult = useSelector((state) => state.product.searchResult);
@@ -170,7 +172,7 @@ export default function Navbar({
                         <i className="fa-solid fa-cart-shopping"></i>
                       </Link>
                       <Button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => dispatch(toggleAuthModal(true))}
                         className=" text-black px-4 py-2 rounded-lg"
                       >
                         SignUp/Login
@@ -465,7 +467,7 @@ export default function Navbar({
                   </Link>
                 ) : (
                   <Button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => dispatch(toggleAuthModal(true))}
                     className=" text-black px-4 py-2 rounded-lg"
                   >
                     SignUp/Login
@@ -621,7 +623,7 @@ export default function Navbar({
           )}
         </div>
 
-        <SignUp isOpen={isModalOpen} setIsOpen={setIsModalOpen} />
+        <SignUp />
       </div>
     </div>
   );

@@ -6,8 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetOtpState, sendOTP } from "../../redux/state/auth/Action";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import login from "../../images/login.webp";
-export default function SignUp({ isOpen, setIsOpen }) {
+import { toggleAuthModal } from "../../redux/state/ui/Action";
+export default function SignUp() {
   const dispatch = useDispatch();
+  const isOpen=useSelector((state)=>state.ui.isAuthModalOpen);
   const { loading, otpSent } = useSelector((state) => state.auth);
   const [isFocused, setIsFocused] = useState(false);
   const [emailError,setEmailError]=useState("");
@@ -32,7 +34,7 @@ export default function SignUp({ isOpen, setIsOpen }) {
   }, [otpSent, isOpen]);
 
   const handleClose = () => {
-    setIsOpen(false);
+    dispatch(toggleAuthModal(false));
   };
 
   const validateEmail = (email) => {
@@ -66,7 +68,7 @@ export default function SignUp({ isOpen, setIsOpen }) {
               {isOtpScreen ? (
                 <OTPModal
                   email={inputValue}
-                  closeModal={() => setIsOpen(false)}
+                  closeModal={handleClose}
                 />
               ) : (
                 <>

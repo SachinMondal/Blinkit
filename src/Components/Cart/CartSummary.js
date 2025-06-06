@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { getAllAddresses } from "../../redux/state/address/Action";
 import { createOrder } from "../../redux/state/order/Action";
 import { clearCart } from "../../redux/state/cart/Action";
+import { toggleAuthModal } from "../../redux/state/ui/Action";
 const CartSummary = ({ cartItems }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const addresses = useSelector((state) => state.address.addresses);
+  const token=useSelector((state)=>state.auth.token);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -39,6 +41,10 @@ const CartSummary = ({ cartItems }) => {
   };
 
   const handlePlaceOrder = () => {
+    if(!token){
+      dispatch(toggleAuthModal(true));
+      return;
+    }
     setIsAddressModalOpen(true);
   };
 

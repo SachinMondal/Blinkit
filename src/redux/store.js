@@ -6,6 +6,7 @@ import { bannerReducer } from "./state/home/Reducer";
 import { cartReducer } from "./state/cart/Reducer";
 import addressReducer from "./state/address/Reducer";
 import orderReducer from "./state/order/Reducer";
+import uiReducer from "./state/ui/Reducer";
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     cart: cartReducer,
     address: addressReducer,
     order: orderReducer,
+    ui:uiReducer
   },
 });
