@@ -8,16 +8,19 @@ const PersonalInfo = () => {
   const dispatch = useDispatch();
   const { user = {}, token, loading } = useSelector((state) => state.auth);
   const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({ name: "", mobileNo: "", location: "" });
-  
+  const [formData, setFormData] = useState({
+    name: "",
+    mobileNo: "",
+    location: "",
+  });
 
   // Fetch user info once if token is present
- useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    dispatch(fetchUserInfo(token));
-  }
-}, [dispatch]);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(fetchUserInfo(token));
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
@@ -31,7 +34,8 @@ const PersonalInfo = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "mobileNo" && (!/^\d*$/.test(value) || value.length > 10)) return;
+    if (name === "mobileNo" && (!/^\d*$/.test(value) || value.length > 10))
+      return;
     setFormData({ ...formData, [name]: value });
   };
 
@@ -57,8 +61,12 @@ const PersonalInfo = () => {
                 {user?.name?.[0]?.toUpperCase() || <User className="h-6 w-6" />}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">Personal Info</h2>
-                <p className="text-sm text-gray-500">Manage your profile details</p>
+                <h2 className="text-2xl font-bold text-gray-800">
+                  Personal Info
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Manage your profile details
+                </p>
               </div>
             </div>
           </div>
@@ -88,7 +96,9 @@ const PersonalInfo = () => {
 
           {/* Mobile */}
           <div className="mb-5">
-            <label className="block text-sm text-gray-600 mb-1">Mobile Number</label>
+            <label className="block text-sm text-gray-600 mb-1">
+              Mobile Number
+            </label>
             {editMode ? (
               <div className="flex items-center space-x-2">
                 <span className="text-gray-500">+91</span>

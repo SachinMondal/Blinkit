@@ -96,11 +96,7 @@ export const addToCart =
           updated.push(cartItem);
         }
 
-        // 6. Compute cart totals
-        const totalQuantity = updated.reduce(
-          (sum, item) => sum + item.quantity,
-          0
-        );
+
         const totalCartAmount = updated.reduce(
           (sum, item) => sum + item.subtotalPrice,
           0

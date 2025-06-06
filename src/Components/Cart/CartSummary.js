@@ -9,7 +9,7 @@ const CartSummary = ({ cartItems }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const addresses = useSelector((state) => state.address.addresses);
-  const token=useSelector((state)=>state.auth.token);
+  const token = useSelector((state) => state.auth.token);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
@@ -20,28 +20,33 @@ const CartSummary = ({ cartItems }) => {
     dispatch(getAllAddresses());
   }, [dispatch]);
 
-
   const totalItemPrice = cartItems?.totalCartAmount || 0;
   const cartSize = cartItems?.totalCartSize || 0;
+
   const discount = cartItems?.totalCartDiscountAmount
-    ? Number(cartItems?.totalCartDiscountAmount.toFixed(2))
+    ? Number(cartItems.totalCartDiscountAmount.toFixed(2))
     : 0;
+
   const handlingCharge = 10;
   const deliveryCharge = 40;
-  const discountedTotal = Number(cartItems?.totalCartDiscountedPrice).toFixed(2) || 0;
-  const rawTotal = Number(discountedTotal + handlingCharge + deliveryCharge).toFixed(2);
+
+  const discountedTotal = Number(cartItems?.totalCartDiscountedPrice) || 0;
+  const rawTotal = (discountedTotal + handlingCharge + deliveryCharge).toFixed(
+    2
+  );
+
   const finalAmount = Math.floor(rawTotal);
   const roundedOffExtra = Number((rawTotal - finalAmount).toFixed(2));
-  const productDiscountPrice = cartItems?.productDiscount||0;
-  const categoryDiscountPrice = cartItems?.categoryDiscount||0;
-  
+
+  const productDiscountPrice = cartItems?.productDiscount || 0;
+  const categoryDiscountPrice = cartItems?.categoryDiscount || 0;
 
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
   };
 
   const handlePlaceOrder = () => {
-    if(!token){
+    if (!token) {
       dispatch(toggleAuthModal(true));
       return;
     }
@@ -107,13 +112,15 @@ const CartSummary = ({ cartItems }) => {
               }`}
             >
               <p>• Product Discount: ₹{productDiscountPrice.toFixed(2)}/each</p>
-              <p>• Category Discount: ₹{categoryDiscountPrice.toFixed(2)}/each</p>
+              <p>
+                • Category Discount: ₹{categoryDiscountPrice.toFixed(2)}/each
+              </p>
             </div>
           </div>
 
           <p className="flex justify-between">
             <span>Subtotal after Discount:</span>
-            <span>₹{discountedTotal}</span>
+            <span>₹{discountedTotal.toFixed(2)}</span>
           </p>
           <p className="flex justify-between">
             <span>Handling Charges:</span> <span>₹{handlingCharge}</span>
