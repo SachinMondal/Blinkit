@@ -17,7 +17,7 @@ const PersonalInfo = () => {
   if (token) {
     dispatch(fetchUserInfo(token));
   }
-}, []);
+}, [dispatch]);
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
