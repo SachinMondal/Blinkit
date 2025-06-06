@@ -22,12 +22,13 @@ import {
   UPDATE_USER_LOCATION_SUCCESS,
   UPDATE_USER_LOCATION_FAIL,
   RESET_OTP_STATE,
+  LOAD_TOKEN_FROM_STORAGE,
 } from "./ActionType";
 
 const initialState = {
   loading: false,
   user: null,
-  users: [], 
+  users: [],
   otpSent: false,
   verified: false,
   error: null,
@@ -69,11 +70,8 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        user: 
-          action.payload,
-        
+        user: action.payload,
       };
-    
 
     // All Users
     case FETCH_ALL_USERS_SUCCESS:
@@ -97,25 +95,29 @@ export const authReducer = (state = initialState, action) => {
     case FETCH_ALL_USERS_FAIL:
     case UPDATE_ROLE_FAIL:
     case UPDATE_USER_LOCATION_FAIL:
-      return { ...state, loading: false, error: action.payload, verified: false };
-    
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+        verified: false,
+      };
+
     case RESET_OTP_STATE:
       return {
         ...state,
-        otpSent:false,
-        error:null,
-        loading:false
-      }
+        otpSent: false,
+        error: null,
+        loading: false,
+      };
     // Logout
     case LOGOUT:
       return { ...initialState };
-    
-    case "LOAD_TOKEN_FROM_STORAGE":
-  return {
-    ...state,
-    token: action.payload,
-  };
 
+    case LOAD_TOKEN_FROM_STORAGE:
+      return {
+        ...state,
+        token: action.payload,
+      };
 
     default:
       return state;

@@ -23,6 +23,7 @@ import {
   UPDATE_USER_LOCATION_SUCCESS,
   UPDATE_USER_LOCATION_FAIL,
   RESET_OTP_STATE,
+  LOAD_TOKEN_FROM_STORAGE,
 } from "./ActionType";
 import { mergeGuestCart } from "../cart/Action";
 
@@ -238,7 +239,7 @@ export const loadTokenFromStorage = () => (dispatch) => {
   const token = localStorage.getItem("token");
   if (token) {
     dispatch({
-      type: "LOAD_TOKEN_FROM_STORAGE",
+      type: LOAD_TOKEN_FROM_STORAGE,
       payload: token,
     });
   }
