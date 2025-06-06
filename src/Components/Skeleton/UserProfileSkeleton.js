@@ -2,7 +2,7 @@ import React from "react";
 
 const UserProfileSkeleton = () => {
   return (
-    <div className="w-full max-w-2xl bg-white rounded-2xl p-6 md:p-10 animate-pulse shadow-md space-y-6 mx-auto">
+    <div className="p-6 max-w-5xl mx-auto flex gap-4 flex-col overflow-hidden min-h-screen animate-pulse">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">

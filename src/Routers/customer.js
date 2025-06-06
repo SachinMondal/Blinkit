@@ -118,9 +118,9 @@ function Customer() {
         <Route
           path="/cart"
           element={
-            <ProtectedRoute>
+            
               <Cart />
-            </ProtectedRoute>
+            
           }
         />
 

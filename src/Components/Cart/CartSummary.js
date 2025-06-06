@@ -73,7 +73,7 @@ const CartSummary = ({ cartItems }) => {
 
   return (
     <>
-      <div className="border rounded-lg shadow-sm bg-white p-4 w-80 right-0">
+      <div className="border rounded-lg shadow-sm bg-white p-4 w-80 right-0 mb-4">
         <h2 className="text-lg font-semibold mb-2">Cart Summary</h2>
         <div className="text-sm">
           <p className="flex justify-between">

@@ -19,6 +19,7 @@ const Cart = () => {
     dispatch(clearCart());
   };
 
+
   return (
     <div className="max-w-5xl mx-auto mt-6 flex flex-col gap-8 overflow-hidden px-4">
       {!loading && cartItems && cartItems.length > 0 && (
@@ -60,7 +61,7 @@ const Cart = () => {
       )}
       {!loading && cartItems && cartItems.length > 0 && (
         <div className="flex flex-col flex-1 items-center sm:items-end justify-center sm:justify-end">
-          <CartSummary cartItems={cart?.data} />
+          <CartSummary cartItems={cart} />
         </div>
       )}
     </div>

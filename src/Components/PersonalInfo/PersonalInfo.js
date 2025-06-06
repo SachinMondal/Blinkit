@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfile, fetchUserInfo } from "../../redux/state/auth/Action";
 import { User } from "lucide-react";
@@ -9,15 +9,16 @@ const PersonalInfo = () => {
   const { user = {}, token, loading } = useSelector((state) => state.auth);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: "", mobileNo: "", location: "" });
-  const isFirstRender = useRef(true);
+  
 
   // Fetch user info once if token is present
-  useEffect(() => {
-    if (token && isFirstRender.current) {
-      dispatch(fetchUserInfo(token));
-      isFirstRender.current = false;
-    }
-  }, [dispatch, token]);
+ useEffect(() => {
+  if (token && (!user || Object.keys(user).length === 0)) {
+    console.log(token);
+    dispatch(fetchUserInfo(token));
+  }
+}, [dispatch, token, user]);
+
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {

@@ -9,6 +9,9 @@ import {
   UPDATE_PROFILE_REQUEST,
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_FAIL,
+  FETCH_USER_INFO_REQUEST,
+  FETCH_USER_INFO_SUCCESS,
+  FETCH_USER_INFO_FAIL,
   LOGOUT,
   FETCH_ALL_USERS_REQUEST,
   FETCH_ALL_USERS_SUCCESS,
@@ -21,6 +24,7 @@ import {
   UPDATE_USER_LOCATION_FAIL,
   RESET_OTP_STATE,
 } from "./ActionType";
+import { mergeGuestCart } from "../cart/Action";
 
 // Send OTP
 export const sendOTP = (email) => async (dispatch) => {
@@ -51,12 +55,12 @@ export const verifyOTP = (email, otp, navigate) => async (dispatch) => {
       `${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-otp`,
       { email, otp }
     );
-localStorage.setItem("token", data.token);
+    localStorage.setItem("token", data.token);
     dispatch({
       type: VERIFY_OTP_SUCCESS,
-      payload: { user: data.user, token: data.token }, 
+      payload: { user: data.user, token: data.token },
     });
-
+    await dispatch(mergeGuestCart());
     navigate("/profile");
   } catch (error) {
     dispatch({
@@ -71,7 +75,7 @@ export const updateProfile = (userData) => async (dispatch, getState) => {
   try {
     dispatch({ type: UPDATE_PROFILE_REQUEST });
 
-    const { token } = getState().auth; 
+    const { token } = getState().auth;
 
     if (!token) {
       return dispatch({
@@ -109,20 +113,27 @@ export const updateProfile = (userData) => async (dispatch, getState) => {
   }
 };
 
-export const fetchUserInfo = (token) => async (dispatch) => {
+export const fetchUserInfo = (token) => async (dispatch, getState) => {
   try {
-    dispatch({ type: "USER_INFO_REQUEST" });
+    dispatch({ type: FETCH_USER_INFO_REQUEST });
+    const { token } = getState().auth;
+    if (!token) {
+      return dispatch({
+        type: UPDATE_PROFILE_FAIL,
+        payload: "Unauthorized: No token provided",
+      });
+    }
+    const { data } = await axios.get(
+      `${process.env.REACT_APP_BACKEND_URL}/api/auth/info`,
+      {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-    const response = await fetch("/api/auth/info", {
-      method: "GET",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    
-
-    dispatch({ type: "USER_INFO_SUCCESS", payload: data });
+    dispatch({ type: FETCH_USER_INFO_SUCCESS, payload: data.user });
   } catch (error) {
-    dispatch({ type: "USER_INFO_FAIL", payload: error.message });
+    dispatch({ type: FETCH_USER_INFO_FAIL, payload: error.message });
   }
 };
 
@@ -185,7 +196,7 @@ export const updateUserRole = (userId, role) => async (dispatch, getState) => {
 };
 
 export const updateUserLocation =
-  ( location,latitude, longitude) => async (dispatch, getState) => {
+  (location, latitude, longitude) => async (dispatch, getState) => {
     try {
       dispatch({ type: UPDATE_USER_LOCATION_REQUEST });
       const token = getState().auth.token;
@@ -193,8 +204,8 @@ export const updateUserLocation =
         `${process.env.REACT_APP_BACKEND_URL}/api/auth/location`,
         {
           location,
-          lat:latitude,
-          lng:longitude,
+          lat: latitude,
+          lng: longitude,
         },
         {
           headers: {
@@ -214,16 +225,14 @@ export const updateUserLocation =
     }
   };
 
-
-export const resetOtpState=()=>({
-  type:RESET_OTP_STATE,
+export const resetOtpState = () => ({
+  type: RESET_OTP_STATE,
 });
 
 export const logout = () => (dispatch) => {
-  localStorage.removeItem("token"); 
+  localStorage.removeItem("token");
   dispatch({ type: LOGOUT });
 };
-
 
 export const loadTokenFromStorage = () => (dispatch) => {
   const token = localStorage.getItem("token");
