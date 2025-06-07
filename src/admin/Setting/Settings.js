@@ -1,28 +1,33 @@
 import { useSelector, useDispatch } from "react-redux";
 import ProfileSettings from "./ProfileSettings";
 import { useEffect } from "react";
-import { fetchAllUsers, fetchUserInfo, logout, updateUserRole } from "../../redux/state/auth/Action";
+import {
+  fetchAllUsers,
+  fetchUserInfo,
+  logout,
+  updateUserRole,
+} from "../../redux/state/auth/Action";
 
 const Settings = () => {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.auth.user);
+  const currentUser = useSelector((state) => state.auth.user) || {};
   const users = useSelector((state) => state.auth.users || []);
-  const admin=useSelector((state)=>state.auth.user||[]);
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch(fetchAllUsers());
-  },[dispatch,users.length]);
-  useEffect(()=>{
+  }, [dispatch, users.length]);
+  useEffect(() => {
     dispatch(fetchUserInfo());
-  },[dispatch])
-  
- const logoutUser = () => {
+  }, [dispatch]);
+
+  const logoutUser = () => {
     dispatch(logout());
   };
   const handleAdminToggle = (user) => {
     if (user.role === "admin") {
-      dispatch(updateUserRole(user._id,"user"));
+      dispatch(updateUserRole(user._id, "user"));
     } else {
-      dispatch(updateUserRole(user._id,"admin"));
+      dispatch(updateUserRole(user._id, "admin"));
     }
   };
 
@@ -39,10 +44,16 @@ const Settings = () => {
       {/* Profile Overview */}
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-medium mb-4">Your Profile</h2>
-        <ProfileSettings data={admin}/>
+
+        {currentUser && currentUser.name ? (
+          <ProfileSettings data={currentUser} />
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            Loading profile...
+          </div>
+        )}
       </div>
 
-      
       <div className="bg-white shadow-md rounded-lg p-6">
         <h2 className="text-xl font-medium mb-4">All Users</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,7 +65,9 @@ const Settings = () => {
                   key={user._id}
                   className="flex items-center justify-between bg-gray-100 p-3 rounded-md md:text-sm"
                 >
-                  <span>{user.name} ({user.email})</span>
+                  <span>
+                    {user.name} ({user.email})
+                  </span>
                   {user._id !== currentUser._id && (
                     <button
                       className="text-sm text-red-600 hover:underline"
@@ -76,7 +89,9 @@ const Settings = () => {
                   key={user._id}
                   className="flex items-center justify-between bg-gray-100 p-3 rounded-md md:text-sm"
                 >
-                  <span>{user.name} ({user.email})</span>
+                  <span>
+                    {user.name} ({user.email})
+                  </span>
                   <button
                     className="text-sm text-blue-600 hover:underline"
                     onClick={() => handleAdminToggle(user)}
@@ -90,8 +105,10 @@ const Settings = () => {
         </div>
       </div>
       <div className="flex justify-center mt-8">
-        <button className="bg-red-500 text-white px-6 py-3 rounded-md w-full sm:w-auto hover:bg-red-600 transition"
-        onClick={logoutUser}>
+        <button
+          className="bg-red-500 text-white px-6 py-3 rounded-md w-full sm:w-auto hover:bg-red-600 transition"
+          onClick={logoutUser}
+        >
           Logout
         </button>
       </div>

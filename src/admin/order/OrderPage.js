@@ -4,13 +4,22 @@ import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
 import { getAllOrdersForAdmin } from "../../redux/state/order/Action";
 import { useDispatch, useSelector } from "react-redux";
 import EmptyOrder from "../../images/emptyOrder.png";
+
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const orders = useSelector((state) => state.order.adminOrders || []);
   const [selectedTab, setSelectedTab] = useState("All");
+  const [loading, setLoading] = useState(false); // false initially for better UX
 
+  // Fetch orders on mount
   useEffect(() => {
-    dispatch(getAllOrdersForAdmin());
+    const fetchOrders = async () => {
+      setLoading(true);
+      await dispatch(getAllOrdersForAdmin());
+      setLoading(false);
+    };
+
+    fetchOrders();
   }, [dispatch]);
 
   const tabs = [
@@ -30,12 +39,34 @@ const OrdersPage = () => {
           (order) => order.orderStatus?.toUpperCase() === selectedTab
         );
 
+  // Refresh handler - same pattern, loading spinner on refresh click
+  const handleRefresh = async () => {
+    setLoading(true);
+    await dispatch(getAllOrdersForAdmin());
+    setLoading(false);
+  };
+
   return (
     <div className="flex flex-col overflow-hidden mx-auto w-full md:max-w-7xl px-4">
       {/* Sticky Tabs */}
       <div className="fixed top-16 bg-white border-b w-full z-10">
-        <h1 className="text-xl font-semibold p-4">Orders</h1>
-        <div className="flex overflow-x-auto scrollbar-hide border-b pb-2 space-x-4">
+        <div className="mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-semibold p-4">Orders</h1>
+          <button
+            onClick={handleRefresh}
+            className="px-3 py-2 rounded-md text-sm mr-8 text-gray-700 flex items-center justify-center"
+            aria-label="Refresh Orders"
+            title="Refresh Orders"
+            disabled={loading} 
+          >
+            <i
+  className={`fa-solid fa-arrows-rotate ${loading ? "animate-spin" : ""}`}
+  style={{ fontSize: "1.2rem" }}
+></i>
+
+          </button>
+        </div>
+        <div className="flex overflow-x-auto scrollbar-hide border-b pb-2 space-x-4 px-4">
           {tabs.map((tab) => (
             <button
               key={tab.status}
@@ -53,8 +84,13 @@ const OrdersPage = () => {
       </div>
 
       {/* Orders Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-28">
-        {filteredOrders && filteredOrders.length > 0 ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 mt-32">
+        {loading ? (
+          <div className="col-span-full text-center p-10">
+            <i className="fa-solid fa-spinner animate-spin text-4xl text-blue-500"></i>
+            <p className="mt-2 text-gray-600">Loading orders...</p>
+          </div>
+        ) : filteredOrders && filteredOrders.length > 0 ? (
           filteredOrders.map((order) => (
             <OrderTile key={order._id} order={order} />
           ))

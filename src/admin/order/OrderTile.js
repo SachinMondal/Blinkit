@@ -5,7 +5,6 @@ import { updateOrder, fetchOrders } from "../../redux/state/order/Action";
 
 const OrderTile = ({ order }) => {
   const dispatch = useDispatch();
-
   const updatedOrder = useSelector(
     (state) => state.orders?.find((o) => o._id === order._id) || order
   );
@@ -113,7 +112,7 @@ const OrderTile = ({ order }) => {
           {order?.user?.name || "Unknown"}
         </h2>
         <span className="text-lg font-bold text-blue-600">
-          {order?.totalCartAmount || "N/A"}
+          {order?.finalPrice || "N/A"}
         </span>
       </div>
 

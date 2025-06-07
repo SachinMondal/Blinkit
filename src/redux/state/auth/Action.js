@@ -23,7 +23,6 @@ import {
   UPDATE_USER_LOCATION_SUCCESS,
   UPDATE_USER_LOCATION_FAIL,
   RESET_OTP_STATE,
-  LOAD_TOKEN_FROM_STORAGE,
 } from "./ActionType";
 import { mergeGuestCart } from "../cart/Action";
 
@@ -56,7 +55,6 @@ export const verifyOTP = (email, otp, navigate) => async (dispatch) => {
       `${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-otp`,
       { email, otp }
     );
-    localStorage.setItem("token", data.token);
     dispatch({
       type: VERIFY_OTP_SUCCESS,
       payload: { user: data.user, token: data.token },
@@ -117,7 +115,7 @@ export const updateProfile = (userData) => async (dispatch, getState) => {
 export const fetchUserInfo = (token) => async (dispatch, getState) => {
   try {
     dispatch({ type: FETCH_USER_INFO_REQUEST });
-    const { token } = getState().auth;
+    const  token = getState().auth.token;
     if (!token) {
       return dispatch({
         type: UPDATE_PROFILE_FAIL,
@@ -235,12 +233,4 @@ export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT });
 };
 
-export const loadTokenFromStorage = () => (dispatch) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    dispatch({
-      type: LOAD_TOKEN_FROM_STORAGE,
-      payload: token,
-    });
-  }
-};
+

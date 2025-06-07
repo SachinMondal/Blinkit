@@ -14,13 +14,12 @@ const PersonalInfo = () => {
     location: "",
   });
 
-  // Fetch user info once if token is present
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      dispatch(fetchUserInfo(token));
+    const localToken = localStorage.getItem("token");
+    if (!user?.name && localToken) {
+      dispatch(fetchUserInfo(localToken));
     }
-  }, [dispatch]);
+  }, [dispatch, user?.name]);
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {

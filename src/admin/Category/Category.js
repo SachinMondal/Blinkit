@@ -6,11 +6,7 @@ import { fetchCategories, deleteCategory } from "../../redux/state/category/Acti
 const Category = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Get categories from Redux store
   const { categories, loading } = useSelector((state) => state.category);
-
-  // State for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
@@ -40,18 +36,16 @@ const Category = () => {
 
   return (
     <div className="w-full min-h-screen px-6 sm:px-12 py-10">
-      {/* Page Title & Add Category Button */}
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-800">Categories</h1>
         <button
           onClick={() => navigate("/admin/category/addCategory")}
-          className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg font-medium mt-4 sm:mt-0"
+          className="bg-green-500 text-white px-6 py-3 rounded-lg text-lg font-medium mt-4 sm:mt-0"
         >
           + Add Category
         </button>
       </div>
 
-      {/* Categories Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="w-full border-collapse">
           <thead>

@@ -116,7 +116,7 @@ export const authReducer = (state = initialState, action) => {
     case LOAD_TOKEN_FROM_STORAGE:
       return {
         ...state,
-        token: action.payload,
+        token: action.payload || localStorage.getItem("token"),
       };
 
     default:

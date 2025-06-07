@@ -153,9 +153,14 @@ const OrderView = () => {
                 </p>
                 <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
               </div>
-              <p className="text-gray-900 font-semibold">
+              <div>
+              <p className="text-gray-900 font-semibold line-through">
                 ₹{(item.subtotalPrice * item.quantity).toFixed(2)}
               </p>
+              <p className="text-green-600 font-semibold ">
+                ₹{(item.subtotalDiscountedPrice * item.quantity).toFixed(2)}
+              </p>
+              </div>
             </div>
           ))}
         </div>
@@ -173,7 +178,7 @@ const OrderView = () => {
           <hr className="my-2" />
           <div className="flex justify-between font-semibold text-lg">
             <p>Total Amount:</p>
-            <p>₹{order.totalCartDiscountedPrice?.toFixed(2)}</p>
+            <p>₹{order.finalPrice?.toFixed(2)}</p>
           </div>
         </div>
       </div>

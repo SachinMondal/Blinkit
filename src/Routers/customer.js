@@ -71,7 +71,7 @@ function Customer() {
   }, []);
 
   useEffect(() => {
-    const storedLocation = localStorage.getItem("userLocation");
+    const storedLocation = user.location;
     if (storedLocation) {
       setUserLocation(storedLocation);
     } else {
@@ -81,7 +81,6 @@ function Customer() {
 
   const handleLocationSelect = (location) => {
     setUserLocation(location);
-    localStorage.setItem("userLocation", location);
     setIsModalOpen(false);
   };
 
