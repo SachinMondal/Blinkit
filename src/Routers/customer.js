@@ -36,7 +36,7 @@ function Customer() {
 
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user); 
-
+console.log(user);
   useEffect(() => {
     if (token) {
       dispatch(fetchUserInfo(token)); 
@@ -71,13 +71,13 @@ function Customer() {
   }, []);
 
   useEffect(() => {
-    const storedLocation = user.location;
-    if (storedLocation) {
-      setUserLocation(storedLocation);
-    } else {
-      setIsModalOpen(true);
-    }
-  }, []);
+  if (user && user.location) {
+    setUserLocation(user.location);
+  } else {
+    setIsModalOpen(true);
+  }
+}, [user]);
+
 
   const handleLocationSelect = (location) => {
     setUserLocation(location);
