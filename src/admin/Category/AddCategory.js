@@ -6,7 +6,7 @@ import {
 } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 import { CircularProgress } from "@mui/material";
-
+import toast from "react-hot-toast";
 const AddCategory = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -86,8 +86,6 @@ const AddCategory = () => {
     if (!validateFields(3)) return "error";
 
     try {
-      console.log("Form Data:", formData);
-
       const categoryData = new FormData();
       categoryData.append("name", formData.name);
       categoryData.append("description", formData.description);
@@ -123,9 +121,11 @@ const AddCategory = () => {
         categoryData.append(`attributes[${key}]`, value);
       });
       await dispatch(addCategory(categoryData));
+      toast.success("Category Added successfully");
       navigate("/admin/category");
     } catch (error) {
       console.error(error);
+      toast.error("Failed to add category");
     }
   };
 
@@ -178,63 +178,77 @@ const AddCategory = () => {
 
       {/* Stepper */}
       <div className="flex flex-wrap justify-between sm:justify-start sm:space-x-6 text-gray-600 font-medium border-b pb-4">
-        {["Basic Details", "Attributes", "SEO"].map((title, index) => (
-          <div
-            key={index}
-            className={`flex-1 sm:w-auto text-center py-2 cursor-pointer ${
-              step === index + 1
-                ? "border-b-4 border-blue-500 text-blue-500 font-semibold"
-                : "text-gray-500"
-            }`}
-            onClick={() => setStep(index + 1)}
-          >
-            {title}
-          </div>
-        ))}
+  {["Basic Details", "Attributes", "SEO"].map((title, index) => {
+    const isClickable = index <= step - 1; // allow navigating only to previous or current step
+
+    return (
+      <div
+        key={index}
+        className={`flex-1 sm:w-auto text-center py-2 cursor-pointer transition 
+          ${
+            step === index + 1
+              ? "border-b-4 border-green-500 text-green-500 font-semibold"
+              : isClickable
+              ? "text-gray-500 hover:text-green-600"
+              : "text-gray-400 cursor-not-allowed"
+          }`}
+        onClick={() => {
+          if (isClickable) {
+            setStep(index + 1);
+          }
+        }}
+      >
+        {title}
       </div>
+    );
+  })}
+</div>
 
       {/* Step 1: Basic Details */}
       {step === 1 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-          <div>
-            <label className="block text-lg font-medium text-gray-700">
-              Category Name*
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Enter category name"
-              value={formData.name}
-              onChange={handleAttribute}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
+  <>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+      <div>
+        <label className="block text-lg font-medium text-gray-700">
+          Category Name*
+        </label>
+        <input
+          type="text"
+          name="name"
+          placeholder="Enter category name"
+          value={formData.name}
+          onChange={handleAttribute}
+          className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+        />
+      </div>
 
-          <div>
-            <label className="block text-lg font-medium text-gray-700">
-              Description*
-            </label>
-            <textarea
-              name="description"
-              placeholder="Enter category description"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
+      <div>
+        <label className="block text-lg font-medium text-gray-700">
+          Description*
+        </label>
+        <textarea
+          name="description"
+          placeholder="Enter category description"
+          value={formData.description}
+          onChange={handleChange}
+          className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+        />
+      </div>
 
-          <div className="sm:col-span-2">
-            <label className="block text-lg font-medium text-gray-700">
-              Category Image*
-            </label>
-            <input
-              type="file"
-              onChange={handleImageUpload}
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
-        </div>
-      )}
+      <div className="sm:col-span-2">
+        <label className="block text-lg font-medium text-gray-700">
+          Category Image*
+        </label>
+        <input
+          type="file"
+          onChange={handleImageUpload}
+          className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+        />
+      </div>
+    </div>
+  </>
+)}
+
 
       {/* Step 2: Attributes */}
       {step === 2 && (
@@ -285,7 +299,7 @@ const AddCategory = () => {
             {/* Add Attribute Button */}
             <button
               onClick={handleAddAttribute}
-              className="mt-3 px-4 py-2 text-blue-600 border border-blue-400 rounded-lg hover:bg-blue-50 w-full md:w-auto"
+              className="mt-3 px-4 py-2 text-green-600 border border-green-400 rounded-lg hover:bg-green-50 w-full md:w-auto"
             >
               + Add Attribute
             </button>
@@ -408,7 +422,7 @@ const AddCategory = () => {
                   name={item.name}
                   checked={formData[item.name]}
                   onChange={handleChange}
-                  className="w-5 h-5 text-blue-500 border-gray-300 focus:ring-blue-500 rounded"
+                  className="w-5 h-5 text-green-500 border-gray-300 focus:ring-green-500 rounded"
                 />
                 <span className="text-gray-800 text-sm sm:text-base">
                   {item.label}
@@ -424,6 +438,14 @@ const AddCategory = () => {
 
       {/* Navigation Buttons */}
       <div className="flex flex-col sm:flex-row justify-between mt-10 space-y-4 sm:space-y-0">
+        {step===1 && (
+          <button
+            onClick={()=>navigate(-1)}
+            className="px-6 py-3 text-lg font-medium text-gray-700 border rounded-lg w-full sm:w-auto"
+          >
+            Back
+          </button>
+        )}
         {step > 1 && (
           <button
             onClick={handleBack}
@@ -439,7 +461,7 @@ const AddCategory = () => {
             className={`px-6 py-2 rounded-lg text-white ${
               isNextDisabled
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
+                : "bg-green-500 hover:bg-green-600"
             }`}
           >
             Next

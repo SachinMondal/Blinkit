@@ -36,7 +36,7 @@ function Customer() {
 
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user); 
-console.log(user);
+
   useEffect(() => {
     if (token) {
       dispatch(fetchUserInfo(token)); 

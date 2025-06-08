@@ -12,6 +12,7 @@ import AddProduct from "../admin/Products/AddProduct";
 import Summary from "../admin/Products/Summary";
 import ViewProduct from "../admin/Products/ViewProduct";
 import EditProduct from "../admin/Products/Edit Product";
+import ViewCategory from "../admin/Category/ViewCategory";
 
 const AdminRoutes = () => {
   return (
@@ -25,7 +26,7 @@ const AdminRoutes = () => {
         <Route path="/category" element={<Category />} />
         <Route path="/category/addCategory" element={<AddCategory />} />
         <Route path="/category/edit/:id" element={<EditCategory />} />
-
+        <Route path="/category/view/:id" element={<ViewCategory />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/addProduct" element={<AddProduct />} />
         <Route path="/products/summary" element={<Summary />} />

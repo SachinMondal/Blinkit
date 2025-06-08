@@ -20,7 +20,7 @@ export default function Navbar({
   const categories = useSelector((state) => state.category.categories);
   const cartSum = useSelector((state) => state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const isModalOpen=useSelector((state)=>state.ui.isAuthModalOpen);
+  const isModalOpen = useSelector((state) => state.ui.isAuthModalOpen);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSticky, setIsSticky] = useState(false);
   const [categoryTop, setCategoryTop] = useState(0);
@@ -33,10 +33,7 @@ export default function Navbar({
   const searchResult = useSelector((state) => state.product.searchResult);
   useEffect(() => {
     function handleClickOutside(event) {
-      if (
-        sideBarRef.current &&
-        !sideBarRef.current.contains(event.target)
-      ) {
+      if (sideBarRef.current && !sideBarRef.current.contains(event.target)) {
         setIsSidebarOpen(false);
       }
     }
@@ -73,7 +70,6 @@ export default function Navbar({
 
   useEffect(() => {
     dispatch(getCategoriesAndSubCategories());
-  
   }, [dispatch]);
   const [activeCategory, setActiveCategory] = useState(null);
 
@@ -167,7 +163,7 @@ export default function Navbar({
                         className="relative p-2 rounded-full transition"
                       >
                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
-                           {cartSum?.totalItem || cartSum?.totalCartSize || 0}
+                          {cartSum?.totalItem || cartSum?.totalCartSize || 0}
                         </span>
                         <i className="fa-solid fa-cart-shopping"></i>
                       </Link>
@@ -456,7 +452,7 @@ export default function Navbar({
                   className="relative p-2 rounded-full transition"
                 >
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
-                     {cartSum?.totalItem || cartSum?.totalCartSize || 0}
+                    {cartSum?.totalItem || cartSum?.totalCartSize || 0}
                   </span>
                   <i className="fa-solid fa-cart-shopping"></i>
                 </Link>
@@ -479,7 +475,7 @@ export default function Navbar({
         </div>
 
         {isMobile && (
-          <p className="text-sm text-gray-700 text-center">
+          <p className="text-sm text-gray-700 text-center mt-1">
             Welcome to our store! Find the best deals here.
           </p>
         )}
@@ -497,40 +493,42 @@ export default function Navbar({
         {isMobile
           ? categories
               ?.filter((category) => category.isVisible === true)
-              .flatMap((category) =>
-                category.subcategories.map((sub) => ({
+              ?.flatMap((category) =>
+                category?.subcategories?.map((sub) => ({
                   categoryId: category._id,
                   id: sub._id,
                   name: sub.name,
                 }))
               )
-              .map((sub, idx) => {
+              ?.map((sub, idx) => {
                 return (
                   <div
-                    key={`${sub.id}-${idx}`}
-                    onClick={() => handleCategorySelection(sub.name)}
+                    key={`${sub?.id}-${idx}`}
+                    onClick={() => handleCategorySelection(sub?.name)}
                     className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
-                      selectedCategory === sub.name
+                      selectedCategory === sub?.name
                         ? "bg-green-600 border-b-4 border-green-950 text-white"
                         : "bg-white"
                     }`}
                   >
-                    <Link to={`/${sub.categoryId}/${sub.id}`}>{sub.name}</Link>
+                    <Link to={`/${sub?.categoryId}/${sub?.id}`}>
+                      {sub?.name}
+                    </Link>
                   </div>
                 );
               })
           : categories
-              .filter((category) => category.isVisible)
-              .map((category) => (
+              ?.filter((category) => category?.isVisible)
+              ?.map((category) => (
                 <div
-                  key={category._id}
+                  key={category?._id}
                   className="relative cursor-pointer group"
                 >
                   {/* Parent Category Name */}
                   <div className="inline-flex items-center">
                     <span className="font-semibold px-4 py-2 cursor-pointer transition-all duration-300">
-                      <Link to={`/categoryviewAll/${category._id}`}>
-                        {category.name}
+                      <Link to={`/categoryviewAll/${category?._id}`}>
+                        {category?.name}
                       </Link>
                       {category?.subcategories?.length > 0 && (
                         <i className="fa-solid fa-angle-down ml-2 transition-transform duration-300 group-hover:rotate-180"></i>
@@ -541,11 +539,11 @@ export default function Navbar({
                     <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
                       {category.subcategories.map((sub) => (
                         <Link
-                          key={sub._id}
-                          to={`/${category._id}/${sub._id}`}
+                          key={sub?._id}
+                          to={`/${category?._id}/${sub?._id}`}
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left"
                         >
-                          {sub.name}
+                          {sub?.name}
                         </Link>
                       ))}
                     </div>
@@ -558,7 +556,7 @@ export default function Navbar({
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         ref={sideBarRef}
-      > 
+      >
         <div className="flex justify-between items-center p-4 border-b bg-white sticky top-0 z-50">
           <h2 className="text-lg font-semibold">Menu</h2>
           <button

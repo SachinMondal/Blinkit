@@ -33,8 +33,10 @@ const HomePage = () => {
     }
   }, [data.length, dispatch]);
 
-  const uniqueCategories = category.reduce((acc, item) => {
-    if (!acc.find((cat) => cat.name === item.name)) {
+const uniqueCategories = category
+  .filter(item => item.status === "active") 
+  .reduce((acc, item) => {
+    if (!acc.find(cat => cat.name === item.name)) {
       acc.push(item);
     }
     return acc;
