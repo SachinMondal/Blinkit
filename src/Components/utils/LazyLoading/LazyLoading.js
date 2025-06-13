@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const LazyImage = ({ src, alt, className }) => {
+const LazyImage = ({ src, alt, className,...rest }) => {
   const [imageSrc, setImageSrc] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,6 +29,7 @@ const LazyImage = ({ src, alt, className }) => {
             isLoading ? "opacity-0" : "opacity-100"
           }`}
           loading="lazy"
+          {...rest}
         />
       )}
     </div>

@@ -20,7 +20,6 @@ export default function Navbar({
   const categories = useSelector((state) => state.category.categories);
   const cartSum = useSelector((state) => state.cart.cart);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const isModalOpen = useSelector((state) => state.ui.isAuthModalOpen);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSticky, setIsSticky] = useState(false);
   const [categoryTop, setCategoryTop] = useState(0);
@@ -280,11 +279,19 @@ export default function Navbar({
                                         setShowDropdown(false);
                                       }}
                                     >
-                                      <LazyImage
-                                        src={item.image}
-                                        alt={item.name}
-                                        className="w-8 h-8 rounded object-cover"
-                                      />
+                                      {Array.isArray(item?.images) &&
+                                      item.images.length > 0 ? (
+                                        <LazyImage
+                                          src={item.images[0]}
+                                          alt={item.name || "Product Image"}
+                                          className="w-8 h-8 rounded object-cover"
+                                        />
+                                      ) : (
+                                        <p className="text-xs text-gray-500">
+                                          No Image to Preview
+                                        </p>
+                                      )}
+
                                       <span>{item.name}</span>
                                     </div>
                                   </Link>
@@ -424,11 +431,19 @@ export default function Navbar({
                                       setShowDropdown(false);
                                     }}
                                   >
-                                    <LazyImage
-                                      src={item.image}
-                                      alt={item.name}
-                                      className="w-8 h-8 rounded object-cover"
-                                    />
+                                    {Array.isArray(item?.images) &&
+                                    item.images.length > 0 ? (
+                                      <LazyImage
+                                        src={item.images[0]}
+                                        alt={item.name || "Product Image"}
+                                        className="w-8 h-8 rounded object-cover"
+                                      />
+                                    ) : (
+                                      <p className="text-xs text-gray-500">
+                                        No Image to Preview
+                                      </p>
+                                    )}
+
                                     <span>{item.name}</span>
                                   </div>
                                 </Link>

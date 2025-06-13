@@ -115,6 +115,7 @@ export const updateProduct = (id, productData) => async (dispatch, getState) => 
     }});
 
     dispatch({ type: UPDATE_PRODUCT_SUCCESS, payload: data });
+    return true;
   } catch (error) {
     dispatch({
       type: UPDATE_PRODUCT_FAILURE,

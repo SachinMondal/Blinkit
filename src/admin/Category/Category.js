@@ -178,63 +178,64 @@ const Category = () => {
             Filters
           </button>
 
-          <AnimatePresence>
-            {filterDropdownOpen && (
-              <motion.div
-                id="filter-dropdown"
-                initial={{ opacity: 0, y: -15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                className="absolute z-50 w-72 mt-2 right-0 bg-white dark:bg-green-300 shadow-xl rounded-lg p-5 border border-gray-200 dark:border-gray-700"
-              >
-                {/* Status Filter */}
-                <div className="mb-5">
-                  <h3 className="font-semibold text-black dark:text-black mb-3 text-lg border-b pb-1 border-gray-300 dark:border-gray-600">
-                    Status
-                  </h3>
-                  {statusOptions.map((status) => (
-                    <label
-                      key={status.value}
-                      className="flex items-center gap-3 mb-2 cursor-pointer select-none text-black hover:text-green-900 dark:hover:text-green-900 transition"
-                    >
-                      <input
-                        type="radio"
-                        name="status"
-                        value={status.value}
-                        checked={selectedStatus === status.value}
-                        onChange={() => setSelectedStatus(status.value)}
-                        className="accent-black-600 dark:accent-black-400 cursor-pointer"
-                      />
-                      <span className="text-sm">{status.label}</span>
-                    </label>
-                  ))}
-                </div>
+     <AnimatePresence>
+  {filterDropdownOpen && (
+    <motion.div
+      id="filter-dropdown"
+      initial={{ opacity: 0, y: -15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -15 }}
+      className="absolute z-50 right-0 mt-2 bg-white dark:bg-green-300 shadow-xl rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700 w-[90vw] sm:w-64 md:w-72 max-h-[90vh] overflow-auto"
+    >
+      {/* Status Filter */}
+      <div className="mb-5">
+        <h3 className="font-semibold text-black dark:text-black mb-3 text-base sm:text-lg border-b pb-1 border-gray-300 dark:border-gray-600">
+          Status
+        </h3>
+        {statusOptions.map((status) => (
+          <label
+            key={status.value}
+            className="flex items-center gap-3 mb-2 cursor-pointer select-none text-black hover:text-green-900 dark:hover:text-green-900 transition text-sm sm:text-base"
+          >
+            <input
+              type="radio"
+              name="status"
+              value={status.value}
+              checked={selectedStatus === status.value}
+              onChange={() => setSelectedStatus(status.value)}
+              className="accent-black-600 dark:accent-black-400 cursor-pointer"
+            />
+            <span>{status.label}</span>
+          </label>
+        ))}
+      </div>
 
-                {/* Tags Filter */}
-                <div>
-                  <h3 className="font-semibold text-black mb-3 text-lg border-b pb-1 border-gray-300 dark:border-gray-600">
-                    Tags
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
-                    {tagFilters.map((tag) => (
-                      <label
-                        key={tag.type}
-                        className="flex items-center gap-3 cursor-pointer select-none text-black hover:text-green-600 dark:hover:text-green-900 transition"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedTags.includes(tag.type)}
-                          onChange={() => toggleTag(tag.type)}
-                          className="accent-green-600 dark:accent-green-400 cursor-pointer"
-                        />
-                        <span className="text-sm">{tag.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* Tags Filter */}
+      <div>
+        <h3 className="font-semibold text-black mb-3 text-base sm:text-lg border-b pb-1 border-gray-300 dark:border-gray-600">
+          Tags
+        </h3>
+        <div className="grid grid-cols-2 gap-2 max-h-52 overflow-y-auto pr-1">
+          {tagFilters.map((tag) => (
+            <label
+              key={tag.type}
+              className="flex items-center gap-3 cursor-pointer select-none text-black hover:text-green-600 dark:hover:text-green-900 transition text-sm sm:text-base"
+            >
+              <input
+                type="checkbox"
+                checked={selectedTags.includes(tag.type)}
+                onChange={() => toggleTag(tag.type)}
+                className="accent-green-600 dark:accent-green-400 cursor-pointer"
+              />
+              <span>{tag.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
+
         </div>
       </div>
 

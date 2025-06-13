@@ -13,6 +13,7 @@ import {
   removeFromCart,
 } from "../../redux/state/cart/Action";
 import ProductDetailsSkeleton from "../Skeleton/ProductDetailsSkeleton";
+import { AnimatePresence, motion } from "framer-motion";
 const ProductPage = () => {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const ProductPage = () => {
   const product = useSelector((state) => state.product.product);
   const cart = useSelector((state) => state.cart.cartItems);
   const allProducts = useSelector((state) => state.category.categoryAndProduct);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -178,6 +180,12 @@ const ProductPage = () => {
     navigate(`/product/${productId}`);
   };
 
+  const imageVariants = {
+    initial: { opacity: 0, scale: 0.95 },
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
+    exit: { opacity: 0, scale: 0.95, transition: { duration: 0.3 } },
+  };
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       {isFetchingProduct ? (
@@ -213,11 +221,46 @@ const ProductPage = () => {
 
           <div className="flex flex-col lg:flex-row items-start lg:space-x-6">
             <div className="w-full lg:w-1/2 p-2 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
-              <LazyImage
-                src={product?.image}
-                alt={product?.name}
-                className="w-full object-contain rounded-lg mb-14"
-              />
+              {product?.images.length > 0 ? (
+                <div className="w-full">
+                  {/* Main Image with AnimatePresence */}
+                  <div className="">
+                    <AnimatePresence mode="wait">
+                      <motion.img
+                        key={product.images[selectedImageIndex]}
+                        src={product.images[selectedImageIndex]}
+                        alt={`Product image ${selectedImageIndex + 1}`}
+                        variants={imageVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        className="w-full max-h-[400px] object-contain rounded-md mx-auto"
+                      />
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Thumbnails with motion.div */}
+                  <div className="flex space-x-3 justify-center">
+                    {product.images.map((img, index) => (
+                      <motion.img
+                        key={index}
+                        src={img}
+                        alt={`Thumbnail ${index + 1}`}
+                        onClick={() => setSelectedImageIndex(index)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`h-20 w-20 object-cover rounded-md cursor-pointer border-2 z-50 ${
+                          selectedImageIndex === index
+                            ? "border-green-500"
+                            : "border-transparent"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500">No image to preview</p>
+              )}
 
               <div className="mt-4 p-4 border-t text-left">
                 <h2 className="text-xl font-semibold">

@@ -130,11 +130,16 @@ const ProductCard = ({ product, onClick }) => {
         className="w-full h-20 bg-gray-100 flex justify-center items-center relative"
         onClick={onClick}
       >
-        <LazyImage
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-contain rounded-md"
-        />
+        {product?.images?.length > 0 ? (
+          <LazyImage
+            src={product?.images[0]}
+            alt={product.name}
+            className="w-full h-full object-contain rounded-md "
+          />
+        ) : (
+          <p>No Image to Preview</p>
+        )}
+
         {selectedVariant?.discount && (
           <span className="absolute top-1 left-1 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md">
             {selectedVariant?.discount}% OFF

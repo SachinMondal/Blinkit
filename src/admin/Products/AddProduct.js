@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { fetchCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
 import LazyImage from "../../Components/utils/LazyLoading/LazyLoading";
+import { motion } from "framer-motion";
+import toast from "react-hot-toast";
 const steps = [
   "Add Product",
   "Basic Details",
@@ -19,13 +21,15 @@ const AddProduct = () => {
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [step, setStep] = useState(1);
   const [error, setError] = useState({});
+
   useEffect(() => {
     setIsNextDisabled(Object.keys(error).length > 0);
   }, [error]);
   const [formData, setFormData] = useState({
     category: "",
     categoryName: "",
-    image: null,
+    images: [],
+    imagePreviews: [],
     productName: "",
     productDescription: "",
     weight: "",
@@ -44,24 +48,20 @@ const AddProduct = () => {
     seller: "",
     disclaimer: "",
     details: [{ key: "", value: "" }],
+    isArchive: false,
   });
 
   useEffect(() => {
-    let imageUrl = null;
-    if (formData.image && typeof formData.image !== "string") {
-      imageUrl = URL.createObjectURL(formData.image);
-      setFormData((prev) => ({ ...prev, imageUrl: imageUrl }));
-    }
-
     return () => {
-      if (imageUrl) URL.revokeObjectURL(imageUrl);
+      formData.imagePreviews?.forEach((url) => URL.revokeObjectURL(url));
     };
-  }, [formData.image]);
+  }, [formData.imagePreviews]);
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, files } = e.target;
     const numericFields = ["weight", "price", "discountPrice", "qty", "stock"];
 
+    // Handle numeric validations
     if (numericFields.includes(name)) {
       if (value === "" || !/^\d+(\.\d{0,2})?$/.test(value)) {
         setError((prev) => ({ ...prev, [name]: "Enter a valid number" }));
@@ -70,6 +70,15 @@ const AddProduct = () => {
       }
     }
 
+    if (name === "isArchive") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value === "true",
+      }));
+      return;
+    }
+
+    // Handle category selection
     if (name === "category") {
       const selectedCategory = categories.find(
         (cat) => cat._id.toString() === value
@@ -79,12 +88,36 @@ const AddProduct = () => {
         category: selectedCategory?._id || "",
         categoryName: selectedCategory?.name || "",
       }));
-    } else {
+      return;
+    }
+
+    if (type === "file" && name === "images") {
+      const newFiles = Array.from(files);
+      const existingCount = formData.images.length;
+      const total = existingCount + newFiles.length;
+
+      if (total > 3) {
+        toast("You can Upload at most 3 images only", { duration: 6000 });
+        return;
+      }
+
+      const newPreviews = newFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+      }));
+
       setFormData((prev) => ({
         ...prev,
-        [name]: type === "file" ? e.target.files[0] : value,
+        images: [...prev.images, ...newFiles],
+        imagePreviews: [...prev.imagePreviews, ...newPreviews],
       }));
     }
+
+    // Default case
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleQtyChange = (e, index, field = null) => {
@@ -185,7 +218,7 @@ const AddProduct = () => {
           newErrors.productName = "Product Name is required";
         if (!formData.productDescription.trim())
           newErrors.productDescription = "Description is required";
-        if (!formData.image) newErrors.image = "Product Image is required";
+        if (!formData.images) newErrors.images = "Product Image is required";
       } else if (step === 2) {
         if (!formData.weight) newErrors.weight = "Weight is required";
         if (!formData.stock) newErrors.stock = "Stock is required";
@@ -210,52 +243,74 @@ const AddProduct = () => {
     validateFields(step);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, step]);
+  const removeImage = (urlToRemove) => {
+    const updatedPreviews = formData.imagePreviews.filter(
+      (preview) => preview.url !== urlToRemove
+    );
+    const updatedImages = formData.imagePreviews
+      .filter((preview) => preview.url !== urlToRemove)
+      .map((preview) => preview.file);
+
+    // Revoke the URL
+    URL.revokeObjectURL(urlToRemove);
+
+    setFormData((prev) => ({
+      ...prev,
+      images: updatedImages,
+      imagePreviews: updatedPreviews,
+    }));
+  };
 
   return (
     <div className="w-full min-h-screen px-4 sm:px-12 py-10">
       {/* Stepper */}
-      <div className="relative flex items-center justify-between mb-10">
-        {steps.map((label, index) => (
-          <div key={index} className="relative flex-1 text-center">
-            {/* Stepper Circle */}
-            <div
-              className={`mx-auto flex items-center justify-center rounded-full text-white font-bold
-              ${
-                step > index + 1
-                  ? "bg-green-500"
-                  : step === index + 1
-                  ? "bg-blue-500"
-                  : "bg-gray-400"
-              }
-              w-8 h-8 sm:w-12 sm:h-12 text-xs sm:text-sm`}
-            >
-              {index + 1}
-            </div>
-            
-            <p className="text-xs sm:text-sm mt-2">{label}</p>
+      <div className="flex items-center justify-between mb-10 w-full relative">
+        {steps.map((label, index) => {
+          const isActive = step === index + 1;
+          const isCompleted = step > index + 1;
 
-            
-            {index < steps.length - 1 && (
+          return (
+            <div
+              key={index}
+              className="flex-1 flex flex-col items-center relative"
+            >
               <div
-                className={`absolute top-4 sm:top-5 left-1/2 transform -translate-x-10 
-              h-1 ${
-                step > index + 1 ? "bg-green-500" : "bg-gray-300"
-              } w-[4rem] sm:w-[20rem]`}
-                style={{ zIndex: -1 }}
-              ></div>
-            )}
-          </div>
-        ))}
+                className={`z-20 flex items-center justify-center rounded-full text-white font-bold
+          ${isCompleted || isActive ? "bg-green-500" : "bg-gray-400"}
+          w-10 h-10 sm:w-12 sm:h-12 text-sm sm:text-base`}
+              >
+                {index + 1}
+              </div>
+
+              <p className="text-[0.5rem] sm:text-xs mt-2 text-center">
+                {label}
+              </p>
+              {index < steps.length - 1 && (
+                <motion.div
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: isCompleted ? 1 : 0 }}
+                  transition={{ duration: 0.5, delay: 0.15 * index }}
+                  className={`absolute right-0 transform h-1 z-10 -translate-x-4 left-1/2 origin-left translate-y-5
+              ${isCompleted ? "bg-green-500" : "bg-gray-300"}`}
+                  style={{
+                    width: "calc(100%)",
+                    maxWidth: "300px",
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <h1 className="text-xl sm:text-3xl font-bold text-gray-800 mb-6">
         {steps[step - 1]}
       </h1>
 
-      
       <div className="bg-white p-4 sm:p-6 shadow-md rounded-lg">
         {step === 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Category Selector */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Category*
@@ -274,26 +329,54 @@ const AddProduct = () => {
                 ))}
               </select>
             </div>
+
             <div>
               <label className="block font-semibold mb-1 text-sm">
-                Product Image*
+                Product Images*
               </label>
-              <input
-                type="file"
-                name="image"
-                accept="image/*"
-                onChange={handleChange}
-              />
-              {formData.image && (
-                <div>
-                  <LazyImage
-                    src={formData.previewImage || formData.image}
-                    alt="Product"
-                    className="w-20 h-20 object-contain"
+              <div className="relative">
+                <label className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded cursor-pointer w-max text-sm hover:bg-green-700 transition">
+                  Choose Images
+                  <input
+                    type="file"
+                    name="images"
+                    accept="image/*"
+                    onChange={handleChange}
+                    multiple
+                    className="hidden"
                   />
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  You can upload up to 3 images. 
+                  <br />
+                  Select the First Image Properly as it will be the Cover Image
+                </p>
+              </div>
+
+              {/* Preview Images */}
+              {formData.imagePreviews?.length > 0 && (
+                <div className="flex gap-4 mt-3 flex-wrap">
+                  {formData.imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative w-20 h-20 group">
+                      <LazyImage
+                        src={preview.url}
+                        alt={`Product ${index + 1}`}
+                        className="w-full h-full object-cover rounded"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(preview.url)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
+
+            {/* Product Name */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Product Name*
@@ -303,8 +386,11 @@ const AddProduct = () => {
                 value={formData.productName}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., Organic Honey"
               />
             </div>
+
+            {/* Product Description */}
             <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
                 Product Description*
@@ -313,7 +399,8 @@ const AddProduct = () => {
                 name="productDescription"
                 value={formData.productDescription}
                 onChange={handleChange}
-                className="border p-2 rounded w-full h-20 sm:h-24 text-sm"
+                className="border p-2 rounded w-full h-24 text-sm resize-none"
+                placeholder="Brief description about the product..."
               />
             </div>
           </div>
@@ -321,6 +408,7 @@ const AddProduct = () => {
 
         {step === 2 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Weight */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Weight*
@@ -330,11 +418,14 @@ const AddProduct = () => {
                 value={formData.weight}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., 500"
               />
               {error.weight && (
-                <p className="text-red-500 text-xs">{error.weight}</p>
+                <p className="text-red-500 text-xs mt-1">{error.weight}</p>
               )}
             </div>
+
+            {/* Stock */}
             <div>
               <label className="block font-semibold mb-1 text-sm">Stock</label>
               <input
@@ -342,17 +433,22 @@ const AddProduct = () => {
                 value={formData.stock}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., 100"
               />
             </div>
 
-            {/* ✅ Net Qty & Price List */}
-            <div className="col-span-2">
+            {/* Variants */}
+            <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
                 Variants (Net Qty, Unit, Price, Discount Price)*
               </label>
-              {formData?.quantities?.map((item, index) => (
-                <div key={index} className="flex gap-2 items-center">
 
+              {formData?.quantities?.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 items-center"
+                >
+                  {/* Qty */}
                   <input
                     type="number"
                     name="qty"
@@ -362,11 +458,12 @@ const AddProduct = () => {
                     placeholder="Qty"
                   />
 
+                  {/* Unit */}
                   <select
                     name="unit"
                     value={item.unit || "g"}
                     onChange={(e) => handleQtyChange(e, index)}
-                    className="border p-2 rounded w-20 text-sm"
+                    className="border p-2 rounded w-full sm:w-20 text-sm"
                   >
                     <option value="g">g</option>
                     <option value="kg">kg</option>
@@ -374,23 +471,19 @@ const AddProduct = () => {
                     <option value="custom">Other</option>
                   </select>
 
-                  {/* ✅ Show Input Box Only When "custom" is Selected */}
+                  {/* Custom Unit */}
                   {item.unit === "custom" && (
                     <input
                       type="text"
                       name="customUnit"
-                      value={
-                        item.unit !== "custom"
-                          ? item.unit
-                          : item.customUnit || ""
-                      }
+                      value={item.customUnit || ""}
                       onChange={(e) => handleQtyChange(e, index, "customUnit")}
-                      className="border p-2 rounded w-24 text-sm"
+                      className="border p-2 rounded w-full sm:w-24 text-sm"
                       placeholder="Enter Unit"
                     />
                   )}
 
-                  {/* ✅ Price Input */}
+                  {/* Price */}
                   <input
                     type="number"
                     name="price"
@@ -400,37 +493,39 @@ const AddProduct = () => {
                     placeholder="Price"
                   />
 
-                  {/* ✅ Discount Price Input */}
+                  {/* Discount */}
                   <input
                     type="number"
                     name="discountPrice"
                     value={item.discountPrice || ""}
                     onChange={(e) => handleQtyChange(e, index)}
-                    className="border p-2 rounded w-full sm:w-24 text-sm"
-                    placeholder="Discount Percent(excluding %)"
+                    className="border p-2 rounded w-full sm:w-28 text-sm"
+                    placeholder="Discount (%)"
                   />
 
-                  {/* ❌ Remove Button */}
+                  {/* Remove Variant Button */}
                   <button
                     type="button"
                     onClick={() => removeQty(index)}
-                    className="text-red-500 text-xl"
+                    className="text-red-500 text-xl sm:ml-1 hover:scale-110 transition-transform"
+                    title="Remove Variant"
                   >
                     ❌
                   </button>
                 </div>
               ))}
 
-              {/* ➕ Add More Button */}
+              {/* Add More Button */}
               <button
                 type="button"
                 onClick={addQty}
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm mt-2"
+                className="bg-green-500 text-white px-4 py-1 rounded text-sm mt-3 hover:bg-green-600 transition"
               >
                 + Add More
               </button>
             </div>
 
+            {/* Veg/Non-Veg */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Veg/Non-Veg*
@@ -448,11 +543,30 @@ const AddProduct = () => {
                 <option value="nonveg">Non-Veg</option>
               </select>
             </div>
+
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Archive*
+              </label>
+              <select
+                name="isArchive"
+                value={formData.isArchive === true ? "true" : "false"}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+              >
+                <option value="" disabled>
+                  Select an option
+                </option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
           </div>
         )}
 
         {step === 3 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Brand */}
             <div>
               <label className="block font-semibold mb-1 text-sm">Brand</label>
               <input
@@ -460,52 +574,58 @@ const AddProduct = () => {
                 value={formData.brand}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., Nestle"
               />
             </div>
 
-            {/* ✅ Dynamic Key-Value Pairs */}
-            <div className="col-span-2">
+            {/* Product Details: Dynamic Key-Value Pairs */}
+            <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
                 Product Details
               </label>
+
               {formData.details?.map((item, index) => (
-                <div key={index} className="flex gap-2 items-center">
-                  {/* ✅ Key Input */}
+                <div
+                  key={index}
+                  className="flex flex-wrap sm:flex-nowrap gap-2 items-center mt-2"
+                >
+                  {/* Key */}
                   <input
                     type="text"
                     name="key"
                     value={item.key || ""}
                     onChange={(e) => handleDetailChange(e, index)}
-                    className="border p-2 rounded w-1/2 text-sm"
-                    placeholder="Enter Key"
+                    className="border p-2 rounded w-full sm:w-1/2 text-sm"
+                    placeholder="Enter Key (e.g., Ingredients)"
                   />
 
-                  {/* ✅ Value Input */}
+                  {/* Value */}
                   <input
                     type="text"
                     name="value"
                     value={item.value || ""}
                     onChange={(e) => handleDetailChange(e, index)}
-                    className="border p-2 rounded w-1/2 text-sm"
-                    placeholder="Enter Value"
+                    className="border p-2 rounded w-full sm:w-1/2 text-sm"
+                    placeholder="Enter Value (e.g., Wheat, Salt)"
                   />
 
-                  {/* ❌ Remove Button */}
+                  {/* Remove Button */}
                   <button
                     type="button"
                     onClick={() => removeDetail(index)}
-                    className="text-red-500 text-xl"
+                    className="text-red-500 text-xl hover:scale-110 transition-transform"
+                    title="Remove"
                   >
                     ❌
                   </button>
                 </div>
               ))}
 
-              {/* ➕ Add More Button */}
+              {/* Add More Button */}
               <button
                 type="button"
                 onClick={addDetail}
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm mt-2"
+                className="bg-green-500 text-white px-4 py-1 rounded text-sm mt-3 hover:bg-green-600 transition"
               >
                 + Add More
               </button>
@@ -515,7 +635,7 @@ const AddProduct = () => {
 
         {step === 4 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {/* ✅ Size / Free Size */}
+            {/* Size / Free Size */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Size / Free Size
@@ -525,10 +645,11 @@ const AddProduct = () => {
                 value={formData.variantSize}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., Medium, Large, Free Size"
               />
             </div>
 
-            {/* ✅ Return Policy */}
+            {/* Return Policy */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Return Policy*
@@ -539,10 +660,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
                 rows="3"
+                placeholder="e.g., Return within 7 days of delivery"
               ></textarea>
             </div>
 
-            {/* ✅ Manufacturer Address */}
+            {/* Manufacturer Address */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Manufacturer Address
@@ -553,10 +675,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
                 rows="2"
+                placeholder="e.g., ABC Industries, Industrial Area, Mumbai"
               ></textarea>
             </div>
 
-            {/* ✅ Marketer Address */}
+            {/* Marketer Address */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Marketer Address
@@ -567,10 +690,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
                 rows="2"
+                placeholder="e.g., XYZ Pvt. Ltd., Delhi"
               ></textarea>
             </div>
 
-            {/* ✅ Country of Origin */}
+            {/* Country of Origin */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Country of Origin
@@ -580,10 +704,11 @@ const AddProduct = () => {
                 value={formData.countryOfOrigin}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., India"
               />
             </div>
 
-            {/* ✅ Customer Care Details */}
+            {/* Customer Care Details */}
             <div>
               <label className="block font-semibold mb-1 text-sm">
                 Customer Care Details*
@@ -594,10 +719,11 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
                 rows="2"
+                placeholder="e.g., support@domain.com, +91-XXXXXXXXXX"
               ></textarea>
             </div>
 
-            {/* ✅ Seller */}
+            {/* Seller */}
             <div>
               <label className="block font-semibold mb-1 text-sm">Seller</label>
               <input
@@ -605,11 +731,25 @@ const AddProduct = () => {
                 value={formData.seller}
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
+                placeholder="e.g., ABC Store"
               />
             </div>
+            <div>
+              <label className="block font-semibold mb-1 text-sm">
+                Packer Details
+              </label>
+              <textarea
+                name="packerDetails"
+                value={formData.packerDetails}
+                onChange={handleChange}
+                className="border p-2 rounded w-full text-sm"
+                rows="2"
+                placeholder="e.g., ABC Industries, Industrial Area, Mumbai"
+              ></textarea>
+            </div>
 
-            {/* ✅ Disclaimer */}
-            <div className="col-span-2">
+            {/* Disclaimer */}
+            <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
                 Disclaimer
               </label>
@@ -619,6 +759,7 @@ const AddProduct = () => {
                 onChange={handleChange}
                 className="border p-2 rounded w-full text-sm"
                 rows="3"
+                placeholder="e.g., Product color may slightly vary due to photographic lighting"
               ></textarea>
             </div>
           </div>
@@ -626,50 +767,60 @@ const AddProduct = () => {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6">
-        {step > 1 ? (
-          <button
-            onClick={prevStep}
-            className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600"
-          >
-            Back
-          </button>
-        ) : (
-          <button
-            onClick={() => navigate("/admin/admin")}
-            className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600"
-          >
-            Cancel
-          </button>
-        )}
-        <>
-          {error &&
-            Object.values(error).map((errMsg, index) => (
-              <p key={index} className="text-red-500 text-sm mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+        {/* Back or Cancel Button */}
+        <div>
+          {step > 1 ? (
+            <button
+              onClick={prevStep}
+              className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600 w-full sm:w-auto"
+            >
+              Back
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/admin/admin")}
+              className="bg-gray-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-gray-600 w-full sm:w-auto"
+            >
+              Cancel
+            </button>
+          )}
+        </div>
+
+        {/* Error Messages */}
+        {error && (
+          <div className="flex flex-col gap-1">
+            {Object.values(error).map((errMsg, index) => (
+              <p key={index} className="text-red-500 text-sm">
                 {errMsg}
               </p>
             ))}
-        </>
-        {step < 4 ? (
-          <button
-            onClick={handleNext}
-            disabled={isNextDisabled}
-            className={`px-6 py-2 rounded-lg text-white ${
-              isNextDisabled
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
-          >
-            Next
-          </button>
-        ) : (
-          <button
-            onClick={handleSubmit}
-            className="bg-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-green-600"
-          >
-            Review & Submit
-          </button>
+          </div>
         )}
+
+        {/* Next or Submit Button */}
+        <div>
+          {step < 4 ? (
+            <button
+              onClick={handleNext}
+              disabled={isNextDisabled}
+              className={`px-6 py-2 rounded-lg text-white w-full sm:w-auto ${
+                isNextDisabled
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600"
+              }`}
+            >
+              Next
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              className="bg-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-sm sm:text-base hover:bg-green-600 w-full sm:w-auto"
+            >
+              Review & Submit
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

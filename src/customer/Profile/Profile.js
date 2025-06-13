@@ -350,11 +350,15 @@ const Profile = () => {
                               className="grid grid-cols-12 items-center py-3 border-t border-gray-200"
                             >
                               <div className="col-span-3 sm:col-span-2 flex justify-center">
-                                <LazyImage
-                                  src={item?.productId?.image}
-                                  alt={item?.productId?.name}
-                                  className="w-14 h-14 object-cover rounded"
-                                />
+                                {item?.productId?.images?.length > 0 ? (
+                                  <LazyImage
+                                    src={item?.productId?.images[0]}
+                                    alt={item?.productId?.name}
+                                    className="w-14 h-14 object-cover rounded"
+                                  />
+                                ) : (
+                                  <p>No image to preview</p>
+                                )}
                               </div>
 
                               <div className="col-span-9 sm:col-span-10 text-left">

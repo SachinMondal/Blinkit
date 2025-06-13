@@ -14,7 +14,7 @@ const ViewAll = () => {
   const { name, subcategories } = useSelector(
     (state) => state.category.categoryAndProduct
   );
-  const loading = useSelector(state => state.category.loading);
+  const loading = useSelector((state) => state.category.loading);
 
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
@@ -28,9 +28,10 @@ const ViewAll = () => {
     return <CategorySkeleton />;
   }
 
-
-  if ((!Array.isArray(subcategories) || subcategories.length === 0) && !loading) {
- 
+  if (
+    (!Array.isArray(subcategories) || subcategories.length === 0) &&
+    !loading
+  ) {
     return (
       <div className="flex flex-col items-center justify-center h-96 text-center">
         <LazyImage
@@ -69,15 +70,18 @@ const ViewAll = () => {
             </h3>
 
             {/* Subcategory Products */}
-            {Array.isArray(subcategory.products) && subcategory.products.length > 0 ? (
+            {Array.isArray(subcategory.products) &&
+            subcategory.products.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-1">
-                {subcategory.products.map((product) => (
-                  <ProductTile
-                    key={product._id}
-                    product={product}
-                    onClick={() => handleProductClick(product._id)}
-                  />
-                ))}
+                {subcategory.products
+                  .filter((product) => product.isArchive !== true)
+                  .map((product) => (
+                    <ProductTile
+                      key={product._id}
+                      product={product}
+                      onClick={() => handleProductClick(product._id)}
+                    />
+                  ))}
               </div>
             ) : (
               <p className="text-gray-500 text-sm">

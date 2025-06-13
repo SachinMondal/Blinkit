@@ -84,19 +84,22 @@ const ProductCarousel = ({ title, products, categoryId }) => {
           </button>
         )}
 
-        <Slider ref={sliderRef} {...settings}>
-          {products.map((product, index) => (
-            <div
-              key={index}
-              className={`px-${products.length < 4 ? "1" : "2"}`}
-            >
-              <ProductTile
-                product={product}
-                onClick={() => handleProductClick(product._id)}
-              />
-            </div>
-          ))}
-        </Slider>
+   <Slider ref={sliderRef} {...settings}>
+  {products
+    .filter((product) => product.isArchive !== true)
+    .map((product, index) => (
+      <div
+        key={index}
+        className={`px-${products.length < 4 ? "1" : "2"}`}
+      >
+        <ProductTile
+          product={product}
+          onClick={() => handleProductClick(product._id)}
+        />
+      </div>
+    ))}
+</Slider>
+
 
         {/* Right Arrow */}
         {showRightArrow && (

@@ -1,7 +1,6 @@
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 
 const OrderModel = ({ order, onBack }) => {
-  
   return (
     <div className="p-4 max-w-3xl mx-auto">
       <div>
@@ -90,11 +89,16 @@ const OrderModel = ({ order, onBack }) => {
                 key={index}
                 className="flex items-center space-x-4 border-b pb-3"
               >
-                <LazyImage
-                  src={item.productId.image}
-                  alt={item.productId.name}
-                  className="w-16 h-16 rounded-md object-cover"
-                />
+                {item?.productId?.images?.length > 0 ? (
+                  <LazyImage
+                    src={item?.productId?.images[0]}
+                    alt={item.productId.name || "Product Image"}
+                    className="w-16 h-16 rounded-md object-cover"
+                  />
+                ) : (
+                  <p>No Image to Preview</p>
+                )}
+
                 <div className="flex-1 flex justify-between items-start">
                   <div>
                     <p className="font-medium">{item.productId.name}</p>
@@ -105,7 +109,9 @@ const OrderModel = ({ order, onBack }) => {
                       </p>
                     )}
                     <p className="text-gray-500 text-sm">
-                      <span className="line-through">₹{item.subtotalPrice}{" "}</span>
+                      <span className="line-through">
+                        ₹{item.subtotalPrice}{" "}
+                      </span>
                       {item.subtotalDiscountedPrice !== item.subtotalPrice && (
                         <span className="text-green-600 ml-2">
                           ₹{item.subtotalDiscountedPrice.toFixed(2)}

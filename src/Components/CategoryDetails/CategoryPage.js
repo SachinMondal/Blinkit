@@ -171,6 +171,7 @@ const CategoryPage = () => {
                           ? priceA - priceB
                           : priceB - priceA;
                       })
+                       .filter((product) => product.isArchive !== true)
                       .map((product, index) => (
                         <ProductTile
                           key={product._id || index}
