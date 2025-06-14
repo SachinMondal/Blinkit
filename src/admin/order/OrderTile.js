@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateOrder, fetchOrders } from "../../redux/state/order/Action";
+import toast from "react-hot-toast";
 
 const OrderTile = ({ order }) => {
   const dispatch = useDispatch();
+
   const updatedOrder = useSelector(
     (state) => state.orders?.find((o) => o._id === order._id) || order
   );
@@ -16,22 +18,20 @@ const OrderTile = ({ order }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
   const [loadingAccept, setLoadingAccept] = useState(false);
+  const [loadingShip, setLoadingShip] = useState(false);
   const [loadingDeliver, setLoadingDeliver] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState(order);
+
+  const [localOrderStatus, setLocalOrderStatus] = useState(order?.orderStatus || "PENDING");
   const [rejectionReason, setRejectionReason] = useState("");
   const [error, setError] = useState("");
 
-  const orderStatus = updatedOrder?.orderStatus || "PENDING";
-
   useEffect(() => {
-    if (
-      updatedOrder &&
-      (updatedOrder._id !== currentOrder._id ||
-        updatedOrder.orderStatus !== currentOrder.orderStatus)
-    ) {
-      setCurrentOrder(updatedOrder);
+    if (updatedOrder && updatedOrder._id === order._id) {
+      setLocalOrderStatus(updatedOrder.orderStatus);
     }
-  }, [currentOrder._id, currentOrder.orderStatus, updatedOrder]);
+  }, [updatedOrder, order]);
+
+  const isPending = localOrderStatus === "PENDING";
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -44,29 +44,45 @@ const OrderTile = ({ order }) => {
   }, [order]);
 
   const handleReject = async () => {
-    if (!rejectionReason.trim()) return;
+    if (!rejectionReason.trim()) {
+      toast.error("Rejection reason cannot be empty.");
+      return;
+    }
 
-    setLoadingReject(true);
-    await dispatch(
-      updateOrder(order._id, {
-        orderStatus: "REJECT",
-        rejectReason: rejectionReason.trim(),
-      })
-    );
-    await dispatch(fetchOrders());
-    setLoadingReject(false);
-    setIsModalOpen(false);
-    setRejectionReason("");
+    try {
+      setLoadingReject(true);
+      await dispatch(
+        updateOrder(order._id, {
+          orderStatus: "REJECT",
+          rejectReason: rejectionReason.trim(),
+        })
+      );
+      setLocalOrderStatus("REJECT");
+      await dispatch(fetchOrders());
+      toast.success("Order rejected successfully.");
+      setIsModalOpen(false);
+      setRejectionReason("");
+    } catch (err) {
+      toast.error("Failed to reject order. Please try again.");
+    } finally {
+      setLoadingReject(false);
+    }
   };
 
-  const handleDeliveryTimeChange = (value) => {
-    if (order.orderStatus !== "PENDING") return;
+  const handleDeliveryTimeChange = async (value) => {
+    if (!isPending) return;
     setSelectedDeliveryOption(value);
 
     if (value !== "") {
-      dispatch(updateOrder(order._id, { deliveryTime: value }));
+      try {
+        await dispatch(updateOrder(order._id, { deliveryTime: value }));
+        toast.success("Delivery time updated.");
+      } catch (err) {
+        toast.error("Failed to update delivery time.");
+      }
     }
   };
+
   const getNextStatus = (status) => {
     switch (status) {
       case "PENDING":
@@ -79,6 +95,7 @@ const OrderTile = ({ order }) => {
         return null;
     }
   };
+
   const handleStatusAdvance = async () => {
     if (
       selectedDeliveryOption?.toLowerCase() === "pending" ||
@@ -88,40 +105,47 @@ const OrderTile = ({ order }) => {
       return;
     }
 
-    setError(""); 
+    setError("");
 
-    const next = getNextStatus(orderStatus);
+    const next = getNextStatus(localOrderStatus);
     if (!next) return;
 
     const loadingSetter = {
       ACCEPTED: setLoadingAccept,
-      SHIPPED: setLoadingDeliver,
-      DELIVERED: () => {},
+      SHIPPED: setLoadingShip,
+      DELIVERED: setLoadingDeliver,
     }[next];
 
-    loadingSetter?.(true);
-    await dispatch(updateOrder(order._id, { orderStatus: next }));
-    loadingSetter?.(false);
-  };
+    loadingSetter(true);
 
+    try {
+      await dispatch(updateOrder(order._id, { orderStatus: next }));
+      setLocalOrderStatus(next);
+      toast.success(`Order ${next}.`);
+    } catch (err) {
+      toast.error("Failed to update order status.");
+    } finally {
+      loadingSetter(false);
+    }
+  };
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex flex-col space-y-3 transition hover:shadow-lg w-full max-w-md sm:max-w-lg lg:max-w-xl mx-auto">
+    <div className="bg-white p-4 rounded-xl shadow border border-gray-200 transition hover:shadow-lg w-full max-w-xl mx-auto">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-800 pl-4">
-          <i className="fa-solid fa-user mr-2"></i>{" "}
+        <h2 className="text-lg font-semibold text-gray-800">
+          <i className="fa-solid fa-user mr-2 text-green-600"></i>
           {order?.user?.name || "Unknown"}
         </h2>
-        <span className="text-lg font-bold text-blue-600">
-          {order?.finalPrice || "N/A"}
+        <span className="text-green-600 font-bold text-lg">
+          ₹{order?.finalPrice || "N/A"}
         </span>
       </div>
 
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 mt-1">
         Order ID: <span className="font-medium">#{order?._id || "N/A"}</span>
       </p>
 
-      <p className="text-gray-600 text-sm truncate pl-4 flex items-center">
-        <i className="fa-solid fa-hand-holding-dollar mr-2"></i>
+      <p className="text-sm text-gray-600 mt-2">
+        <i className="fa-solid fa-hand-holding-dollar mr-2 text-green-500"></i>
         {order?.orderItems
           ?.map((o) => `${o?.productId?.name} x ${o?.quantity}`)
           .join(", ")}
@@ -130,16 +154,13 @@ const OrderTile = ({ order }) => {
       <select
         value={selectedDeliveryOption}
         onChange={(e) => handleDeliveryTimeChange(e.target.value)}
-        className={`mt-2 w-full p-2 border rounded-md text-sm focus:outline-none 
-         ${
-           order.orderStatus !== "PENDING"
-             ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-             : ""
-         }`}
-        disabled={order.orderStatus !== "PENDING"}
+        className={`mt-4 w-full p-2 border rounded-md text-sm focus:outline-none ${
+          isPending ? "" : "bg-gray-100 text-gray-500 cursor-not-allowed"
+        }`}
+        disabled={!isPending}
       >
         <option value="" disabled>
-          Select delivery option below
+          Select delivery option
         </option>
         {["same-day", "1-day", "2-days", "3-days"].map((option) => (
           <option key={option} value={option}>
@@ -158,6 +179,7 @@ const OrderTile = ({ order }) => {
           )}
         <option value="custom">Custom</option>
       </select>
+
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 
       {selectedDeliveryOption === "custom" && (
@@ -167,68 +189,61 @@ const OrderTile = ({ order }) => {
           className="mt-2 w-full p-2 border rounded-md text-sm"
           onBlur={async (e) => {
             const value = e.target.value.trim();
-            if (value && order?.orderStatus === "PENDING") {
-              setSelectedDeliveryOption(value);
-              await dispatch(updateOrder(order._id, { deliveryTime: value }));
+            if (value && isPending) {
+              await handleDeliveryTimeChange(value);
             }
           }}
         />
       )}
 
-      <div className="mt-3 flex flex-col sm:flex-row justify-between gap-2">
+      <div className="mt-4 flex flex-wrap gap-4 justify-between items-center">
         <Link
           to={`/admin/orders/${order?._id}`}
-          className="text-blue-500 font-medium hover:underline text-center"
+          className="text-blue-500 hover:underline text-sm"
         >
-          View
+          View Details
         </Link>
 
-        {orderStatus === "PENDING" && (
+        {localOrderStatus === "PENDING" && (
           <>
             <button
-              className="text-red-500 font-medium hover:underline text-center"
               onClick={() => setIsModalOpen(true)}
+              className="text-red-500 hover:underline text-sm"
             >
               Reject
             </button>
             <button
-              className={`text-green-500 font-medium hover:underline text-center ${
-                !selectedDeliveryOption ||
-                selectedDeliveryOption === "" ||
-                loadingAccept
+              onClick={handleStatusAdvance}
+              className={`text-green-600 hover:underline text-sm ${
+                !selectedDeliveryOption || loadingAccept
                   ? "opacity-50 cursor-not-allowed"
                   : ""
               }`}
-              onClick={handleStatusAdvance}
-              disabled={
-                !selectedDeliveryOption ||
-                selectedDeliveryOption === "" ||
-                loadingAccept
-              }
+              disabled={!selectedDeliveryOption || loadingAccept}
             >
               {loadingAccept ? "Accepting..." : "Accept"}
             </button>
           </>
         )}
 
-        {orderStatus === "ACCEPTED" && (
+        {localOrderStatus === "ACCEPTED" && (
           <button
-            className={`text-yellow-500 font-medium hover:underline text-center ${
-              loadingDeliver ? "opacity-50 cursor-not-allowed" : ""
-            }`}
             onClick={handleStatusAdvance}
-            disabled={loadingDeliver}
+            className={`text-yellow-600 hover:underline text-sm ${
+              loadingShip ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loadingShip}
           >
-            {loadingDeliver ? "Shipping..." : "Ship"}
+            {loadingShip ? "Shipping..." : "Ship"}
           </button>
         )}
 
-        {orderStatus === "SHIPPED" && (
+        {localOrderStatus === "SHIPPED" && (
           <button
-            className={`text-green-600 font-medium hover:underline text-center ${
+            onClick={handleStatusAdvance}
+            className={`text-green-700 hover:underline text-sm ${
               loadingDeliver ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            onClick={handleStatusAdvance}
             disabled={loadingDeliver}
           >
             {loadingDeliver ? "Delivering..." : "Deliver"}
@@ -236,37 +251,35 @@ const OrderTile = ({ order }) => {
         )}
       </div>
 
-      {/* Modal for Rejection Confirmation */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Confirm Rejection
-            </h2>
-            <p className="text-sm text-gray-600 mt-2">
-              Are you sure you want to reject this order?
+            <h2 className="text-lg font-semibold text-gray-800">Reject Order</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Please provide a reason for rejection.
             </p>
 
             <textarea
               placeholder="Enter rejection reason"
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="w-full mt-4 p-2 border rounded text-sm"
+              className="w-full mt-3 p-2 border rounded text-sm"
             />
 
             <div className="flex justify-end space-x-4 mt-4">
               <button
-                className="text-gray-600 hover:text-gray-800"
                 onClick={() => {
-                  setRejectionReason("");
                   setIsModalOpen(false);
+                  setRejectionReason("");
                 }}
+                className="text-gray-500 hover:text-gray-800 text-sm"
               >
                 Cancel
               </button>
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleReject}
+                className="bg-red-500 text-white px-4 py-1.5 rounded text-sm hover:bg-red-600 disabled:opacity-50"
                 disabled={loadingReject || !rejectionReason.trim()}
               >
                 {loadingReject ? "Rejecting..." : "Reject"}
