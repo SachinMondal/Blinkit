@@ -64,7 +64,7 @@ const Profile = () => {
       ) : (
         <div className="max-w-5xl xl:max-w-6xl mx-auto mt-6 flex gap-4 xl:gap-24 flex-col overflow-hidden">
           <nav className="w-full mb-3 ml-8 text-sm text-gray-600 text-left">
-            <Link to="/" className="text-blue-500 hover:underline">
+            <Link to="/" className="text-green-500 hover:underline">
               Home
             </Link>{" "}
             &gt;

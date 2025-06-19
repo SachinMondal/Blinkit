@@ -97,7 +97,7 @@ const OrdersPage = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-7xl mx-auto px-4">
+    <div className="flex flex-col w-full max-w-7xl mx-auto px-4 mb-4">
       {/* Sticky Header */}
       <div className="fixed top-16 left-0 right-0 bg-white w-full z-20 shadow-sm border-b border-green-100">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3 px-4 py-3">

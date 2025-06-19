@@ -5,8 +5,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Poppins", "sans-serif"],
-        heading: ["Inter", "sans-serif"], 
+        sans: ["Poppins"],
+        heading: ["Poppins"], 
       },
       fontSize: {
         base: "1rem", 

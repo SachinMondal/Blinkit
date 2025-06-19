@@ -90,7 +90,7 @@ const OrderView = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="flex justify-between items-center p-4 bg-green-700 text-white shadow sticky top-0 z-30">
+      <header className="flex justify-between items-center p-4 bg-green-500 mt-2 rounded-b-xl text-white shadow sticky top-0 z-30">
         <h1 className="text-2xl font-extrabold tracking-wide">Order #{order._id}</h1>
         <Link
           to="/admin/orders"
