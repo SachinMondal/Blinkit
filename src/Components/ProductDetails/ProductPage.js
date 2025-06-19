@@ -206,13 +206,13 @@ const ProductPage = () => {
       ) : (
         <>
           <nav className="mb-4 ml-4 text-sm text-gray-600 w-full lg:hidden text-left overflow-hidden">
-            <Link to="/" className="text-blue-500 hover:underline">
+            <Link to="/" className="text-green-500 hover:underline">
               Home
             </Link>{" "}
             &gt;{" "}
             <Link
               to={`/category/${product?.category?._id}`}
-              className="text-blue-500 hover:underline"
+              className="text-green-500 hover:underline"
             >
               {product?.category?.name}
             </Link>{" "}
@@ -249,7 +249,7 @@ const ProductPage = () => {
                         onClick={() => setSelectedImageIndex(index)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`h-20 w-20 object-cover rounded-md cursor-pointer border-2 z-50 ${
+                        className={`h-20 w-20 object-cover rounded-md cursor-pointer border-2 z-50 mt-4 ${
                           selectedImageIndex === index
                             ? "border-green-500"
                             : "border-transparent"
@@ -271,19 +271,29 @@ const ProductPage = () => {
                 </p>
                 <p className="text-xl font-semibold  mt-2">
                   Price:{" "}
-                  <span className="line-through text-gray-500">
-                    ₹
-                    {Math.floor(
-                      selectedVariant.price - selectedVariant.discountPrice
-                    )}
-                  </span>
-                  <span className="text-green-700 ml-3">
+                  <span className="text-green-700 mr-3">
                     ₹
                     {Math.floor(
                       selectedVariant.price -
                         selectedVariant.discountPrice -
                         selectedVariant.categoryDiscount
-                    )}
+                    ).toFixed(2)}
+                  </span>
+                  
+                   <span className="line-through text-gray-500 mr-3">
+                    ₹
+                    {Math.floor(
+                      selectedVariant.price - selectedVariant.discountPrice
+                    ).toFixed(2)}
+                  </span>
+                   <span className="line-through text-gray-500 ">
+                  
+                    
+                    ₹
+                  {selectedVariant
+                ? Math.floor(selectedVariant.price).toFixed(2)
+                : Math.floor(product.price * 1.2)}
+                  
                   </span>
                 </p>
               </div>
@@ -355,13 +365,13 @@ const ProductPage = () => {
             </div>
             <div className="w-full lg:w-1/2">
               <div className="mb-4 text-sm text-gray-600 hidden lg:block text-left">
-                <Link to="/" className="text-blue-500 hover:underline">
+                <Link to="/" className="text-green-500 hover:underline">
                   Home
                 </Link>{" "}
                 &gt;{" "}
                 <Link
                   to={`/category/${product?.category?._id}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-green-500 hover:underline"
                 >
                   {product?.category?.name}
                 </Link>{" "}

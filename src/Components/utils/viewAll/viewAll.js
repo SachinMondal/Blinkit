@@ -49,7 +49,7 @@ const ViewAll = () => {
   return (
     <div className="p-6 max-w-5xl mx-auto flex gap-4 flex-col overflow-hidden min-h-screen">
       <div className="text-sm text-gray-600 text-left">
-        <Link to="/" className="text-blue-500 hover:underline">
+        <Link to="/" className="text-green-500 hover:underline">
           Home
         </Link>{" "}
         / <span className="text-gray-800">{name || "Category"}</span>
@@ -72,7 +72,7 @@ const ViewAll = () => {
             {/* Subcategory Products */}
             {Array.isArray(subcategory.products) &&
             subcategory.products.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-1">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
                 {subcategory.products
                   .filter((product) => product.isArchive !== true)
                   .map((product) => (

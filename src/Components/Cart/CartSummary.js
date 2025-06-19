@@ -217,7 +217,7 @@ const CartSummary = ({ cartItems }) => {
             </h2>
             <p className="text-center mt-2">Thank you for your purchase.</p>
             <button
-              className="mt-4 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+              className="mt-4 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600"
               onClick={handleViewOrders}
             >
               View Orders

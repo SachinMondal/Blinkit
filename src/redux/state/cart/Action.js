@@ -195,11 +195,11 @@ export const updateCart =
 export const removeFromCart =
   (productId, variantIndex) => async (dispatch, getState) => {
     const token = getState().auth.token;
+
     if (token) {
+      // For authenticated users
       try {
         dispatch({ type: REMOVE_FROM_CART_REQUEST });
-
-        if (!token) throw new Error("No token found");
 
         const config = {
           headers: {
@@ -207,14 +207,19 @@ export const removeFromCart =
             "Content-Type": "application/json",
           },
         };
-        const data = await axios.post(
+
+        const response = await axios.post(
           `${API_URL}/api/cart/remove`,
           { productId, variantIndex },
           config
         );
 
-        dispatch({ type: REMOVE_FROM_CART_SUCCESS, payload: data.data.data });
-        return data.data.success;
+        dispatch({
+          type: REMOVE_FROM_CART_SUCCESS,
+          payload: response.data.data,
+        });
+
+        return response.data.success;
       } catch (error) {
         dispatch({
           type: REMOVE_FROM_CART_FAILURE,
@@ -222,33 +227,62 @@ export const removeFromCart =
         });
       }
     } else {
+      // For guest users
       try {
         dispatch({ type: REMOVE_FROM_CART_REQUEST });
 
-        const cart = JSON.parse(localStorage.getItem("guest_cart")) || [];
-        const updated = cart.filter(
+        const guestCart = JSON.parse(localStorage.getItem("guest_cart")) || {
+          cartItems: [],
+        };
+
+        const updatedItems = guestCart.cartItems.filter(
           (item) =>
             !(
-              item.productId === productId && item.variantIndex === variantIndex
+              item.product._id === productId &&
+              item.variantIndex === variantIndex
             )
         );
 
-        localStorage.setItem("guest_cart", JSON.stringify(updated));
+        const totalCartAmount = updatedItems.reduce(
+          (sum, item) => sum + item.subtotalPrice,
+          0
+        );
+        const totalCartDiscountAmount = updatedItems.reduce(
+          (sum, item) => sum + item.discountAmount * item.quantity,
+          0
+        );
+        const totalCartDiscountedPrice = updatedItems.reduce(
+          (sum, item) => sum + item.subtotalDiscountedPrice,
+          0
+        );
+
+        const updatedCart = {
+          ...guestCart,
+          cartItems: updatedItems,
+          totalCartSize: updatedItems.length,
+          totalCartAmount,
+          totalCartDiscountAmount,
+          totalCartDiscountedPrice,
+          updatedAt: new Date().toISOString(),
+        };
+
+        localStorage.setItem("guest_cart", JSON.stringify(updatedCart));
+
         dispatch({
           type: REMOVE_FROM_CART_SUCCESS,
-          payload: {
-            cartItems: updated,
-            totalItem: updated.length,
-            totalQuantity: updated.reduce((sum, item) => sum + item.count, 0),
-            totalPrice: 0,
-          },
+          payload: updatedCart,
         });
+
         return true;
       } catch (err) {
-        dispatch({ type: REMOVE_FROM_CART_FAILURE, payload: err.message });
+        dispatch({
+          type: REMOVE_FROM_CART_FAILURE,
+          payload: err.message,
+        });
       }
     }
   };
+
 
 export const fetchCart = () => async (dispatch, getState) => {
   const token = getState().auth.token;

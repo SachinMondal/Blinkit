@@ -123,13 +123,13 @@ export default function Navbar({
       }`}
     >
       <nav
-        className={`bg-[#F1C542] p-4 w-full relative z-40 ${
+        className={`bg-[#F1C542] p-4 w-full relative z-40  ${
           isMobile
             ? "h-[30vh] flex flex-col items-center justify-around rounded-b-3xl"
-            : "flex justify-center"
+            : "flex justify-center w-full"
         }`}
       >
-        <div className={`flex justify-around w-full max-w-5xl lg:max-w-6xl `}>
+        <div className={`flex justify-around w-full max-w-6xl md:max-2-5xl xl:max-w-full mx-auto `}>
           {isMobile ? (
             <>
               <div className="w-full">
@@ -312,7 +312,7 @@ export default function Navbar({
             </>
           ) : (
             <>
-              <div className="flex justify-around gap-2 items-center">
+              <div className="flex justify-around gap-4 items-center">
                 <button
                   onClick={() => setIsSidebarOpen(true)}
                   className="text-white text-xl"
@@ -337,7 +337,7 @@ export default function Navbar({
                   </p>
 
                   {location ? (
-                    <div className="relative w-full max-w-[200px] sm:max-w-[250px] md:max-w-[300px] overflow-hidden h-6">
+                    <div className="relative w-full max-w-90 sm:max-w-72 md:max-w-96 overflow-hidden h-6">
                       <div className="absolute whitespace-nowrap animate-marquee font-medium text-gray-800 text-xs md:text-sm">
                         {location}
                       </div>
@@ -490,7 +490,7 @@ export default function Navbar({
         </div>
 
         {isMobile && (
-          <p className="text-sm text-gray-700 text-center mt-1">
+          <p className="text-[10px] sm:text-xs md:text-s text-gray-700 text-center mt-1">
             Welcome to our store! Find the best deals here.
           </p>
         )}

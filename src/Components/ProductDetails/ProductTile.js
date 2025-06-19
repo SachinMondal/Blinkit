@@ -87,42 +87,42 @@ const ProductCard = ({ product, onClick }) => {
       setLoading(false);
     }
   };
+const handleDecrease = async (e) => {
+  e.stopPropagation();
+  if (!selectedVariant || variantIndex === -1) return;
 
-  const handleDecrease = async (e) => {
-    e.stopPropagation();
-    if (!selectedVariant || variantIndex === -1 || count === 0) return;
+  const newQty = count - 1;
+  setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
+  setLoading(true);
 
-    const newQty = count - 1;
-    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
-    setLoading(true);
-
-    try {
-      if (newQty > 0) {
-        const result = await dispatch(
-          addToCart(product._id, variantIndex, newQty)
-        );
-        if (result) {
-          dispatch(fetchCart());
-        } else {
-          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
-        }
+  try {
+    if (newQty > 0) {
+      const result = await dispatch(
+        addToCart(product._id, variantIndex, newQty)
+      );
+      if (result) {
+        dispatch(fetchCart());
       } else {
-        const result = await dispatch(
-          removeFromCart(product._id, variantIndex)
-        );
-        if (result) {
-          dispatch(fetchCart());
-        } else {
-          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
-        }
+        setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
       }
-    } catch (error) {
-      console.error("Error updating cart", error);
-      setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
-    } finally {
-      setLoading(false);
+    } else {
+      const result = await dispatch(
+        removeFromCart(product._id, variantIndex)
+      );
+      if (result) {
+        dispatch(fetchCart());
+      } else {
+        setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+      }
     }
-  };
+  } catch (error) {
+    console.error("Error updating cart", error);
+    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative">
@@ -130,16 +130,11 @@ const ProductCard = ({ product, onClick }) => {
         className="w-full h-20 bg-gray-100 flex justify-center items-center relative"
         onClick={onClick}
       >
-        {product?.images?.length > 0 ? (
-          <LazyImage
-            src={product?.images[0]}
-            alt={product.name}
-            className="w-full h-full object-contain rounded-md "
-          />
-        ) : (
-          <p>No Image to Preview</p>
-        )}
-
+        <LazyImage
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-contain rounded-md"
+        />
         {selectedVariant?.discount && (
           <span className="absolute top-1 left-1 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md">
             {selectedVariant?.discount}% OFF
@@ -189,22 +184,14 @@ const ProductCard = ({ product, onClick }) => {
                   selectedVariant.price -
                     selectedVariant.discountPrice -
                     selectedVariant.categoryDiscount
-                )
+                ).toFixed(2)
               : Math.floor(product.price) ?? "N/A"}
           </p>
           <div className="flex flex-row gap-1 mr-2">
-            <p className="text-xs font-semibold text-gray-500 line-through">
+            <p className="text-[10px] font-semibold text-gray-500 line-through">
               ₹
               {selectedVariant
-                ? Math.floor(
-                    selectedVariant.price - selectedVariant.discountPrice
-                  )
-                : Math.floor(product.price * 1.2)}
-            </p>
-            <p className="text-xs font-semibold text-gray-500 line-through">
-              ₹
-              {selectedVariant
-                ? Math.floor(selectedVariant.price)
+                ? Math.floor(selectedVariant.price).toFixed(2)
                 : Math.floor(product.price * 1.2)}
             </p>
           </div>
