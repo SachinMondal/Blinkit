@@ -41,34 +41,54 @@ const Summary = () => {
 };
 
 
-  const handleSubmit = () => {
+const handleSubmit = () => {
   setLoading(true);
 
+  // 1. Replace custom units in quantity
   const updatedQuantities = formData.quantities.map((item) => ({
     ...item,
     unit: item.unit === "custom" ? item.customUnit : item.unit,
   }));
 
-  const formattedData = {
-    ...formData,
-    quantities: JSON.stringify(updatedQuantities),
-    details: JSON.stringify(formData.details),
-  };
-console.log("final",formattedData)
+  // 2. Initialize FormData for image + text
+  const formDataToSend = new FormData();
+
+  // 3. Append normal fields
+  Object.entries(formData).forEach(([key, value]) => {
+    if (key === "images") {
+      // Append images properly
+      value.forEach((file) => {
+        formDataToSend.append("imagePreviews[]", file);
+      });
+    } else if (key === "quantities") {
+      formDataToSend.append("quantities", JSON.stringify(updatedQuantities));
+    } else if (key === "details") {
+      formDataToSend.append("details", JSON.stringify(value));
+    } else if (typeof value === "boolean") {
+      formDataToSend.append(key, value.toString()); // Convert booleans to string
+    } else {
+      formDataToSend.append(key, value ?? ""); // fallback for null/undefined
+    }
+  });
+
+  // 4. Show loading toast while saving
   toast.promise(
-    saveSettings(formattedData),
+    saveSettings(formDataToSend), // Must handle FormData in saveSettings()
     {
       loading: "Saving...",
       success: <b>Product saved!</b>,
       error: <b>Could not save.</b>,
     }
-  ).then(() => {
-    setLoading(false);
-    navigate("/admin/products");
-  }).catch(() => {
-    setLoading(false);
-  });
+  )
+    .then(() => {
+      setLoading(false);
+      navigate("/admin/products");
+    })
+    .catch(() => {
+      setLoading(false);
+    });
 };
+
 
   // Keys to exclude from main table
   const excludedKeys = [

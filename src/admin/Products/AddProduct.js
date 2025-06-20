@@ -57,68 +57,71 @@ const AddProduct = () => {
     };
   }, [formData.imagePreviews]);
 
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    const numericFields = ["weight", "price", "discountPrice", "qty", "stock"];
+ const handleChange = (e) => {
+  const { name, value, type, files } = e.target;
+  const numericFields = ["weight", "price", "discountPrice", "qty", "stock"];
 
-    // Handle numeric validations
-    if (numericFields.includes(name)) {
-      if (value === "" || !/^\d+(\.\d{0,2})?$/.test(value)) {
-        setError((prev) => ({ ...prev, [name]: "Enter a valid number" }));
-      } else {
-        setError((prev) => ({ ...prev, [name]: "" }));
-      }
+  // Handle numeric validations
+  if (numericFields.includes(name)) {
+    if (value === "" || !/^\d+(\.\d{0,2})?$/.test(value)) {
+      setError((prev) => ({ ...prev, [name]: "Enter a valid number" }));
+    } else {
+      setError((prev) => ({ ...prev, [name]: "" }));
     }
+  }
 
-    if (name === "isArchive") {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value === "true",
-      }));
-      return;
-    }
-
-    // Handle category selection
-    if (name === "category") {
-      const selectedCategory = categories.find(
-        (cat) => cat._id.toString() === value
-      );
-      setFormData((prev) => ({
-        ...prev,
-        category: selectedCategory?._id || "",
-        categoryName: selectedCategory?.name || "",
-      }));
-      return;
-    }
-
-    if (type === "file" && name === "images") {
-      const newFiles = Array.from(files);
-      const existingCount = formData.images.length;
-      const total = existingCount + newFiles.length;
-
-      if (total > 3) {
-        toast("You can Upload at most 3 images only", { duration: 6000 });
-        return;
-      }
-
-      const newPreviews = newFiles.map((file) => ({
-        file,
-        url: URL.createObjectURL(file),
-      }));
-
-      setFormData((prev) => ({
-        ...prev,
-        images: [...prev.images, ...newFiles],
-        imagePreviews: [...prev.imagePreviews, ...newPreviews],
-      }));
-    }
-
-    // Default case
+  // Handle boolean field
+  if (name === "isArchive") {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value === "true",
     }));
-  };
+    return;
+  }
+
+  // Handle category selection
+  if (name === "category") {
+    const selectedCategory = categories.find(
+      (cat) => cat._id.toString() === value
+    );
+    setFormData((prev) => ({
+      ...prev,
+      category: selectedCategory?._id || "",
+      categoryName: selectedCategory?.name || "",
+    }));
+    return;
+  }
+
+  // Handle file input
+  if (type === "file" && name === "images") {
+    const newFiles = Array.from(files);
+    const existingCount = formData.images.length;
+    const total = existingCount + newFiles.length;
+
+    if (total > 3) {
+      toast("You can Upload at most 3 images only", { duration: 6000 });
+      return;
+    }
+
+    const newPreviews = newFiles.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, ...newFiles],
+      imagePreviews: [...prev.imagePreviews, ...newPreviews],
+    }));
+    return;
+  }
+
+  // Default case
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
 
   const handleQtyChange = (e, index, field = null) => {
     const { name, value } = e.target;

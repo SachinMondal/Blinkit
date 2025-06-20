@@ -9,12 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCategoryProduct } from "../../redux/state/product/Action.js";
 import { getBanners } from "../../redux/state/home/Action.js";
 import HomeSkeleton from "../../Components/Skeleton/HomeSkeleton.js";
-import { useNavigate } from "react-router-dom";
+
 
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const navigate=useNavigate();
   const category = useSelector((state) => state.category.categories);
   const data = useSelector((state) => state.product.categories);
   const loading = useSelector((state) => state.product.loading);
@@ -96,9 +95,7 @@ const HomePage = () => {
   };
 
   const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/category/${categoryId}`);
-  };
+
   return (
     <>
       {loading ? (
@@ -132,7 +129,7 @@ const HomePage = () => {
                     image={item.image}
                     name={item.name}
                     discount={item.discountPercentage}
-                    onClick={() => handleCategoryClick(item._id)}
+                    subId={item._id}
                   />
                 ))}
               </Slider>
@@ -144,7 +141,7 @@ const HomePage = () => {
                     image={item.image}
                     name={item.name}
                     discount={item.discountPercentage}
-                    onClick={() => handleCategoryClick(item._id)}
+                    subId={item._id}
                   />
                 ))}
               </div>

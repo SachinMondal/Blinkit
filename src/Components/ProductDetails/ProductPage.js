@@ -279,16 +279,7 @@ const ProductPage = () => {
                         selectedVariant.categoryDiscount
                     ).toFixed(2)}
                   </span>
-                  
-                   <span className="line-through text-gray-500 mr-3">
-                    ₹
-                    {Math.floor(
-                      selectedVariant.price - selectedVariant.discountPrice
-                    ).toFixed(2)}
-                  </span>
                    <span className="line-through text-gray-500 ">
-                  
-                    
                     ₹
                   {selectedVariant
                 ? Math.floor(selectedVariant.price).toFixed(2)
