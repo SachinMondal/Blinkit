@@ -57,7 +57,6 @@ const CategoryPage = () => {
   const handleCategoryClick = (name) => {
     setSelectedCategory(name);
   };
-
   return (
     <div className="max-w-6xl mx-auto p-0 sm:p-4 flex flex-col md:flex-row">
       {/* Left Sidebar on Desktop */}
@@ -85,7 +84,9 @@ const CategoryPage = () => {
                   alt={cat.name}
                   className="w-10 h-10 object-contain rounded-md"
                 />
-                <span className="ml-4 text-sm truncate">{cat.name}</span>
+                <span className="ml-4 text-sm truncate">
+                  {index === 0 ? "All" : cat.name}
+                </span>
               </li>
               {index !== categories.subcategories.length - 1 && (
                 <hr className="border-gray-200 my-2" />
@@ -98,7 +99,7 @@ const CategoryPage = () => {
       {/* Top Horizontal Scroll for Mobile */}
       <div className="md:hidden w-full overflow-x-auto scrollbar-hide border-b py-3">
         <div className="flex gap-4 px-2">
-          {categories?.subcategories?.map((cat) => (
+          {categories?.subcategories?.map((cat, index) => (
             <motion.div
               whileTap={{ scale: 0.95 }}
               key={cat._id}
@@ -115,7 +116,7 @@ const CategoryPage = () => {
                 className="w-12 h-12 object-contain rounded-full"
               />
               <span className="text-xs mt-1 text-center max-w-[60px] truncate">
-                {cat.name}
+                {index === 0 ? "All" : cat.name}
               </span>
             </motion.div>
           ))}
@@ -123,11 +124,19 @@ const CategoryPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto" ref={containerRef}>
+      <div
+        className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto"
+        ref={containerRef}
+      >
         {/* Breadcrumb */}
         <div className="text-sm text-gray-600 self-start">
-          <Link to="/" className="text-green-500 hover:underline">Home</Link> &gt;{" "}
-          <span className="text-gray-900">{selectedCategory || "All Products"}</span>
+          <Link to="/" className="text-green-500 hover:underline">
+            Home
+          </Link>{" "}
+          &gt;{" "}
+          <span className="text-gray-900">
+            {selectedCategory || "All Products"}
+          </span>
         </div>
 
         {/* Sort Controls */}
@@ -180,14 +189,21 @@ const CategoryPage = () => {
         {/* Products */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8 ">
           {categories?.subcategories
-            ?.filter((subcategory) => subcategory.name === selectedCategory)
+            ?.filter((subcategory, index) => {
+              if (selectedCategory === categories.subcategories?.[0]?.name) {
+                return index !== 0;
+              }
+              return subcategory.name === selectedCategory;
+            })
             ?.flatMap((subcategory) =>
               Array.isArray(subcategory.products)
                 ? [...subcategory.products]
                     .sort((a, b) => {
                       const priceA = a.variants?.[0]?.price ?? 0;
                       const priceB = b.variants?.[0]?.price ?? 0;
-                      return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+                      return sortOrder === "asc"
+                        ? priceA - priceB
+                        : priceB - priceA;
                     })
                     .filter((product) => product.isArchive !== true)
                     .map((product, index) => (

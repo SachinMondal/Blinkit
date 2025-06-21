@@ -65,14 +65,20 @@ const AddCategory = () => {
     dispatch(fetchCategories());
   }, [dispatch]);
   const handleBack = () => setStep((prev) => prev - 1);
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => {
-      const updatedFormData = { ...prev, [name]: value };
-      validateFields(step);
-      return updatedFormData;
-    });
-  };
+const handleChange = (e) => {
+  const { name, type, value, checked } = e.target;
+
+  setFormData((prev) => {
+    const updatedFormData = {
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    };
+
+    validateFields(step);
+    return updatedFormData;
+  });
+};
+
 
   const handleImageUpload = (e) => {
     setFormData((prev) => {

@@ -207,7 +207,7 @@ const handleSubmit = () => {
                       <th className="p-3 border border-gray-300">Unit</th>
                       <th className="p-3 border border-gray-300">Price</th>
                       <th className="p-3 border border-gray-300">
-                        Discounted Price
+                        Discount Percent
                       </th>
                     </tr>
                   </thead>

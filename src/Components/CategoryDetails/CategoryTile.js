@@ -19,7 +19,7 @@ const CategoryTile = ({ image, name, discount, subId }) => {
           />
         </div>
         <div className="p-1 text-center">
-          <h3 className="text-sm font-medium">{name}</h3>
+          <h3 className="text-xs font-medium">{name}</h3>
         </div>
       </div>
     </Link>

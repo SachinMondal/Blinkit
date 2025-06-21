@@ -61,8 +61,8 @@ const ViewAll = () => {
       </h2>
 
       {/* Display subcategories and products */}
-      {Array.isArray(subcategories) && subcategories.length > 0 ? (
-        subcategories.map((subcategory) => (
+      {Array.isArray(subcategories) && subcategories.length > 1 ? (
+        subcategories.slice(1).map((subcategory) => (
           <div key={subcategory._id} className="mb-8">
             {/* Subcategory Title */}
             <h3 className="text-xl font-semibold text-gray-700 text-left mb-6">

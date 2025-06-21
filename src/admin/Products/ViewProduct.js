@@ -14,7 +14,7 @@ const ViewProduct = () => {
   useEffect(() => {
     dispatch(getProductById(id));
   }, [dispatch, id]);
-  console.log(product);
+  
 
   return (
     <div

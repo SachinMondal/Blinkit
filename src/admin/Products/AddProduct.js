@@ -499,7 +499,7 @@ const AddProduct = () => {
                   {/* Discount */}
                   <input
                     type="number"
-                    name="discountPrice"
+                    name="discountPercent"
                     value={item.discountPrice || ""}
                     onChange={(e) => handleQtyChange(e, index)}
                     className="border p-2 rounded w-full sm:w-28 text-sm"

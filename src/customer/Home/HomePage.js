@@ -10,8 +10,6 @@ import { getCategoryProduct } from "../../redux/state/product/Action.js";
 import { getBanners } from "../../redux/state/home/Action.js";
 import HomeSkeleton from "../../Components/Skeleton/HomeSkeleton.js";
 
-
-
 const HomePage = () => {
   const dispatch = useDispatch();
   const category = useSelector((state) => state.category.categories);
@@ -45,27 +43,45 @@ const HomePage = () => {
     }, []);
 
   const filteredSections = {
-    featured: {},
-    newArrivals: {},
-    onSale: {},
-    special: {},
-    topCategories: {},
-    bestSeller: {},
+    featured: [],
+    newArrivals: [],
+    onSale: [],
+    special: [],
+    topCategories: [],
+    bestSeller: [],
   };
 
-  Object.entries(data || {}).forEach(([key, category]) => {
+  Object.values(data || {}).forEach((category) => {
     const details = category?.categoryDetails || {};
-    if (details?.isFeatured) filteredSections.featured[key] = category;
-    else if (details?.newArrivals) filteredSections.newArrivals[key] = category;
-    else if (details?.isSale) filteredSections.onSale[key] = category;
-    else if (details?.isSpecial) filteredSections.special[key] = category;
-    else if (details?.isHomePageVisible || details?.isVisible) filteredSections.topCategories[key] = category;
-    else if (details?.isBestSeller || details?.isVisible) filteredSections.bestSeller[key] = category;
+    const products = category?.products || [];
+
+    if (!products.length) return;
+
+    if (details?.isFeatured) filteredSections.featured.push(...products);
+    if (details?.newArrivals) filteredSections.newArrivals.push(...products);
+    if (details?.isSale) filteredSections.onSale.push(...products);
+    if (details?.isSpecial) filteredSections.special.push(...products);
+    if (details?.isHomePageVisible || details?.isVisible) filteredSections.topCategories.push(...products);
+    if (details?.isBestSeller || details?.isVisible) filteredSections.bestSeller.push(...products);
+  });
+
+  // Remove duplicate products (same product might be in multiple sections)
+  const removeDuplicateProducts = (products) => {
+    const seen = new Set();
+    return products.filter((prod) => {
+      if (seen.has(prod._id)) return false;
+      seen.add(prod._id);
+      return true;
+    });
+  };
+
+  Object.keys(filteredSections).forEach((section) => {
+    filteredSections[section] = removeDuplicateProducts(filteredSections[section]);
   });
 
   const bannerSliderSettings = {
     dots: true,
-    infinite: banners?.data?.length > 1,
+    infinite: banners?.data?.length > 1?true:false,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -84,7 +100,7 @@ const HomePage = () => {
       autoplay: itemsLength > baseSlides,
       autoplaySpeed: 2500,
       cssEase: "linear",
-     responsive: [
+      responsive: [
         { breakpoint: 1280, settings: { slidesToShow: Math.min(itemsLength, 5.5) } },
         { breakpoint: 1024, settings: { slidesToShow: Math.min(itemsLength, 4) } },
         { breakpoint: 640, settings: { slidesToShow: Math.min(itemsLength, 2.8) } },
@@ -95,6 +111,15 @@ const HomePage = () => {
   };
 
   const categorySliderSettings = generateSliderSettings(uniqueCategories.length, 6);
+
+  const sectionTitles = {
+    featured: "Featured Products",
+    newArrivals: "New Arrivals",
+    onSale: "On Sale",
+    special: "Special Offers",
+    topCategories: "Top Categories",
+    bestSeller: "Best Sellers",
+  };
 
   return (
     <>
@@ -119,7 +144,7 @@ const HomePage = () => {
             </Slider>
           )}
 
-         {/* Category Section */}
+          {/* Category Section */}
           <div className="w-full max-w-7xl mx-auto mt-4 px-4">
             {uniqueCategories.length > 5 ? (
               <Slider {...categorySliderSettings}>
@@ -147,27 +172,21 @@ const HomePage = () => {
               </div>
             )}
           </div>
+
           {/* Product Sections */}
           <div className="flex flex-col gap-4 px-4">
-            {Object.entries(filteredSections).map(
-              ([sectionName, sectionObject]) =>
-                Object.entries(sectionObject).map(([key, categoryData]) => {
-                  if (!categoryData?.products?.length) return null;
+            {Object.entries(filteredSections).map(([sectionName, products]) => {
+              if (!products.length) return null;
 
-                  return (
-                    <ProductCarousel
-                      key={categoryData.categoryId}
-                      title={
-                        sectionName === "HomePageVisible"
-                          ? categoryData?.categoryDetails?.name || key
-                          : sectionName
-                      }
-                      products={categoryData.products}
-                      categoryId={categoryData.categoryId}
-                    />
-                  );
-                })
-            )}
+              return (
+                <ProductCarousel
+                  key={sectionName}
+                  title={sectionTitles[sectionName] || sectionName}
+                  products={products}
+                  categoryId={null}
+                />
+              );
+            })}
           </div>
         </div>
       )}

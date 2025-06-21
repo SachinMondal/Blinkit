@@ -234,7 +234,7 @@ const ProductPage = () => {
                         initial="initial"
                         animate="animate"
                         exit="exit"
-                        className="w-full max-h-[400px] object-contain rounded-md mx-auto"
+                        className="w-full h-[400px] object-contain rounded-md mx-auto"
                       />
                     </AnimatePresence>
                   </div>

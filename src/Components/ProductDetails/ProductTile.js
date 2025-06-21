@@ -87,67 +87,75 @@ const ProductCard = ({ product, onClick }) => {
       setLoading(false);
     }
   };
-const handleDecrease = async (e) => {
-  e.stopPropagation();
-  if (!selectedVariant || variantIndex === -1) return;
+  const handleDecrease = async (e) => {
+    e.stopPropagation();
+    if (!selectedVariant || variantIndex === -1) return;
 
-  const newQty = count - 1;
-  setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
-  setLoading(true);
+    const newQty = count - 1;
+    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: newQty }));
+    setLoading(true);
 
-  try {
-    if (newQty > 0) {
-      const result = await dispatch(
-        addToCart(product._id, variantIndex, newQty)
-      );
-      if (result) {
-        dispatch(fetchCart());
+    try {
+      if (newQty > 0) {
+        const result = await dispatch(
+          addToCart(product._id, variantIndex, newQty)
+        );
+        if (result) {
+          dispatch(fetchCart());
+        } else {
+          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+        }
       } else {
-        setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+        const result = await dispatch(
+          removeFromCart(product._id, variantIndex)
+        );
+        if (result) {
+          dispatch(fetchCart());
+        } else {
+          setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+        }
       }
-    } else {
-      const result = await dispatch(
-        removeFromCart(product._id, variantIndex)
-      );
-      if (result) {
-        dispatch(fetchCart());
-      } else {
-        setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
-      }
+    } catch (error) {
+      console.error("Error updating cart", error);
+      setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error updating cart", error);
-    setVariantQuantities((prev) => ({ ...prev, [variantIndex]: count }));
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  };
+console.log(product);
   return (
     <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative">
       <div
         className="w-full h-20 bg-gray-100 flex justify-center items-center relative"
         onClick={onClick}
       >
-        <LazyImage
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-contain rounded-md"
-        />
-        {selectedVariant?.discount && (
+        {Array.isArray(product.images) && product.images.length > 0 ? (
+          <LazyImage
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-contain rounded-md"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500 text-sm rounded-md">
+            N/A
+          </div>
+        )}
+
+        {selectedVariant?.discount &&  selectedVariant?.discount>0 ?(
           <span className="absolute top-1 left-1 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-md">
             {selectedVariant?.discount}% OFF
           </span>
+        ):(
+          <span></span>
         )}
       </div>
 
       <div className="text-left mt-2 w-full">
-        <h3 className="text-sm font-medium">{product.name}</h3>
+        <h3 className="text-[9px] font-medium">{product.name}</h3>
 
         {product?.variants?.length > 0 ? (
           <div className="mt-1 flex flex-col space-y-1">
-            <label className="text-xs font-medium text-gray-700">
+            <label className="text-[8px] font-medium text-gray-700">
               Select Variant:
             </label>
             <select
@@ -163,7 +171,7 @@ const handleDecrease = async (e) => {
               {product.variants.map((variant) => (
                 <option key={variant._id} value={variant._id}>
                   {variant.qty} {variant.unit} - ₹
-                  {Math.floor(selectedVariant.price - variant.discountPrice)}
+                  {Math.floor(variant.price - variant.discountPrice)}
                 </option>
               ))}
             </select>

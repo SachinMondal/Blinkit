@@ -180,35 +180,32 @@ const OrdersPage = () => {
             <p className="mt-3 text-gray-600">Loading orders...</p>
           </div>
         ) : filteredOrders.length > 0 ? (
-          <motion.div
-            layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4"
-          >
-            <AnimatePresence>
-              {filteredOrders.map((order) => (
-                <motion.div
-                  key={order._id}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <OrderTile order={order} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20">
-            <LazyImage
-              src={EmptyOrder}
-              alt="No Orders"
-              className="w-32 h-32 mb-4"
-            />
-            <p className="text-gray-600 text-lg">No orders available</p>
-          </div>
-        )}
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4">
+    <AnimatePresence>
+      {filteredOrders.map((order) => (
+        <motion.div
+          key={order._id}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.3 }}
+        >
+          <OrderTile order={order} />
+        </motion.div>
+      ))}
+    </AnimatePresence>
+  </div>
+) : (
+  <div className="flex flex-col items-center justify-center py-20">
+    <LazyImage
+      src={EmptyOrder}
+      alt="No Orders"
+      className="w-32 h-32 mb-4"
+    />
+    <p className="text-gray-600 text-lg">No orders available</p>
+  </div>
+)}
+
       </div>
     </div>
   );
