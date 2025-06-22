@@ -443,7 +443,7 @@ const AddProduct = () => {
             {/* Variants */}
             <div className="col-span-1 sm:col-span-2">
               <label className="block font-semibold mb-1 text-sm">
-                Variants (Net Qty, Unit, Price, Discount Price)*
+                Variants (Net Qty, Unit, Price, Discount Percent)*
               </label>
 
               {formData?.quantities?.map((item, index) => (
@@ -499,7 +499,7 @@ const AddProduct = () => {
                   {/* Discount */}
                   <input
                     type="number"
-                    name="discountPercent"
+                    name="discountPrice"
                     value={item.discountPrice || ""}
                     onChange={(e) => handleQtyChange(e, index)}
                     className="border p-2 rounded w-full sm:w-28 text-sm"
