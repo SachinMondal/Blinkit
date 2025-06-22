@@ -122,7 +122,7 @@ const ProductCard = ({ product, onClick }) => {
       setLoading(false);
     }
   };
-console.log(product);
+
   return (
     <div className="border rounded-lg p-3 shadow-md w-[140px] bg-white flex flex-col items-left h-56 cursor-pointer relative">
       <div

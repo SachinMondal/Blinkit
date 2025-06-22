@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
 import ProductTile from "../ProductDetails/ProductTile";
@@ -12,12 +12,14 @@ const CategoryPage = () => {
   const category = parentCategory;
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location=useLocation();
+  const {selectedCategoryName}=location.state||{};
 
   const categories = useSelector(
     (state) => state.category.categoryAndProduct || []
   );
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(selectedCategoryName);
   const [sortOrder, setSortOrder] = useState("asc");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -27,11 +29,20 @@ const CategoryPage = () => {
     dispatch(getCategoryAndProduct(category));
   }, [dispatch, category]);
 
-  useEffect(() => {
-    if (categories?.subcategories?.length > 0) {
-      setSelectedCategory(categories.subcategories[0].name);
-    }
-  }, [categories]);
+ useEffect(() => {
+  if (
+    categories?.subcategories?.length > 0 &&
+    !selectedCategoryName // only default if not passed
+  ) {
+    setSelectedCategory(categories.subcategories[0].name);
+  } else if (
+    categories?.subcategories?.some(
+      (sub) => sub.name === selectedCategoryName
+    )
+  ) {
+    setSelectedCategory(selectedCategoryName);
+  }
+}, [categories, selectedCategoryName]);
 
   useEffect(() => {
     const handleScroll = () => {

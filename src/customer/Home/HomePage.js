@@ -102,7 +102,7 @@ const HomePage = () => {
       cssEase: "linear",
       responsive: [
         { breakpoint: 1280, settings: { slidesToShow: Math.min(itemsLength, 5.5) } },
-        { breakpoint: 1024, settings: { slidesToShow: Math.min(itemsLength, 4) } },
+        { breakpoint: 1024, settings: { slidesToShow: Math.min(itemsLength, 4.5) } },
         { breakpoint: 640, settings: { slidesToShow: Math.min(itemsLength, 2.8) } },
         { breakpoint: 425, settings: { slidesToShow: Math.min(itemsLength, 2) } },
         { breakpoint: 320, settings: { slidesToShow: Math.min(itemsLength, 1.5) } },
@@ -115,7 +115,7 @@ const HomePage = () => {
   const sectionTitles = {
     featured: "Featured Products",
     newArrivals: "New Arrivals",
-    onSale: "On Sale",
+    onSale: "Sale - Grab it Soon Before Ending",
     special: "Special Offers",
     topCategories: "Top Categories",
     bestSeller: "Best Sellers",

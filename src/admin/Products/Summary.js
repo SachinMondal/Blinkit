@@ -227,7 +227,7 @@ const handleSubmit = () => {
                           ₹{item.price}
                         </td>
                         <td className="p-3 border border-gray-300 whitespace-nowrap">
-                          ₹{item.discountPrice}
+                          {item.discountPrice}%
                         </td>
                       </tr>
                     ))}

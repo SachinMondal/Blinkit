@@ -526,7 +526,7 @@ export default function Navbar({
                         : "bg-white"
                     }`}
                   >
-                    <Link to={`/${sub?.categoryId}/${sub?.id}`}>
+                    <Link to={`/${sub?.categoryId}/${sub?.id}`} state={{selectedCategoryName:sub.name}}>
                       {sub?.name}
                     </Link>
                   </div>
@@ -556,6 +556,7 @@ export default function Navbar({
                         <Link
                           key={sub?._id}
                           to={`/${category?._id}/${sub?._id}`}
+                          state={{selectedCategoryName:sub.name}}
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left text-xs"
                         >
                           {sub?.name}

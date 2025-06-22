@@ -415,9 +415,9 @@ const ProductPage = () => {
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               ₹
                               {Math.floor(
-                                selectedVariant.price -
-                                  selectedVariant.discountPrice -
-                                  selectedVariant.categoryDiscount
+                                variant.price -
+                                  variant.discountPrice -
+                                  variant.categoryDiscount
                               )}
                             </td>
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">

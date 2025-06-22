@@ -64,7 +64,7 @@ export const getAllProducts = () => async (dispatch, getState) => {
     const config = getAuthHeaders(getState);
 
     const {data} = await axios.get(`${API_URL}/api/product/`, config);
-
+    console.log(data.data)
     dispatch({ type: GET_PRODUCTS_SUCCESS, payload: data.data});
   } catch (error) {
     dispatch({

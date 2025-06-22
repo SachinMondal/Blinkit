@@ -48,9 +48,10 @@ const ProductCarousel = ({ title, products, categoryId }) => {
     responsive: [
       { breakpoint: 1280, settings: { slidesToShow: Math.min(products.length, 7) } },
       { breakpoint: 1024, settings: { slidesToShow: Math.min(products.length, 6) } },
-      { breakpoint: 768, settings: { slidesToShow: Math.min(products.length, 5) } },
+      { breakpoint: 768, settings: { slidesToShow: Math.min(products.length, 4) } },
       { breakpoint: 640, settings: { slidesToShow: Math.min(products.length, 2.5) } },
       { breakpoint: 425, settings: { slidesToShow: Math.min(products.length, 2) } },
+      { breakpoint: 350, settings: { slidesToShow: Math.min(products.length, 1) } },
     ],
   };
 
@@ -58,7 +59,7 @@ const ProductCarousel = ({ title, products, categoryId }) => {
   const showRightArrow = currentSlide + visibleSlides < totalSlides;
 
   return (
-    <div className="relative px-4 mt-6 lg:max-w-5xl w-full mb-10">
+    <div className="relative px-4 mt-6 lg:max-w-6xl w-full mb-10">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <p className="text-left font-bold text-2xl capitalize">{title}</p>
