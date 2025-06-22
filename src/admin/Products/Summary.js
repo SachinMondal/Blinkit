@@ -44,19 +44,25 @@ const Summary = () => {
 const handleSubmit = () => {
   setLoading(true);
 
-  // 1. Replace custom units in quantity
-  const updatedQuantities = formData.quantities.map((item) => ({
-    ...item,
-    unit: item.unit === "custom" ? item.customUnit : item.unit,
-  }));
+  const updatedQuantities = formData.quantities.map((item) => {
+    const price = parseFloat(item.price);
+    const discountPrice = parseFloat(item.discountPrice);
 
-  // 2. Initialize FormData for image + text
+    let discount = 0;
+    if (!isNaN(price) && !isNaN(discountPrice) && price > 0 && discountPrice <= price) {
+      discount = ((price - discountPrice) / price) * 100;
+    }
+
+    return {
+      ...item,
+      unit: item.unit === "custom" ? item.customUnit : item.unit,
+      categoryDiscount: Math.max(discount, 0), // ensures no negative value
+    };
+  });
+
   const formDataToSend = new FormData();
-
-  // 3. Append normal fields
   Object.entries(formData).forEach(([key, value]) => {
     if (key === "images") {
-      // Append images properly
       value.forEach((file) => {
         formDataToSend.append("imagePreviews[]", file);
       });
@@ -65,21 +71,18 @@ const handleSubmit = () => {
     } else if (key === "details") {
       formDataToSend.append("details", JSON.stringify(value));
     } else if (typeof value === "boolean") {
-      formDataToSend.append(key, value.toString()); // Convert booleans to string
+      formDataToSend.append(key, value.toString());
     } else {
-      formDataToSend.append(key, value ?? ""); // fallback for null/undefined
+      formDataToSend.append(key, value ?? "");
     }
   });
 
-  // 4. Show loading toast while saving
-  toast.promise(
-    saveSettings(formDataToSend), // Must handle FormData in saveSettings()
-    {
+  toast
+    .promise(saveSettings(formDataToSend), {
       loading: "Saving...",
       success: <b>Product saved!</b>,
       error: <b>Could not save.</b>,
-    }
-  )
+    })
     .then(() => {
       setLoading(false);
       navigate("/admin/products");
@@ -88,6 +91,7 @@ const handleSubmit = () => {
       setLoading(false);
     });
 };
+
 
 
   // Keys to exclude from main table
