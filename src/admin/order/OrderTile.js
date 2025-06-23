@@ -129,7 +129,7 @@ const OrderTile = ({ order }) => {
     }
   };
   return (
-    <div className="bg-white p-4 rounded-xl shadow border border-gray-200 transition hover:shadow-lg w-full max-w-xl mx-auto">
+    <div className="bg-white p-4 rounded-xl shadow border border-gray-200 transition hover:shadow-lg w-full max-w-xl mx-auto max-h-48">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-800">
           <i className="fa-solid fa-user mr-2 text-green-600"></i>
@@ -144,7 +144,7 @@ const OrderTile = ({ order }) => {
         Order ID: <span className="font-medium">#{order?._id || "N/A"}</span>
       </p>
 
-      <p className="text-sm text-gray-600 mt-2">
+      <p className="text-xs text-gray-600 mt-2 truncate">
         <i className="fa-solid fa-hand-holding-dollar mr-2 text-green-500"></i>
         {order?.orderItems
           ?.map((o) => `${o?.productId?.name} x ${o?.quantity}`)

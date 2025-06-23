@@ -4,29 +4,61 @@ import {
   uploadBanner,
   getBanners,
   deleteBanner,
+  fetchCharges,
+  updateCharges,
 } from "../../redux/state/home/Action";
-import { useDispatch, useSelector } from "react-redux";
 import {
   getAllOrdersForAdmin,
   updateOrder,
 } from "../../redux/state/order/Action";
+import { useDispatch, useSelector } from "react-redux";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
   const [deliveryTimes, setDeliveryTimes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const [altText, setAltText] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [deletingBannerId, setDeletingBannerId] = useState(null);
   const [altError, setAltError] = useState("");
-  const dispatch = useDispatch();
+  const [isLoadingOrders, setIsLoadingOrders] = useState(true);
+
+  const [isEditingCharges, setIsEditingCharges] = useState(false);
+  const [deliveryCharge, setDeliveryCharge] = useState(0);
+  const [handlingCharge, setHandlingCharge] = useState(0);
+  const [prevCharges, setPrevCharges] = useState({ delivery: 0, handling: 0 });
+
+
   const banners = useSelector((state) => state.banner.banners || []);
   const orders = useSelector((state) => state.order.adminOrders || []);
+  const {settings,loading}=useSelector((state)=>state.banner);
   useEffect(() => {
     dispatch(getBanners());
-  }, [dispatch, banners.length]);
+  }, [dispatch]);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setIsLoadingOrders(true);
+      await dispatch(getAllOrdersForAdmin());
+      setIsLoadingOrders(false);
+    };
+    fetchOrders();
+  }, [dispatch]);
+useEffect(() => {
+    dispatch(fetchCharges());
+  }, [dispatch]);
+  useEffect(()=>{
+    if(settings){
+      setDeliveryCharge(settings.deliveryCharge||0);
+      setHandlingCharge(settings.handlingCharge||0);
+    }
+  },[settings]);
+
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
     if (file) {
       setSelectedImage({
         file,
@@ -40,32 +72,28 @@ const Dashboard = () => {
       setAltError("Alt text is required.");
       return;
     }
-  
-    setAltError(""); 
+
+    setAltError("");
     setIsUploading(true);
-  
+
     const formData = new FormData();
     formData.append("image", selectedImage.file);
     formData.append("alt", altText);
-  
+
     await dispatch(uploadBanner(formData));
     dispatch(getBanners());
     setSelectedImage(null);
     setAltText("");
     setIsUploading(false);
   };
-  
 
-  const handleDeleteBanner = async (id) => {
-    await dispatch(deleteBanner(id));
-    dispatch(getBanners());
-  };
   const handleDeleteBannerWithAnimation = async (id) => {
     setDeletingBannerId(id);
-    setTimeout(() => {
-      handleDeleteBanner(id);
+    setTimeout(async () => {
+      await dispatch(deleteBanner(id));
+      dispatch(getBanners());
       setDeletingBannerId(null);
-    }, 1000);
+    }, 800);
   };
 
   const handleDeliveryTimeChange = (orderId, value) => {
@@ -78,87 +106,99 @@ const Dashboard = () => {
     );
   };
 
-  useEffect(() => {
-    dispatch(getAllOrdersForAdmin());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orders.length]);
   const filteredOrders = orders.filter(
-    (order) => order.orderStatus !== "Pending"
+    (order) => order.orderStatus === "Pending"
   );
-  
-  return (
-    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {/* Live Orders */}
-      <div className="bg-white p-5 rounded-lg shadow col-span-1 md:col-span-2 lg:col-span-3 min-h-[250px] flex flex-col items-center justify-center">
-        <h3 className="text-xl font-semibold mb-4">Live Orders</h3>
-        {orders.length > 0 ? (
-          <div className="max-h-60 overflow-y-auto w-full">
-            <ul className="divide-y divide-gray-200">
-              {filteredOrders.map((order) => (
-                <li
-                  key={order._id}
-                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-3 gap-2"
-                >
-                  <div>
-                    <h4 className="font-semibold">{order.user.name}</h4>
-                    <p className="text-gray-500">
-                      {order?.orderItems
-                        ?.map((o) => `${o.productId?.name} x ${o.quantity}`)
-                        .join(", ")}{" "}
-                      items - {order.orderStatus}
-                    </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <span className="text-gray-700">{order.subtotalPrice}</span>
+ const handleEditClick = () => {
+    setPrevCharges({ delivery: deliveryCharge, handling: handlingCharge });
+    setIsEditingCharges(true);
+  };
 
-                    <select
-                      value={
-                        deliveryTimes[order._id] || order.deliveryTime || ""
-                      }
-                      onChange={(e) =>
+  const handleCancelClick = () => {
+    setDeliveryCharge(prevCharges.delivery);
+    setHandlingCharge(prevCharges.handling);
+    setIsEditingCharges(false);
+  };
+
+  const handleSaveClick = async () => {
+    await dispatch(updateCharges(Number(deliveryCharge), Number(handlingCharge)));
+    setIsEditingCharges(false);
+  };
+  return (
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Live Orders */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white p-6 rounded-lg shadow col-span-full"
+      >
+        <h3 className="text-2xl font-semibold mb-4">📦 Live Orders</h3>
+        {isLoadingOrders ? (
+          <motion.div
+            className="flex justify-center items-center h-40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ repeat: Infinity, duration: 1, repeatType: "mirror" }}
+          >
+            <p className="text-gray-500 text-lg animate-pulse">
+              Loading orders...
+            </p>
+          </motion.div>
+        ) : filteredOrders.length > 0 ? (
+          <ul className="max-h-60 overflow-y-auto divide-y divide-gray-200">
+            {filteredOrders.map((order) => (
+              <li
+                key={order._id}
+                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-2"
+              >
+                <div>
+                  <h4 className="font-semibold">{order.user.name}</h4>
+                  <p className="text-gray-500 text-sm">
+                    {order.orderItems
+                      .map((item) => `${item.productId?.name} x ${item.quantity}`)
+                      .join(", ")}{" "}
+                    - {order.orderStatus}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                  <span className="text-gray-800 font-semibold">
+                    ₹{order.subtotalPrice}
+                  </span>
+                  <select
+                    value={
+                      deliveryTimes[order._id] || order.deliveryTime || ""
+                    }
+                    onChange={(e) =>
+                      handleDeliveryTimeChange(order._id, e.target.value)
+                    }
+                    className="p-2 border rounded bg-gray-100 text-sm"
+                  >
+                    <option value="" disabled>
+                      Select Time
+                    </option>
+                    {["10 mins", "20 mins", "30 mins", "1 Hour"].map((time) => (
+                      <option key={time} value={time}>
+                        {time}
+                      </option>
+                    ))}
+                    <option value="custom">Custom</option>
+                  </select>
+
+                  {deliveryTimes[order._id] === "custom" && (
+                    <input
+                      type="text"
+                      placeholder="Custom time"
+                      className="p-2 border rounded text-sm"
+                      onBlur={(e) =>
                         handleDeliveryTimeChange(order._id, e.target.value)
                       }
-                      className="p-2 border rounded bg-gray-100 text-sm"
-                    >
-                      <option value="" disabled>
-                        Select Time
-                      </option>
-
-                      {["10 mins", "20 mins", "30 mins", "1 Hour"].map(
-                        (time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        )
-                      )}
-
-                      {order.deliveryTime &&
-                        !["30 mins", "1 hour", "2 hours"].includes(
-                          order.deliveryTime
-                        ) && (
-                          <option value={order.deliveryTime}>
-                            {order.deliveryTime}
-                          </option>
-                        )}
-
-                      <option value="custom">Custom</option>
-                    </select>
-
-                    {deliveryTimes[order._id] === "custom" && (
-                      <input
-                        type="text"
-                        placeholder="Enter custom time"
-                        className="p-2 border rounded text-sm"
-                        onBlur={(e) =>
-                          handleDeliveryTimeChange(order._id, e.target.value)
-                        }
-                      />
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
+                    />
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         ) : (
           <div className="flex flex-col items-center text-center">
             <LazyImage
@@ -167,17 +207,23 @@ const Dashboard = () => {
               className="w-40 h-40 opacity-75"
             />
             <p className="mt-4 text-gray-600 text-lg italic">
-              "No orders yet. Stay patient, great things take time."
+              "No pending orders currently."
             </p>
           </div>
         )}
-      </div>
-      {/* Banners */}
-      <div className="bg-white p-6 rounded-lg shadow col-span-1 md:col-span-2 lg:col-span-3">
-        <h3 className="text-xl font-semibold mb-4">Home Screen Banners</h3>
+      </motion.div>
 
-        {/* Upload Image */}
-        <div className="mb-4 flex items-center space-x-4">
+      {/* Banner Management */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white p-6 rounded-lg shadow col-span-full"
+      >
+        <h3 className="text-2xl font-semibold mb-4">🖼️ Home Screen Banners</h3>
+
+        {/* Upload Section */}
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-4">
           <label className="bg-green-500 text-white px-4 py-2 rounded cursor-pointer">
             Select Image
             <input
@@ -205,43 +251,46 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Alt Text Input */}
         {selectedImage && (
-          <div className="mb-4">
+          <>
             <input
               type="text"
               placeholder="Enter alt text"
               value={altText}
               onChange={(e) => {
                 setAltText(e.target.value);
-                if (e.target.value.trim()) setAltError(""); 
+                if (e.target.value.trim()) setAltError("");
               }}
-              className="p-2 border rounded w-full"
+              className="p-2 border rounded w-full mb-2"
             />
-          </div>
-        )}
-        {altError && <p className="text-red-500 text-sm mt-1">{altError}</p>}
-
-        {/* Submit Button */}
-        {selectedImage && (
-          <button
-            onClick={handleSubmitBanner}
-            disabled={isUploading}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            {isUploading ? "Uploading..." : "Submit"}
-          </button>
+            {altError && (
+              <p className="text-red-500 text-sm mb-2">{altError}</p>
+            )}
+            <button
+              onClick={handleSubmitBanner}
+              disabled={isUploading}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              {isUploading ? "Uploading..." : "Submit"}
+            </button>
+          </>
         )}
 
         {/* Display Banners */}
-        {banners?.data?.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {banners?.data?.map((banner) => (
-              <div key={banner.id} className="relative">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+          {banners?.data?.length > 0 ? (
+            banners?.data?.map((banner) => (
+              <motion.div
+                key={banner._id}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="relative"
+              >
                 <LazyImage
                   src={banner.image}
                   alt={banner.alt}
-                  className={`rounded-lg shadow-lg w-full h-20 object-cover transition-all duration-500 ${
+                  className={`rounded-lg shadow w-full h-20 object-cover transition-all duration-500 ${
                     deletingBannerId === banner._id
                       ? "opacity-30 animate-pulse"
                       : "opacity-100"
@@ -253,20 +302,99 @@ const Dashboard = () => {
                 >
                   ✖
                 </button>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center p-6 text-gray-500 italic">
-            <LazyImage
-              src="https://i.imgur.com/qIufhof.png"
-              alt="No banners"
-              className="w-40 h-40 opacity-75"
+              </motion.div>
+            ))
+          ) : (
+            <div className="col-span-full flex flex-col items-center text-center">
+              <LazyImage
+                src="https://i.imgur.com/qIufhof.png"
+                alt="No banners"
+                className="w-40 h-40 opacity-75"
+              />
+              <p className="mt-4 text-gray-500 italic">
+                "No banners uploaded yet."
+              </p>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Charges Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-white p-6 rounded-lg shadow col-span-full"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-2xl font-semibold">⚙️ Charges Settings</h3>
+          {!isEditingCharges ? (
+            <button
+              onClick={handleEditClick}
+              className="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Edit
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleSaveClick}
+                disabled={loading}
+                className={`text-sm px-4 py-2 rounded ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed text-white"
+                    : "bg-green-600 text-white hover:bg-green-700"
+                }`}
+              >
+                {loading ? "Saving..." : "Save"}
+              </button>
+              <button
+                onClick={handleCancelClick}
+                className="text-sm bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Delivery Charge (₹)
+            </label>
+            <input
+              type="number"
+              value={deliveryCharge}
+              onChange={(e) => setDeliveryCharge(e.target.value)}
+              disabled={!isEditingCharges}
+              className={`w-full px-4 py-2 border rounded-md shadow-sm ${
+                isEditingCharges
+                  ? "focus:ring-2 focus:ring-green-500"
+                  : "bg-gray-100 cursor-not-allowed"
+              }`}
+              placeholder="e.g. 30"
             />
-            <p className="mt-4">"No banners uploaded yet."</p>
           </div>
-        )}
-      </div>
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">
+              Handling Charge (₹)
+            </label>
+            <input
+              type="number"
+              value={handlingCharge}
+              onChange={(e) => setHandlingCharge(e.target.value)}
+              disabled={!isEditingCharges}
+              className={`w-full px-4 py-2 border rounded-md shadow-sm ${
+                isEditingCharges
+                  ? "focus:ring-2 focus:ring-green-500"
+                  : "bg-gray-100 cursor-not-allowed"
+              }`}
+              placeholder="e.g. 10"
+            />
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

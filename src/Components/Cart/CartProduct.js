@@ -82,7 +82,7 @@ const CartProduct = ({ item }) => {
         )}
 
         <div className="flex-1">
-          <h3 className="text-sm font-semibold">
+          <h3 className="text-xs font-semibold">
             {item?.product?.name || "Unnamed Product"}
           </h3>
           <p className="text-xs line-through text-gray-600">

@@ -8,7 +8,13 @@ import {
     GET_BANNER_FAILURE,
     DELETE_BANNER_REQUEST,
     DELETE_BANNER_SUCCESS,
-    DELETE_BANNER_FAILURE
+    DELETE_BANNER_FAILURE,
+    GET_SETTINGS_REQUEST,
+    GET_SETTINGS_SUCCESS,
+    GET_SETTINGS_FAILURE,
+    UPDATE_SETTINGS_REQUEST,
+    UPDATE_SETTINGS_SUCCESS,
+    UPDATE_SETTINGS_FAILURE
 } from "./ActionType";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -61,4 +67,42 @@ export const deleteBanner = (id) => async (dispatch,getState) => {
             payload: error.response?.data.message || error.message,
         });
     }
+};
+
+export const fetchCharges = () => async (dispatch,getState) => {
+  dispatch({ type: GET_SETTINGS_REQUEST });
+
+  try {
+    const token=getState().auth.token;
+    const { data } = await axios.get(`${API_URL}/api/other/settings`,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },});
+    dispatch({ type: GET_SETTINGS_SUCCESS, payload: data.settings });
+  } catch (error) {
+    dispatch({
+      type: GET_SETTINGS_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
+};
+
+// UPDATE Settings
+export const updateCharges = (deliveryCharge, handlingCharge) => async (dispatch,getState) => {
+  dispatch({ type: UPDATE_SETTINGS_REQUEST });
+
+  try {
+    const token=getState().auth.token;
+    const { data } = await axios.post(`${API_URL}/api/other/settings`, { deliveryCharge, handlingCharge },{
+        headers:{
+              Authorization: `Bearer ${token}`,
+        }
+    });
+    dispatch({ type: UPDATE_SETTINGS_SUCCESS, payload: data.settings });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_SETTINGS_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+  }
 };

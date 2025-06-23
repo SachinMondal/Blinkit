@@ -5,6 +5,7 @@ import { getAllAddresses } from "../../redux/state/address/Action";
 import { createOrder } from "../../redux/state/order/Action";
 import { clearCart } from "../../redux/state/cart/Action";
 import { toggleAuthModal } from "../../redux/state/ui/Action";
+import { fetchCharges } from "../../redux/state/home/Action";
 const CartSummary = ({ cartItems }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -15,10 +16,14 @@ const CartSummary = ({ cartItems }) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [showDiscountDetails, setShowDiscountDetails] = useState(false);
-
+const {settings}=useSelector((state)=>state.banner);
   useEffect(() => {
     dispatch(getAllAddresses());
   }, [dispatch]);
+
+  useEffect(()=>{
+    dispatch(fetchCharges());
+  },[dispatch]);
 
   const totalItemPrice = cartItems?.totalCartAmount || 0;
   const cartSize = cartItems?.totalCartSize || 0;
@@ -27,8 +32,8 @@ const CartSummary = ({ cartItems }) => {
     ? Number(cartItems.totalCartDiscountAmount.toFixed(2))
     : 0;
 
-  const handlingCharge = 10;
-  const deliveryCharge = 40;
+  const handlingCharge = settings.handlingCharge;
+  const deliveryCharge = settings.deliveryCharge;
 
   const discountedTotal = Number(cartItems?.totalCartDiscountedPrice) || 0;
   const rawTotal = (discountedTotal + handlingCharge + deliveryCharge).toFixed(

@@ -178,7 +178,10 @@ const OrdersPage = () => {
             <p className="mt-3 text-gray-600">Loading orders...</p>
           </div>
         ) : (
-          <>
+          <motion.div
+            layout
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4"
+          >
             {/* AnimatePresence is always rendered */}
             <AnimatePresence mode="wait">
               {filteredOrders.length > 0
@@ -207,7 +210,7 @@ const OrdersPage = () => {
                 <p className="text-gray-600 text-lg">No orders available</p>
               </div>
             )}
-          </>
+          </motion.div>
         )}
       </div>
     </div>
