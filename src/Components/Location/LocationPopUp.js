@@ -64,7 +64,11 @@ const LocationModal = ({ onClose, onLocationSelect }) => {
   };
 
   return (
-    <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-start z-50">
+    <motion.div
+    initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+     className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-start z-50">
       <div className="bg-gray-200 p-6 rounded-lg shadow-lg w-96 border border-gray-300 m-4 relative">
         <button
           className="absolute top-2 right-2 text-gray-500"
