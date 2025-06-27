@@ -86,10 +86,10 @@ const CartProduct = ({ item }) => {
             {item?.product?.name || "Unnamed Product"}
           </h3>
           <p className="text-xs line-through text-gray-600">
-            ₹{Number(item.subtotalPrice).toFixed(2)} /each
+            ₹{Number(item.subtotalPrice).toFixed(2)} 
           </p>
           <p className="text-xs text-gray-600">
-            ₹{Number(price).toFixed(2)} /each
+            ₹{Number(price).toFixed(2)} 
           </p>
         </div>
 

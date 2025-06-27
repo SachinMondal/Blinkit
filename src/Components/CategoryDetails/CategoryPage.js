@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ChevronUp } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,37 +12,37 @@ const CategoryPage = () => {
   const category = parentCategory;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location=useLocation();
-  const {selectedCategoryName}=location.state||{};
+  const location = useLocation();
+  const { selectedCategoryName } = location.state || {};
 
-  const categories = useSelector(
-    (state) => state.category.categoryAndProduct || []
+  const { categoryAndProduct: categories, loading } = useSelector(
+    (state) => state.category
   );
 
   const [selectedCategory, setSelectedCategory] = useState(selectedCategoryName);
   const [sortOrder, setSortOrder] = useState("asc");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const containerRef = useRef(null);
 
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
+    window.scrollTo(0, 0);
   }, [dispatch, category]);
 
- useEffect(() => {
-  if (
-    categories?.subcategories?.length > 0 &&
-    !selectedCategoryName // only default if not passed
-  ) {
-    setSelectedCategory(categories.subcategories[0].name);
-  } else if (
-    categories?.subcategories?.some(
-      (sub) => sub.name === selectedCategoryName
-    )
-  ) {
-    setSelectedCategory(selectedCategoryName);
-  }
-}, [categories, selectedCategoryName]);
+  useEffect(() => {
+    if (
+      categories?.subcategories?.length > 0 &&
+      !selectedCategoryName
+    ) {
+      setSelectedCategory(categories.subcategories[0].name);
+    } else if (
+      categories?.subcategories?.some(
+        (sub) => sub.name === selectedCategoryName
+      )
+    ) {
+      setSelectedCategory(selectedCategoryName);
+    }
+  }, [categories, selectedCategoryName]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,9 +68,10 @@ const CategoryPage = () => {
   const handleCategoryClick = (name) => {
     setSelectedCategory(name);
   };
+
   return (
     <div className="max-w-6xl mx-auto p-0 sm:p-4 flex flex-col md:flex-row">
-      {/* Left Sidebar on Desktop */}
+      {/* Sidebar (Desktop) */}
       <div className="hidden md:block w-1/4 min-w-[4rem] border-r p-2 sm:p-6 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
         <ul className="flex flex-col w-full">
           {categories?.subcategories?.map((cat, index) => (
@@ -107,7 +108,7 @@ const CategoryPage = () => {
         </ul>
       </div>
 
-      {/* Top Horizontal Scroll for Mobile */}
+      {/* Top Scrollable Menu (Mobile) */}
       <div className="md:hidden w-full overflow-x-auto scrollbar-hide border-b py-3">
         <div className="flex gap-4 px-2">
           {categories?.subcategories?.map((cat, index) => (
@@ -135,19 +136,11 @@ const CategoryPage = () => {
       </div>
 
       {/* Main Content */}
-      <div
-        className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto"
-        ref={containerRef}
-      >
+      <div className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto">
         {/* Breadcrumb */}
         <div className="text-sm text-gray-600 self-start">
-          <Link to="/" className="text-green-500 hover:underline">
-            Home
-          </Link>{" "}
-          &gt;{" "}
-          <span className="text-gray-900">
-            {selectedCategory || "All Products"}
-          </span>
+          <Link to="/" className="text-green-500 hover:underline">Home</Link> &gt;{" "}
+          <span className="text-gray-900">{selectedCategory || "All Products"}</span>
         </div>
 
         {/* Sort Controls */}
@@ -197,39 +190,45 @@ const CategoryPage = () => {
           </div>
         </div>
 
-        {/* Products */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8 ">
-          {categories?.subcategories
-            ?.filter((subcategory, index) => {
-              if (selectedCategory === categories.subcategories?.[0]?.name) {
-                return index !== 0;
-              }
-              return subcategory.name === selectedCategory;
-            })
-            ?.flatMap((subcategory) =>
-              Array.isArray(subcategory.products)
-                ? [...subcategory.products]
-                    .sort((a, b) => {
-                      const priceA = a.variants?.[0]?.price ?? 0;
-                      const priceB = b.variants?.[0]?.price ?? 0;
-                      return sortOrder === "asc"
-                        ? priceA - priceB
-                        : priceB - priceA;
-                    })
-                    .filter((product) => product.isArchive !== true)
-                    .map((product, index) => (
-                      <ProductTile
-                        key={product._id || index}
-                        product={product}
-                        onClick={() => handleProductClick(product._id)}
-                      />
-                    ))
-                : []
-            )}
-        </div>
+        {/* Products or Loader */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64 w-full">
+            <div className="w-12 h-12 border-4 border-green-500 border-dashed rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
+            {categories?.subcategories
+              ?.filter((subcategory, index) => {
+                if (selectedCategory === categories.subcategories?.[0]?.name) {
+                  return index !== 0;
+                }
+                return subcategory.name === selectedCategory;
+              })
+              ?.flatMap((subcategory) =>
+                Array.isArray(subcategory.products)
+                  ? [...subcategory.products]
+                      .sort((a, b) => {
+                        const priceA = a.variants?.[0]?.price ?? 0;
+                        const priceB = b.variants?.[0]?.price ?? 0;
+                        return sortOrder === "asc"
+                          ? priceA - priceB
+                          : priceB - priceA;
+                      })
+                      .filter((product) => product.isArchive !== true)
+                      .map((product, index) => (
+                        <ProductTile
+                          key={product._id || index}
+                          product={product}
+                          onClick={() => handleProductClick(product._id)}
+                        />
+                      ))
+                  : []
+              )}
+          </div>
+        )}
       </div>
 
-      {/* Scroll to Top */}
+      {/* Scroll to Top Button */}
       {showScrollButton && (
         <button
           className="fixed bottom-6 right-6 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-700 flex items-center"
