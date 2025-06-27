@@ -168,14 +168,14 @@ const Profile = () => {
                               {/* Address Details */}
                               <div className="col-span-9">
                                 <p className="font-bold">
-                                  {addr.firstName} {addr.lastName}
+                                  {addr?.firstName} {addr?.lastName}
                                 </p>
                                 <p className="text-gray-600">
-                                  {addr.streetAddress}, {addr.city},{" "}
-                                  {addr.state}, {addr.zipCode}
+                                  {addr?.streetAddress}, {addr?.city},{" "}
+                                  {addr?.state}, {addr?.zipCode}
                                 </p>
                                 <p className="text-gray-500 text-sm">
-                                  Mobile: {addr.mobile}
+                                  Mobile: {addr?.mobile}
                                 </p>
                               </div>
 

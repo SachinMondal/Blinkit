@@ -19,10 +19,20 @@ const CategoryPage = () => {
     (state) => state.category
   );
 
-  const [selectedCategory, setSelectedCategory] = useState(selectedCategoryName);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortOrder, setSortOrder] = useState("asc");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
+
+  // Add "All" as a synthetic subcategory
+  const allCategory = {
+    _id: "all",
+    name: "All",
+    image: "/placeholder-all.png", // Replace with your default image path
+  };
+  const subcategoriesWithAll = categories?.subcategories
+    ? [allCategory, ...categories.subcategories]
+    : [];
 
   useEffect(() => {
     dispatch(getCategoryAndProduct(category));
@@ -30,11 +40,8 @@ const CategoryPage = () => {
   }, [dispatch, category]);
 
   useEffect(() => {
-    if (
-      categories?.subcategories?.length > 0 &&
-      !selectedCategoryName
-    ) {
-      setSelectedCategory(categories.subcategories[0].name);
+    if (!selectedCategoryName) {
+      setSelectedCategory("All");
     } else if (
       categories?.subcategories?.some(
         (sub) => sub.name === selectedCategoryName
@@ -74,44 +81,38 @@ const CategoryPage = () => {
       {/* Sidebar (Desktop) */}
       <div className="hidden md:block w-1/4 min-w-[4rem] border-r p-2 sm:p-6 min-h-screen lg:max-h-screen overflow-y-auto scrollbar-hide">
         <ul className="flex flex-col w-full">
-          {categories?.subcategories?.map((cat, index) => (
-            <div key={cat._id}>
-              <li
-                className={`p-2 cursor-pointer rounded flex items-center w-full relative ${
+          {subcategoriesWithAll.map((cat) => (
+            <li
+              key={cat._id}
+              className={`p-2 cursor-pointer rounded flex items-center w-full relative ${
+                selectedCategory === cat.name
+                  ? "bg-green-200 font-bold"
+                  : "hover:bg-gray-100"
+              }`}
+              onClick={() => handleCategoryClick(cat.name)}
+            >
+              <div
+                className={`absolute right-0 lg:left-0 top-0 h-full w-1 rounded-md transition-all duration-200 ${
                   selectedCategory === cat.name
-                    ? "bg-green-200 font-bold"
-                    : "hover:bg-gray-100"
+                    ? "bg-green-700"
+                    : "bg-transparent"
                 }`}
-                onClick={() => handleCategoryClick(cat.name)}
-              >
-                <div
-                  className={`absolute right-0 lg:left-0 top-0 h-full w-1 rounded-md transition-all duration-200 ${
-                    selectedCategory === cat.name
-                      ? "bg-green-700"
-                      : "bg-transparent"
-                  }`}
-                ></div>
-                <LazyImage
-                  src={cat.image}
-                  alt={cat.name}
-                  className="w-10 h-10 object-contain rounded-md"
-                />
-                <span className="ml-4 text-sm truncate">
-                  {index === 0 ? "All" : cat.name}
-                </span>
-              </li>
-              {index !== categories.subcategories.length - 1 && (
-                <hr className="border-gray-200 my-2" />
-              )}
-            </div>
+              ></div>
+              <LazyImage
+                src={cat.image}
+                alt={cat.name}
+                className="w-10 h-10 object-contain rounded-md"
+              />
+              <span className="ml-4 text-sm truncate">{cat.name}</span>
+            </li>
           ))}
         </ul>
       </div>
 
-      {/* Top Scrollable Menu (Mobile) */}
+      {/* Mobile Scrollable Categories */}
       <div className="md:hidden w-full overflow-x-auto scrollbar-hide border-b py-3">
         <div className="flex gap-4 px-2">
-          {categories?.subcategories?.map((cat, index) => (
+          {subcategoriesWithAll.map((cat) => (
             <motion.div
               whileTap={{ scale: 0.95 }}
               key={cat._id}
@@ -128,7 +129,7 @@ const CategoryPage = () => {
                 className="w-12 h-12 object-contain rounded-full"
               />
               <span className="text-xs mt-1 text-center max-w-[60px] truncate">
-                {index === 0 ? "All" : cat.name}
+                {cat.name}
               </span>
             </motion.div>
           ))}
@@ -139,8 +140,13 @@ const CategoryPage = () => {
       <div className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto">
         {/* Breadcrumb */}
         <div className="text-sm text-gray-600 self-start">
-          <Link to="/" className="text-green-500 hover:underline">Home</Link> &gt;{" "}
-          <span className="text-gray-900">{selectedCategory || "All Products"}</span>
+          <Link to="/" className="text-green-500 hover:underline">
+            Home
+          </Link>{" "}
+          &gt;{" "}
+          <span className="text-gray-900">
+            {selectedCategory || "All Products"}
+          </span>
         </div>
 
         {/* Sort Controls */}
@@ -197,33 +203,25 @@ const CategoryPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-8">
-            {categories?.subcategories
-              ?.filter((subcategory, index) => {
-                if (selectedCategory === categories.subcategories?.[0]?.name) {
-                  return index !== 0;
-                }
-                return subcategory.name === selectedCategory;
+            {(selectedCategory === "All"
+              ? categories?.subcategories?.flatMap((sub) => sub.products || [])
+              : categories?.subcategories
+                  ?.find((sub) => sub.name === selectedCategory)
+                  ?.products || []
+            )
+              .filter((product) => !product.isArchive)
+              .sort((a, b) => {
+                const priceA = a?.variants?.[0]?.price ?? Infinity;
+                const priceB = b?.variants?.[0]?.price ?? Infinity;
+                return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
               })
-              ?.flatMap((subcategory) =>
-                Array.isArray(subcategory.products)
-                  ? [...subcategory.products]
-                      .sort((a, b) => {
-                        const priceA = a.variants?.[0]?.price ?? 0;
-                        const priceB = b.variants?.[0]?.price ?? 0;
-                        return sortOrder === "asc"
-                          ? priceA - priceB
-                          : priceB - priceA;
-                      })
-                      .filter((product) => product.isArchive !== true)
-                      .map((product, index) => (
-                        <ProductTile
-                          key={product._id || index}
-                          product={product}
-                          onClick={() => handleProductClick(product._id)}
-                        />
-                      ))
-                  : []
-              )}
+              .map((product, index) => (
+                <ProductTile
+                  key={product._id || index}
+                  product={product}
+                  onClick={() => handleProductClick(product._id)}
+                />
+              ))}
           </div>
         )}
       </div>
