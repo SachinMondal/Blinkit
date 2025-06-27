@@ -31,7 +31,7 @@ const {settings}=useSelector((state)=>state.banner);
   const discount = cartItems?.totalCartDiscountAmount
     ? Number(cartItems.totalCartDiscountAmount.toFixed(2))
     : 0;
-  console.log(settings);
+
 
   const handlingCharge = settings?.handlingCharge || 0;
   const deliveryCharge = settings?.deliveryCharge||0;

@@ -19,6 +19,7 @@ import Cart from "../Components/Cart/CartPage";
 import PageNotFound from "../customer/PageNotFound/PageNotFound";
 import AboutUs from "../Components/AboutUs/Aboutus";
 import ScrollToTop from "../Components/utils/ScrollToTop/ScrollToTop";
+import { AnimatePresence } from "framer-motion";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -51,24 +52,26 @@ function Customer() {
     }
   }, [user]);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsFooterVisible(entry.isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
+ useEffect(() => {
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      setIsFooterVisible(entry.isIntersecting);
+    },
+    { threshold: 0.1 }
+  );
 
-    if (footerRef.current) {
-      observer.observe(footerRef.current);
+  const footerNode = footerRef.current;
+
+  if (footerNode) {
+    observer.observe(footerNode);
+  }
+
+  return () => {
+    if (footerNode) {
+      observer.unobserve(footerNode); // ✅ Cleanly disconnect observed node, not live ref
     }
-
-    return () => {
-      if (footerRef.current) {
-        observer.unobserve(footerRef.current);
-      }
-    };
-  }, []);
+  };
+}, []);
 
   useEffect(() => {
   if (user && user.location) {
@@ -86,12 +89,14 @@ function Customer() {
 
   return (
     <div className="App">
+      <AnimatePresence>
       {isModalOpen && (
         <LocationModal
           onClose={() => setIsModalOpen(false)}
           onLocationSelect={handleLocationSelect}
         />
       )}
+      </AnimatePresence>
 
       <Navbar location={userLocation} isLoggedIn={!!token} isAdmin={isAdmin} setLocationModal={setIsModalOpen} />
 <ScrollToTop />

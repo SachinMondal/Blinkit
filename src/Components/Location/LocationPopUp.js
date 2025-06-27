@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateUserLocation } from "../../redux/state/auth/Action";
-
+import {motion} from "framer-motion";
 const LocationModal = ({ onClose, onLocationSelect }) => {
   const [location, setLocation] = useState("");
   const [latitude, setLatitude] = useState(null);
@@ -64,7 +64,7 @@ const LocationModal = ({ onClose, onLocationSelect }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-start z-50">
+    <motion.div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-start z-50">
       <div className="bg-gray-200 p-6 rounded-lg shadow-lg w-96 border border-gray-300 m-4 relative">
         <button
           className="absolute top-2 right-2 text-gray-500"
@@ -127,7 +127,7 @@ const LocationModal = ({ onClose, onLocationSelect }) => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
