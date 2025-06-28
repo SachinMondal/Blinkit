@@ -1,14 +1,15 @@
 import { Button } from "@mui/material";
 import { useState, useEffect, useRef } from "react";
-import SignUp from "../../customer/auth/SignUp";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../../images/logo.png";
-import { getCategoriesAndSubCategories } from "../../redux/state/category/Action";
 import { useDispatch, useSelector } from "react-redux";
+import { getCategoriesAndSubCategories } from "../../redux/state/category/Action";
 import { fetchCart } from "../../redux/state/cart/Action";
 import { searchProducts } from "../../redux/state/product/Action";
 import LazyImage from "../utils/LazyLoading/LazyLoading";
 import { toggleAuthModal } from "../../redux/state/ui/Action";
+import SignUp from "../../customer/auth/SignUp";
+
 export default function Navbar({
   isLoggedIn,
   location,
@@ -16,33 +17,58 @@ export default function Navbar({
   isAdmin,
 }) {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const sideBarRef = useRef(null);
+  const searchRef = useRef(null);
+
   const categories = useSelector((state) => state.category.categories);
   const cartSum = useSelector((state) => state.cart.cart);
+  const searchResult = useSelector((state) => state.product.searchResult);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [isSticky, setIsSticky] = useState(false);
   const [categoryTop, setCategoryTop] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
   const [query, setQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const searchRef = useRef(null);
-  const navigate = useNavigate();
-  const searchResult = useSelector((state) => state.product.searchResult);
+  // Handle sidebar outside click
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleSidebarClickOutside = (event) => {
       if (sideBarRef.current && !sideBarRef.current.contains(event.target)) {
         setIsSidebarOpen(false);
       }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setIsSidebarOpen]);
+
+    document.addEventListener("mousedown", handleSidebarClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleSidebarClickOutside);
+  }, []);
+
+  // Handle search dropdown outside click
+  useEffect(() => {
+    const handleSearchClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleSearchClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleSearchClickOutside);
+  }, []);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Sticky category bar logic
   useEffect(() => {
     const categoryList = document.getElementById("category-list");
     if (categoryList) {
@@ -50,46 +76,24 @@ export default function Navbar({
     }
 
     const handleScroll = () => {
-      if (window.scrollY > categoryTop + 10) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
+      setIsSticky(window.scrollY > categoryTop + 10);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [categoryTop]);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  // Fetch categories on mount
   useEffect(() => {
     dispatch(getCategoriesAndSubCategories());
   }, [dispatch]);
-  const [activeCategory, setActiveCategory] = useState(null);
 
-  const handleCategoryClick = (categoryName) => {
-    setActiveCategory((prev) => (prev === categoryName ? null : categoryName));
-  };
-
-  const handleCategorySelection = (categoryName) => {
-    if (selectedCategory === categoryName) {
-      setSelectedCategory("");
-      navigate("/");
-    } else {
-      setSelectedCategory(categoryName);
-    }
-    handleCategoryClick(categoryName);
-  };
-
+  // Fetch cart
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
 
+  // Handle search debounce
   useEffect(() => {
     const trimmedQuery = query.trim();
 
@@ -104,18 +108,22 @@ export default function Navbar({
       setShowDropdown(false);
     }
   }, [query, dispatch]);
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  // Handle category toggle
+  const handleCategoryClick = (categoryName) => {
+    setActiveCategory((prev) => (prev === categoryName ? null : categoryName));
+  };
+
+  // Handle category selection
+  const handleCategorySelection = (categoryName) => {
+    if (selectedCategory === categoryName) {
+      setSelectedCategory("");
+      navigate("/");
+    } else {
+      setSelectedCategory(categoryName);
+    }
+    handleCategoryClick(categoryName);
+  };
   return (
     <div
       className={`${isMobile ? "" : "sticky top-0"}  bg-gray-100 z-40 ${
@@ -129,7 +137,9 @@ export default function Navbar({
             : "flex justify-center w-full"
         }`}
       >
-        <div className={`flex justify-around w-full max-w-6xl md:max-2-5xl xl:max-w-full mx-auto `}>
+        <div
+          className={`flex justify-around w-full max-w-6xl md:max-2-5xl xl:max-w-full mx-auto `}
+        >
           {isMobile ? (
             <>
               <div className="w-full">
@@ -157,15 +167,18 @@ export default function Navbar({
                     </div>
                   ) : (
                     <div className="flex gap-2">
-                      <Link
-                        to={"/cart"}
-                        className="relative p-2 rounded-full transition"
-                      >
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
-                          {cartSum?.totalItem || cartSum?.totalCartSize || 0}
-                        </span>
-                        <i className="fa-solid fa-cart-shopping"></i>
-                      </Link>
+                      {false && (
+                        <Link
+                          to={"/cart"}
+                          className="relative p-2 rounded-full transition"
+                        >
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold w-5 h-5 flex items-center justify-center rounded-full">
+                            {cartSum?.totalItem || cartSum?.totalCartSize || 0}
+                          </span>
+                          <i className="fa-solid fa-cart-shopping"></i>
+                        </Link>
+                      )}
+
                       <Button
                         onClick={() => dispatch(toggleAuthModal(true))}
                         className=" text-black px-4 py-2 rounded-lg"
@@ -234,56 +247,56 @@ export default function Navbar({
                         {searchResult?.categories?.length > 0 ||
                         searchResult?.products?.length > 0 ? (
                           <>
-                            {searchResult.categories.length > 0 && (
+                            {searchResult?.categories?.length > 0 && (
                               <>
                                 <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
                                   Categories
                                 </div>
-                                {searchResult.categories.map((category) => (
+                                {searchResult?.categories?.map((category) => (
                                   <Link
-                                    to={`/category/${category._id}`}
-                                    key={category._id}
+                                    to={`/category/${category?._id}`}
+                                    key={category._id ?? category.name}
                                   >
                                     <div
                                       className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
                                       onClick={() => {
-                                        setQuery(category.name);
+                                        setQuery(category?.name);
                                         setShowDropdown(false);
                                       }}
                                     >
                                       <LazyImage
-                                        src={category.image}
-                                        alt={category.name}
+                                        src={category?.image}
+                                        alt={category?.name}
                                         className="w-8 h-8 rounded object-cover"
                                       />
-                                      <span>{category.name}</span>
+                                      <span>{category?.name}</span>
                                     </div>
                                   </Link>
                                 ))}
                               </>
                             )}
-                            {searchResult.products.length > 0 && (
+                            {searchResult?.products?.length > 0 && (
                               <>
                                 <div className="px-3 py-1 text-left text-xs text-gray-500 font-semibold uppercase mt-2">
                                   Products
                                 </div>
-                                {searchResult.products.map((item) => (
+                                {searchResult?.products?.map((item) => (
                                   <Link
-                                    to={`/product/${item._id}`}
-                                    key={item._id}
+                                    to={`/product/${item?._id}`}
+                                    key={item?._id ?? item.name}
                                   >
                                     <div
                                       className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
                                       onClick={() => {
-                                        setQuery(item.name);
+                                        setQuery(item?.name);
                                         setShowDropdown(false);
                                       }}
                                     >
-                                      {Array.isArray(item?.images) &&
-                                      item.images.length > 0 ? (
+                                      {Array?.isArray(item?.images) &&
+                                      item?.images?.length > 0 ? (
                                         <LazyImage
-                                          src={item.images[0]}
-                                          alt={item.name || "Product Image"}
+                                          src={item?.images[0]}
+                                          alt={item?.name || "Product Image"}
                                           className="w-8 h-8 rounded object-cover"
                                         />
                                       ) : (
@@ -292,7 +305,7 @@ export default function Navbar({
                                         </p>
                                       )}
 
-                                      <span>{item.name}</span>
+                                      <span>{item?.name}</span>
                                     </div>
                                   </Link>
                                 ))}
@@ -380,62 +393,62 @@ export default function Navbar({
                     }}
                   />
                 </div>
-                {showDropdown && query.trim().length > 0 && (
+                {showDropdown && query?.trim()?.length > 0 && (
                   <div className="absolute w-full bg-white border mt-1 rounded-md z-50 shadow-lg overflow-hidden">
                     <div className="max-h-64 overflow-y-auto">
                       {searchResult?.categories?.length > 0 ||
                       searchResult?.products?.length > 0 ? (
                         <>
-                          {searchResult.categories.length > 0 && (
+                          {searchResult?.categories?.length > 0 && (
                             <>
                               <div className="px-3 py-1 text-xs text-gray-500 font-semibold uppercase">
                                 Categories
                               </div>
-                              {searchResult.categories.map((category) => (
+                              {searchResult?.categories?.map((category) => (
                                 <Link
-                                  to={`/category/${category._id}`}
-                                  key={category._id}
+                                  to={`/category/${category?._id}`}
+                                  key={category?._id ?? category?.name}
                                 >
                                   <div
                                     className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
-                                      setQuery(category.name);
+                                      setQuery(category?.name);
                                       setShowDropdown(false);
                                     }}
                                   >
                                     <LazyImage
-                                      src={category.image}
-                                      alt={category.name}
+                                      src={category?.image}
+                                      alt={category?.name}
                                       className="w-8 h-8 rounded object-cover"
                                     />
-                                    <span>{category.name}</span>
+                                    <span>{category?.name}</span>
                                   </div>
                                 </Link>
                               ))}
                             </>
                           )}
-                          {searchResult.products.length > 0 && (
+                          {searchResult?.products?.length > 0 && (
                             <>
                               <div className="px-3 py-1 text-left text-xs text-gray-500 font-semibold uppercase mt-2">
                                 Products
                               </div>
-                              {searchResult.products.map((item) => (
+                              {searchResult?.products?.map((item) => (
                                 <Link
-                                  to={`/product/${item._id}`}
-                                  key={item._id}
+                                  to={`/product/${item?._id}`}
+                                  key={item?._id ?? item?.name}
                                 >
                                   <div
                                     className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
                                     onClick={() => {
-                                      setQuery(item.name);
+                                      setQuery(item?.name);
                                       setShowDropdown(false);
                                     }}
                                   >
-                                    {Array.isArray(item?.images) &&
-                                    item.images.length > 0 ? (
+                                    {Array?.isArray(item?.images) &&
+                                    item?.images?.length > 0 ? (
                                       <LazyImage
-                                        src={item.images[0]}
-                                        alt={item.name || "Product Image"}
+                                        src={item?.images[0]}
+                                        alt={item?.name || "Product Image"}
                                         className="w-8 h-8 rounded object-cover"
                                       />
                                     ) : (
@@ -444,7 +457,7 @@ export default function Navbar({
                                       </p>
                                     )}
 
-                                    <span>{item.name}</span>
+                                    <span>{item?.name}</span>
                                   </div>
                                 </Link>
                               ))}
@@ -507,18 +520,18 @@ export default function Navbar({
       >
         {isMobile
           ? categories
-              ?.filter((category) => category.isVisible === true)
+              ?.filter((category) => category?.isVisible === true)
               ?.flatMap((category) =>
                 category?.subcategories?.map((sub) => ({
-                  categoryId: category._id,
-                  id: sub._id,
-                  name: sub.name,
+                  categoryId: category?._id,
+                  id: sub?._id,
+                  name: sub?.name,
                 }))
               )
               ?.map((sub, idx) => {
                 return (
                   <div
-                    key={`${sub?.id}-${idx}`}
+                    key={`${sub?.id}-${idx} ?? ${sub?.name}`}
                     onClick={() => handleCategorySelection(sub?.name)}
                     className={`shadow-md rounded-md px-4 py-2 text-gray-800 text-sm mt-2 cursor-pointer transition-all duration-300 ${
                       selectedCategory === sub?.name
@@ -526,7 +539,10 @@ export default function Navbar({
                         : "bg-white"
                     }`}
                   >
-                    <Link to={`/${sub?.categoryId}/${sub?.id}`} state={{selectedCategoryName:sub.name}}>
+                    <Link
+                      to={`/${sub?.categoryId}/${sub?.id}`}
+                      state={{ selectedCategoryName: sub?.name }}
+                    >
                       {sub?.name}
                     </Link>
                   </div>
@@ -552,11 +568,11 @@ export default function Navbar({
                   </div>
                   {category?.subcategories?.length > 0 && (
                     <div className="absolute left-0 top-full mt-1 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 z-40">
-                      {category.subcategories.map((sub) => (
+                      {category?.subcategories?.map((sub) => (
                         <Link
                           key={sub?._id}
                           to={`/${category?._id}/${sub?._id}`}
-                          state={{selectedCategoryName:sub.name}}
+                          state={{ selectedCategoryName: sub?.name }}
                           className="block px-4 py-2 text-gray-700 hover:bg-gray-200 w-full text-left text-xs"
                         >
                           {sub?.name}
@@ -585,23 +601,23 @@ export default function Navbar({
 
         <div className="h-[calc(100vh-64px)] overflow-y-auto scrollbar-hide">
           <nav className="p-4 space-y-2">
-            {categories.map((category, index) => (
+            {categories?.map((category, index) => (
               <div key={index} className="border-b">
                 <p
                   className={`text-gray-700 font-semibold cursor-pointer flex justify-between items-center py-2 ${
-                    category.subcategories?.length ? "" : "cursor-default"
+                    category?.subcategories?.length ? "" : "cursor-default"
                   }`}
                   onClick={() =>
-                    category.subcategories?.length &&
-                    handleCategoryClick(category.name)
+                    category?.subcategories?.length &&
+                    handleCategoryClick(category?.name)
                   }
                 >
-                  {category.name}
+                  {category?.name}
 
-                  {category.subcategories?.length > 0 && (
+                  {category?.subcategories?.length > 0 && (
                     <i
                       className={`fa-solid fa-chevron-down transform transition-transform duration-300 ${
-                        activeCategory === category.name
+                        activeCategory === category?.name
                           ? "rotate-180"
                           : "rotate-0"
                       }`}
@@ -611,7 +627,7 @@ export default function Navbar({
 
                 <ul
                   className={`ml-4 overflow-hidden transition-all text-left duration-300 ${
-                    activeCategory === category.name
+                    activeCategory === category?.name
                       ? "max-h-40 opacity-100"
                       : "max-h-0 opacity-0"
                   }`}
@@ -622,7 +638,9 @@ export default function Navbar({
                       key={idx}
                       className="text-gray-600 hover:text-green-500 cursor-pointer py-1"
                     >
-                      <Link to={`/${category._id}/${cat._id}`}>{cat.name}</Link>
+                      <Link to={`/${category?._id}/${cat?._id}`}>
+                        {cat?.name}
+                      </Link>
                     </li>
                   ))}
                 </ul>

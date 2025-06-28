@@ -89,7 +89,7 @@ const Profile = () => {
           </div>
           <div className="flex flex-col md:flex-row flex-grow">
             {/* Mobile View: My Profile Heading */}
-            <h2 className="text-lg md:hidden font-bold text-center mb-3 md:block hidden">
+            <h2 className="text-lg md:hidden font-bold text-center mb-3 hidden">
               My Profile
             </h2>
 

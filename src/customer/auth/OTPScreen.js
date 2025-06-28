@@ -28,8 +28,8 @@ export default function OTPModal({ email, closeModal }) {
       setTimeout(() => navigate("/profile"), 300);
     }
   }, [verified, closeModal, navigate]);
-  
-  
+
+
 
   const handleChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
@@ -56,7 +56,7 @@ export default function OTPModal({ email, closeModal }) {
     setLoading(true);
     await dispatch(verifyOTP(email, enteredOtp, navigate));
     setLoading(false);
-    
+    navigate("/profile");
     if (verified) {
       closeModal();
     }

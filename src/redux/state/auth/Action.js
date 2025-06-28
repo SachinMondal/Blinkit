@@ -60,7 +60,6 @@ export const verifyOTP = (email, otp, navigate) => async (dispatch) => {
       payload: { user: data.user, token: data.token },
     });
     await dispatch(mergeGuestCart());
-    navigate("/profile");
   } catch (error) {
     dispatch({
       type: VERIFY_OTP_FAIL,

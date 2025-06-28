@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Link, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { useSelector, useDispatch } from "react-redux"; 
-import { fetchUserInfo } from "../redux/state/auth/Action"; 
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUserInfo } from "../redux/state/auth/Action";
 import HomePage from "../customer/Home/HomePage";
 import SignUp from "../customer/auth/SignUp";
 import CategoryPage from "../Components/CategoryDetails/CategoryPage";
@@ -23,7 +23,7 @@ import { AnimatePresence } from "framer-motion";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
-  const token = useSelector((state) => state.auth.token); 
+  const token = useSelector((state) => state.auth.token);
   return token ? children : <Navigate to="/" />;
 };
 
@@ -32,15 +32,17 @@ function Customer() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const footerRef = useRef(null);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
+  const footerRef = useRef(null);
+  const location = useLocation();
 
   const token = useSelector((state) => state.auth.token);
-  const user = useSelector((state) => state.auth.user); 
+  const user = useSelector((state) => state.auth.user);
+  const cartItems = useSelector((state) => state.cart.cartItems);
 
   useEffect(() => {
     if (token) {
-      dispatch(fetchUserInfo(token)); 
+      dispatch(fetchUserInfo(token));
     }
   }, [token, dispatch]);
 
@@ -52,61 +54,69 @@ function Customer() {
     }
   }, [user]);
 
- useEffect(() => {
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      setIsFooterVisible(entry.isIntersecting);
-    },
-    { threshold: 0.1 }
-  );
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFooterVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
 
-  const footerNode = footerRef.current;
+    const footerNode = footerRef.current;
+    if (footerNode) observer.observe(footerNode);
 
-  if (footerNode) {
-    observer.observe(footerNode);
-  }
-
-  return () => {
-    if (footerNode) {
-      observer.unobserve(footerNode); // ✅ Cleanly disconnect observed node, not live ref
-    }
-  };
-}, []);
+    return () => {
+      if (footerNode) observer.unobserve(footerNode);
+    };
+  }, []);
 
   useEffect(() => {
-  if (user && user.location) {
-    setUserLocation(user.location);
-  } else {
-    setIsModalOpen(true);
-  }
-}, [user]);
-
+    if (user && user?.location) {
+      setUserLocation(user.location);
+    } else {
+      setIsModalOpen(true);
+    }
+  }, [user]);
 
   const handleLocationSelect = (location) => {
     setUserLocation(location);
     setIsModalOpen(false);
   };
 
+  const shouldShowCartItem =
+    cartItems &&
+    cartItems.length > 0 &&
+    location.pathname !== "/cart" &&
+    location.pathname !== "/profile";
+
   return (
     <div className="App">
-      <AnimatePresence>
-      {isModalOpen && (
-        <LocationModal
-          onClose={() => setIsModalOpen(false)}
-          onLocationSelect={handleLocationSelect}
-        />
-      )}
-      </AnimatePresence>
+     <AnimatePresence mode="wait">
+  {isModalOpen && (
+    <LocationModal
+      key="location-modal" 
+      onClose={() => setIsModalOpen(false)}
+      onLocationSelect={handleLocationSelect}
+    />
+  )}
+</AnimatePresence>
 
-      <Navbar location={userLocation} isLoggedIn={!!token} isAdmin={isAdmin} setLocationModal={setIsModalOpen} />
-<ScrollToTop />
+
+      <Navbar
+        location={userLocation}
+        isLoggedIn={!!token}
+        isAdmin={isAdmin}
+        setLocationModal={setIsModalOpen}
+      />
+
+      <ScrollToTop />
+
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/" element={<HomePage userLocation={userLocation} />} />
         <Route path="/:parentCategory/:category" element={<CategoryPage />} />
         <Route path="/product/:productId" element={<ProductPage />} />
         <Route path="/categoryviewAll/:category" element={<ViewAll />} />
-
         <Route
           path="/profile"
           element={
@@ -115,33 +125,23 @@ function Customer() {
             </ProtectedRoute>
           }
         />
-
         <Route path="/termsconditions" element={<TermsAndConditions />} />
         <Route path="/privacypolicy" element={<PrivacyPolicy />} />
-
-        <Route
-          path="/cart"
-          element={
-            
-              <Cart />
-            
-          }
-        />
-
+        <Route path="/cart" element={<Cart />} />
         <Route path="/aboutUs" element={<AboutUs />} />
-
-        {/* Catch-All Route (404 Page) */}
         <Route path="*" element={<PageNotFound />} />
       </Routes>
 
-      <Link
-        to={"/cart"}
-        className={`${
-          isFooterVisible ? "hidden" : "fixed bottom-4 left-1/2"
-        } transition-all duration-300 ease-out`}
-      >
-        <CartItem />
-      </Link>
+      {shouldShowCartItem && (
+        <Link
+          to={"/cart"}
+          className={`${
+            isFooterVisible ? "hidden" : "fixed bottom-4 left-1/2 transform -translate-x-1/2"
+          } transition-all duration-300 ease-out`}
+        >
+          <CartItem />
+        </Link>
+      )}
 
       <div ref={footerRef}>
         <Footer />
