@@ -12,7 +12,7 @@ import {
   updateOrder,
 } from "../../redux/state/order/Action";
 import { useDispatch, useSelector } from "react-redux";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -24,16 +24,15 @@ const Dashboard = () => {
   const [deletingBannerId, setDeletingBannerId] = useState(null);
   const [altError, setAltError] = useState("");
   const [isLoadingOrders, setIsLoadingOrders] = useState(true);
-
+  const [visibleOrders, setVisibleOrders] = useState([]);
   const [isEditingCharges, setIsEditingCharges] = useState(false);
   const [deliveryCharge, setDeliveryCharge] = useState(0);
   const [handlingCharge, setHandlingCharge] = useState(0);
   const [prevCharges, setPrevCharges] = useState({ delivery: 0, handling: 0 });
 
-
   const banners = useSelector((state) => state.banner.banners || []);
   const orders = useSelector((state) => state.order.adminOrders || []);
-  const {settings,loading}=useSelector((state)=>state.banner);
+  const { settings, loading } = useSelector((state) => state.banner);
   useEffect(() => {
     dispatch(getBanners());
   }, [dispatch]);
@@ -46,16 +45,15 @@ const Dashboard = () => {
     };
     fetchOrders();
   }, [dispatch]);
-useEffect(() => {
+  useEffect(() => {
     dispatch(fetchCharges());
   }, [dispatch]);
-  useEffect(()=>{
-    if(settings){
-      setDeliveryCharge(settings.deliveryCharge||0);
-      setHandlingCharge(settings.handlingCharge||0);
+  useEffect(() => {
+    if (settings) {
+      setDeliveryCharge(settings.deliveryCharge || 0);
+      setHandlingCharge(settings.handlingCharge || 0);
     }
-  },[settings]);
-
+  }, [settings]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -101,15 +99,29 @@ useEffect(() => {
       ...prev,
       [orderId]: value,
     }));
-    dispatch(
-      updateOrder(orderId, { deliveryTime: value, orderStatus: "ACCEPTED" })
-    );
+
+    if (value !== "") {
+      dispatch(
+        updateOrder(orderId, { deliveryTime: value, orderStatus: "ACCEPTED" })
+      );
+
+      // Animate and remove the order after 500ms
+      setTimeout(() => {
+        setVisibleOrders((prevOrders) =>
+          prevOrders.filter((order) => order._id !== orderId)
+        );
+      }, 500);
+    }
   };
 
-  const filteredOrders = orders.filter(
-    (order) => order.orderStatus === "Pending"
-  );
- const handleEditClick = () => {
+  useEffect(() => {
+    const pending = orders.filter(
+      (order) => order.orderStatus?.toLowerCase() === "pending"
+    );
+    setVisibleOrders(pending);
+  }, [orders]);
+
+  const handleEditClick = () => {
     setPrevCharges({ delivery: deliveryCharge, handling: handlingCharge });
     setIsEditingCharges(true);
   };
@@ -121,7 +133,9 @@ useEffect(() => {
   };
 
   const handleSaveClick = async () => {
-    await dispatch(updateCharges(Number(deliveryCharge), Number(handlingCharge)));
+    await dispatch(
+      updateCharges(Number(deliveryCharge), Number(handlingCharge))
+    );
     setIsEditingCharges(false);
   };
   return (
@@ -145,59 +159,68 @@ useEffect(() => {
               Loading orders...
             </p>
           </motion.div>
-        ) : filteredOrders.length > 0 ? (
+        ) : visibleOrders.length > 0 ? (
           <ul className="max-h-60 overflow-y-auto divide-y divide-gray-200">
-            {filteredOrders.map((order) => (
-              <li
-                key={order._id}
-                className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-2"
-              >
-                <div>
-                  <h4 className="font-semibold">{order.user.name}</h4>
-                  <p className="text-gray-500 text-sm">
-                    {order.orderItems
-                      .map((item) => `${item.productId?.name} x ${item.quantity}`)
-                      .join(", ")}{" "}
-                    - {order.orderStatus}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                  <span className="text-gray-800 font-semibold">
-                    ₹{order.subtotalPrice}
-                  </span>
-                  <select
-                    value={
-                      deliveryTimes[order._id] || order.deliveryTime || ""
-                    }
-                    onChange={(e) =>
-                      handleDeliveryTimeChange(order._id, e.target.value)
-                    }
-                    className="p-2 border rounded bg-gray-100 text-sm"
-                  >
-                    <option value="" disabled>
-                      Select Time
-                    </option>
-                    {["10 mins", "20 mins", "30 mins", "1 Hour"].map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                    <option value="custom">Custom</option>
-                  </select>
-
-                  {deliveryTimes[order._id] === "custom" && (
-                    <input
-                      type="text"
-                      placeholder="Custom time"
-                      className="p-2 border rounded text-sm"
-                      onBlur={(e) =>
+            <AnimatePresence>
+              {visibleOrders.map((order) => (
+                <motion.li
+                  key={order._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.3 }}
+                  layout
+                  className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-2"
+                >
+                  <div>
+                    <h4 className="font-semibold">{order.user.name}</h4>
+                    <p className="text-gray-500 text-sm">
+                      {order.orderItems
+                        .map(
+                          (item) => `${item.productId?.name} x ${item.quantity}`
+                        )
+                        .join(", ")}{" "}
+                      - {order.orderStatus}
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <span className="text-gray-800 font-semibold">
+                      ₹{order?.totalCartDiscountedPrice}
+                    </span>
+                    <select
+                      value={deliveryTimes[order._id] || ""}
+                      onChange={(e) =>
                         handleDeliveryTimeChange(order._id, e.target.value)
                       }
-                    />
-                  )}
-                </div>
-              </li>
-            ))}
+                      className="p-2 border rounded bg-gray-100 text-sm w-full sm:w-auto"
+                    >
+                      <option value="" disabled>
+                        Select Time
+                      </option>
+                      {["10 mins", "20 mins", "30 mins", "1 Hour"].map(
+                        (time) => (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        )
+                      )}
+                      <option value="custom">Custom</option>
+                    </select>
+
+                    {deliveryTimes[order._id] === "custom" && (
+                      <input
+                        type="text"
+                        placeholder="Custom time"
+                        className="p-2 border rounded text-sm w-full sm:w-auto"
+                        onBlur={(e) =>
+                          handleDeliveryTimeChange(order._id, e.target.value)
+                        }
+                      />
+                    )}
+                  </div>
+                </motion.li>
+              ))}
+            </AnimatePresence>
           </ul>
         ) : (
           <div className="flex flex-col items-center text-center">

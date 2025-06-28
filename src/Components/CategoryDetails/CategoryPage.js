@@ -24,14 +24,14 @@ const CategoryPage = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  // Add "All" as a synthetic subcategory
   const allCategory = {
     _id: "all",
     name: "All",
-    image: "/placeholder-all.png", // Replace with your default image path
+    image:categories?.subcategories[0]?.image
   };
+
   const subcategoriesWithAll = categories?.subcategories
-    ? [allCategory, ...categories.subcategories]
+    ? [allCategory, ...categories.subcategories.slice(1)]
     : [];
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const CategoryPage = () => {
                 }`}
               ></div>
               <LazyImage
-                src={cat.image}
+                src={cat.image || allCategory.image}
                 alt={cat.name}
                 className="w-10 h-10 object-contain rounded-md"
               />
@@ -124,7 +124,7 @@ const CategoryPage = () => {
               }`}
             >
               <LazyImage
-                src={cat.image}
+                src={cat.image || allCategory.image}
                 alt={cat.name}
                 className="w-12 h-12 object-contain rounded-full"
               />
