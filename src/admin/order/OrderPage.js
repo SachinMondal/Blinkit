@@ -171,7 +171,7 @@ const OrdersPage = () => {
       </div>
 
       {/* Padding top to prevent overlap with fixed header */}
-      <div className="pt-[176px]"> 
+      <div className="pt-[300px] sm:pt-[184px] md:pt-[160px] lg:pt-[150px] xl:pt-[150px] ">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <i className="fa-solid fa-spinner animate-spin text-4xl text-green-600"></i>
@@ -180,7 +180,7 @@ const OrdersPage = () => {
         ) : (
           <motion.div
             layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4 "
           >
             {/* AnimatePresence is always rendered */}
             <AnimatePresence mode="wait">

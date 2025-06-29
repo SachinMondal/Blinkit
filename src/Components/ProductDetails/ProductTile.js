@@ -151,7 +151,7 @@ const ProductCard = ({ product, onClick }) => {
       </div>
 
       <div className="text-left mt-2 w-full">
-        <h3 className="text-[9px] font-medium">{product.name}</h3>
+        <h3 className="text-[9px] font-medium truncate">{product.name}</h3>
 
         {product?.variants?.length > 0 ? (
           <div className="mt-1 flex flex-col space-y-1">

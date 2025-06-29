@@ -441,7 +441,7 @@ const Category = () => {
                                   )}
                                 </div>
                               </td>
-                              <td className="p-4 flex justify-center flex-wrap gap-2">
+                              <td className="p-2 flex justify-center flex-wrap gap-1">
                                 <button
                                   className="bg-green-500 px-3 py-1.5 rounded-md text-sm text-white hover:bg-green-600 transition"
                                   onClick={() =>

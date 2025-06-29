@@ -139,7 +139,7 @@ const CategoryPage = () => {
       {/* Main Content */}
       <div className="w-full md:w-3/4 flex flex-col px-2 sm:px-4 space-y-4 mb-4 mx-auto">
         {/* Breadcrumb */}
-        <div className="text-sm text-gray-600 self-start">
+        <div className="text-sm text-gray-600 self-start mt-2">
           <Link to="/" className="text-green-500 hover:underline">
             Home
           </Link>{" "}
@@ -211,9 +211,18 @@ const CategoryPage = () => {
             )
               .filter((product) => !product.isArchive)
               .sort((a, b) => {
-                const priceA = a?.variants?.[0]?.price ?? Infinity;
-                const priceB = b?.variants?.[0]?.price ?? Infinity;
-                return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+               const priceA =
+  (a?.variants?.[0]?.price ?? 0) -
+  (a?.variants?.[0]?.discountPrice ?? 0) -
+  (a?.variants?.[0]?.categoryDiscount ?? 0);
+
+const priceB =
+  (b?.variants?.[0]?.price ?? 0) -
+  (b?.variants?.[0]?.discountPrice ?? 0) -
+  (b?.variants?.[0]?.categoryDiscount ?? 0);
+
+return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+
               })
               .map((product, index) => (
                 <ProductTile
