@@ -41,7 +41,7 @@ const {settings}=useSelector((state)=>state.banner);
     2
   );
 
-  const finalAmount = Math.floor(rawTotal);
+  const finalAmount = (rawTotal);
   const roundedOffExtra = Number((rawTotal - finalAmount).toFixed(2));
 
   const productDiscountPrice = cartItems?.productDiscount || 0;

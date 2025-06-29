@@ -14,6 +14,7 @@ import {
   FETCH_CART_REQUEST,
   FETCH_CART_SUCCESS,
   FETCH_CART_FAILURE,
+  LOGOUT
 } from "./ActionType";
 
 const initialState = {
@@ -90,6 +91,11 @@ export const cartReducer = (state = initialState, action) => {
         totalPrice: 0,
         loading: false,
         error: null,
+      };
+    
+    case LOGOUT:
+      return{
+        ...initialState,
       };
 
     case FETCH_CART_FAILURE:

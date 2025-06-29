@@ -222,7 +222,30 @@ const ProductPage = () => {
           <div className="flex flex-col lg:flex-row items-start lg:space-x-6">
             <div className="w-full lg:w-1/2 p-2 border-r lg:h-screen lg:sticky top-0 overflow-y-auto scrollbar-hide">
               {product?.images.length > 0 ? (
-                <div className="w-full">
+                <div className="w-full relative">
+                  {selectedVariant?.price &&
+                    (selectedVariant.discountPrice > 0 ||
+                      selectedVariant.categoryDiscount > 0) &&
+                    (() => {
+                      const discountValue =
+                        ((selectedVariant.discountPrice +
+                          selectedVariant.categoryDiscount) /
+                          selectedVariant.price) *
+                        100;
+
+                      const formattedDiscount = discountValue
+                        .toFixed(2)
+                        .endsWith(".00")
+                        ? `${parseInt(discountValue)}% OFF`
+                        : `${discountValue.toFixed(2)}% OFF`;
+
+                      return (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs sm:text-sm font-semibold px-2 py-1 rounded-md z-10 shadow-md">
+                          {formattedDiscount}
+                        </div>
+                      );
+                    })()}
+
                   {/* Main Image with AnimatePresence */}
                   <div className="">
                     <AnimatePresence mode="wait">
@@ -249,7 +272,7 @@ const ProductPage = () => {
                         onClick={() => setSelectedImageIndex(index)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`h-20 w-20 object-cover rounded-md cursor-pointer border-2 z-50 mt-4 ${
+                        className={`h-20 w-20 object-cover rounded-md cursor-pointer border-2 mt-4 ${
                           selectedImageIndex === index
                             ? "border-green-500"
                             : "border-transparent"
@@ -273,18 +296,17 @@ const ProductPage = () => {
                   Price:{" "}
                   <span className="text-green-700 mr-3">
                     ₹
-                    {Math.floor(
+                    {(
                       selectedVariant.price -
-                        selectedVariant.discountPrice -
-                        selectedVariant.categoryDiscount
+                      selectedVariant.discountPrice -
+                      selectedVariant.categoryDiscount
                     ).toFixed(2)}
                   </span>
-                   <span className="line-through text-gray-500 ">
+                  <span className="line-through text-gray-500 ">
                     ₹
-                  {selectedVariant
-                ? Math.floor(selectedVariant.price).toFixed(2)
-                : Math.floor(product.price * 1.2)}
-                  
+                    {selectedVariant
+                      ? selectedVariant.price.toFixed(2)
+                      : product.price * 1.2}
                   </span>
                 </p>
               </div>
@@ -384,7 +406,7 @@ const ProductPage = () => {
                             Price
                           </th>
                           <th className="border border-gray-300 px-2 sm:px-4 py-2">
-                            Discount
+                            Offer Price
                           </th>
                           <th className="border border-gray-300 px-2 sm:px-4 py-2">
                             Quantity
@@ -414,11 +436,9 @@ const ProductPage = () => {
                             </td>
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               ₹
-                              {Math.floor(
-                                variant.price -
-                                  variant.discountPrice -
-                                  variant.categoryDiscount
-                              )}
+                              {variant.price -
+                                variant.discountPrice -
+                                variant.categoryDiscount}
                             </td>
                             <td className="border border-gray-300 px-2 sm:px-4 py-2">
                               {variant.qty} {variant.unit}

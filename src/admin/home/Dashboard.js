@@ -115,6 +115,16 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    dispatch(fetchCharges());
+
+    const interval = setInterval(() => {
+      dispatch(fetchCharges());
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [dispatch]);
+
+  useEffect(() => {
     const pending = orders.filter(
       (order) => order.orderStatus?.toLowerCase() === "pending"
     );
@@ -351,6 +361,20 @@ const Dashboard = () => {
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-2xl font-semibold">⚙️ Charges Settings</h3>
+          {settings?.lastUpdatedBy && (
+            <p className="text-sm text-gray-500 mt-1">
+              Last updated by:{" "}
+              <span className="font-medium text-gray-800">
+                {settings.lastUpdatedBy.name}
+              </span>
+            </p>
+          )}
+          {settings?.updatedAt && (
+            <p className="text-xs text-gray-400">
+              Last updated at: {new Date(settings.updatedAt).toLocaleString()}
+            </p>
+          )}
+
           {!isEditingCharges ? (
             <button
               onClick={handleEditClick}

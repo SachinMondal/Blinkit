@@ -229,6 +229,8 @@ export const resetOtpState = () => ({
 
 export const logout = () => (dispatch) => {
   localStorage.removeItem("token");
+  localStorage.removeItem("guest_cart");
+  
   dispatch({ type: LOGOUT });
 };
 

@@ -17,9 +17,11 @@ const CartItem = ({ max = 3 }) => {
   }
 
   return (
-    <div className="transform -translate-x-1/2 hover:animate-pulse">
-      <button className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-full shadow-md hover:bg-gray-100 transition">
-        {/* Display up to `max` cart items as avatars */}
+    <div
+      className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-[9999]"
+      style={{ pointerEvents: "auto" }}
+    >
+      <button className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-full shadow-lg hover:bg-gray-100 transition-all">
         <div className="flex -space-x-2">
           {cartItems?.slice(0, max).map((item, index) =>
             item?.product?.images?.length > 0 ? (
@@ -42,7 +44,6 @@ const CartItem = ({ max = 3 }) => {
           )}
         </div>
 
-        {/* Show "+X" if more items exist */}
         {cartItems.length > max && (
           <span className="text-gray-700 font-semibold text-sm px-2 py-1 bg-gray-200 rounded-full">
             +{cartItems.length - max}

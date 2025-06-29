@@ -171,7 +171,7 @@ const ProductCard = ({ product, onClick }) => {
               {product.variants.map((variant) => (
                 <option key={variant._id} value={variant._id}>
                   {variant.qty} {variant.unit} - ₹
-                  {Math.floor(variant.price - variant.discountPrice)}
+                  {(variant.price - variant.discountPrice)}
                 </option>
               ))}
             </select>
@@ -188,19 +188,19 @@ const ProductCard = ({ product, onClick }) => {
           <p className="text-sm text-left font-semibold text-gray-800 mr-1">
             ₹
             {selectedVariant
-              ? Math.floor(
+              ? (
                   selectedVariant.price -
                     selectedVariant.discountPrice -
                     selectedVariant.categoryDiscount
                 ).toFixed(2)
-              : Math.floor(product.price) ?? "N/A"}
+              : (product.price) ?? "N/A"}
           </p>
           <div className="flex flex-row gap-1 mr-2">
             <p className="text-[10px] font-semibold text-gray-500 line-through">
               ₹
               {selectedVariant
-                ? Math.floor(selectedVariant.price).toFixed(2)
-                : Math.floor(product.price * 1.2)}
+                ? (selectedVariant.price).toFixed(2)
+                : (product.price * 1.2)}
             </p>
           </div>
         </div>
