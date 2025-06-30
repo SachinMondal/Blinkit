@@ -138,7 +138,7 @@ export default function Navbar({
         }`}
       >
         <div
-          className={`flex justify-around w-full max-w-6xl md:max-2-5xl xl:max-w-full mx-auto `}
+          className={`flex justify-around w-full max-w-6xl md:max-w-5xl xl:max-w-full mx-auto `}
         >
           {isMobile ? (
             <>

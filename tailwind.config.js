@@ -15,7 +15,7 @@ module.exports = {
         xl: "1.25rem", 
       },
       animation: {
-        marquee: "marquee 10s linear infinite",
+        marquee: "marquee 12s linear infinite",
       },
       keyframes: {
         marquee: {
