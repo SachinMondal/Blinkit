@@ -13,7 +13,7 @@ const OrdersPage = () => {
   const [selectedTab, setSelectedTab] = useState("All");
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOrder, setSortOrder] = useState(""); 
+  const [sortOrder, setSortOrder] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -177,40 +177,36 @@ const OrdersPage = () => {
             <i className="fa-solid fa-spinner animate-spin text-4xl text-green-600"></i>
             <p className="mt-3 text-gray-600">Loading orders...</p>
           </div>
-        ) : (
+        ) : filteredOrders.length > 0 ? (
           <motion.div
             layout
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4 "
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-2 sm:px-4"
           >
-            {/* AnimatePresence is always rendered */}
             <AnimatePresence mode="wait">
-              {filteredOrders.length > 0
-                ? filteredOrders.map((order) => (
-                    <motion.div
-                      key={order._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <OrderTile order={order} />
-                    </motion.div>
-                  ))
-                : null}
+              {filteredOrders.map((order) => (
+                <motion.div
+                  key={order._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <OrderTile order={order} />
+                </motion.div>
+              ))}
             </AnimatePresence>
-
-            {/* Show empty message only when no orders */}
-            {filteredOrders.length === 0 && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <LazyImage
-                  src={EmptyOrder}
-                  alt="No Orders"
-                  className="w-32 h-32 mb-4"
-                />
-                <p className="text-gray-600 text-lg">No orders available</p>
-              </div>
-            )}
           </motion.div>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full py-20 px-4 sm:px-8 md:px-12">
+            <LazyImage
+              src={EmptyOrder}
+              alt="No Orders"
+              className="w-32 h-32 mb-4"
+            />
+            <p className="text-gray-600 text-lg text-center">
+              No orders available
+            </p>
+          </div>
         )}
       </div>
     </div>

@@ -14,6 +14,7 @@ const OrderTile = ({ order }) => {
   const [selectedDeliveryOption, setSelectedDeliveryOption] = useState(() =>
     order?.deliveryTime === "PENDING" ? "" : order?.deliveryTime || ""
   );
+  const [customTimeInput, setCustomTimeInput] = useState("");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingReject, setLoadingReject] = useState(false);
@@ -21,7 +22,9 @@ const OrderTile = ({ order }) => {
   const [loadingShip, setLoadingShip] = useState(false);
   const [loadingDeliver, setLoadingDeliver] = useState(false);
 
-  const [localOrderStatus, setLocalOrderStatus] = useState(order?.orderStatus || "PENDING");
+  const [localOrderStatus, setLocalOrderStatus] = useState(
+    order?.orderStatus || "PENDING"
+  );
   const [rejectionReason, setRejectionReason] = useState("");
   const [error, setError] = useState("");
 
@@ -75,8 +78,14 @@ const OrderTile = ({ order }) => {
 
     if (value !== "") {
       try {
-        await dispatch(updateOrder(order._id, { deliveryTime: value }));
-        toast.success("Delivery time updated.");
+        await dispatch(
+          updateOrder(order._id, {
+            deliveryTime: value,
+            orderStatus: "ACCEPTED",
+          })
+        );
+        toast.success("Delivery time updated and order accepted.");
+        setLocalOrderStatus("ACCEPTED"); // Also update local status
       } catch (err) {
         toast.error("Failed to update delivery time.");
       }
@@ -140,7 +149,7 @@ const OrderTile = ({ order }) => {
         </span>
       </div>
 
-      <p className="text-sm text-gray-500 mt-1">
+      <p className="text-sm sm:text-xs text-gray-500 mt-1">
         Order ID: <span className="font-medium">#{order?._id || "N/A"}</span>
       </p>
 
@@ -151,50 +160,78 @@ const OrderTile = ({ order }) => {
           .join(", ")}
       </p>
 
-      <select
-        value={selectedDeliveryOption}
-        onChange={(e) => handleDeliveryTimeChange(e.target.value)}
-        className={`mt-4 w-full p-2 border rounded-md text-sm focus:outline-none ${
-          isPending ? "" : "bg-gray-100 text-gray-500 cursor-not-allowed"
-        }`}
-        disabled={!isPending}
-      >
-        <option value="" disabled>
-          Select delivery option
-        </option>
-        {["same-day", "1-day", "2-days", "3-days"].map((option) => (
-          <option key={option} value={option}>
-            {option.replace("-", " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+      {/* Delivery Time Selection */}
+      <div className="flex items-center gap-2 mt-4 w-full flex-wrap">
+        {/* Select dropdown */}
+        <select
+          value={selectedDeliveryOption}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val !== "custom") {
+              setCustomTimeInput(""); // clear input on normal selection
+              handleDeliveryTimeChange(val);
+            } else {
+              setSelectedDeliveryOption("custom");
+            }
+          }}
+          className={`p-2 border rounded-md text-sm focus:outline-none transition-all ${
+            selectedDeliveryOption === "custom" ? "w-1/3" : "w-full"
+          }`}
+          disabled={!isPending}
+        >
+          <option value="" disabled>
+            Select delivery option
           </option>
-        ))}
-        {selectedDeliveryOption &&
-          !["same-day", "1-day", "2-days", "3-days"].includes(
-            selectedDeliveryOption
-          ) && (
-            <option value={selectedDeliveryOption}>
-              {selectedDeliveryOption
+          {["same-day", "1-day", "2-days", "3-days"].map((option) => (
+            <option key={option} value={option}>
+              {option
                 .replace("-", " ")
                 .replace(/\b\w/g, (l) => l.toUpperCase())}
             </option>
-          )}
-        <option value="custom">Custom</option>
-      </select>
-
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-
-      {selectedDeliveryOption === "custom" && (
-        <input
-          type="text"
-          placeholder="Enter custom time (e.g., 5 days)"
-          className="mt-2 w-full p-2 border rounded-md text-sm"
-          onBlur={async (e) => {
-            const value = e.target.value.trim();
-            if (value && isPending) {
-              await handleDeliveryTimeChange(value);
-            }
-          }}
-        />
-      )}
+          ))}
+          {selectedDeliveryOption &&
+            !["same-day", "1-day", "2-days", "3-days"].includes(
+              selectedDeliveryOption
+            ) &&
+            selectedDeliveryOption !== "custom" && (
+              <option value={selectedDeliveryOption}>
+                {selectedDeliveryOption
+                  .replace("-", " ")
+                  .replace(/\b\w/g, (l) => l.toUpperCase())}
+              </option>
+            )}
+          <option value="custom">Custom</option>
+        </select>
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {/* Show these only when 'custom' is selected */}
+        {selectedDeliveryOption === "custom" && (
+          <>
+            <input
+              type="text"
+              placeholder="Enter custom time"
+              value={customTimeInput}
+              onChange={(e) => setCustomTimeInput(e.target.value)}
+              className="w-1/3 p-2 border rounded-md text-sm"
+            />
+            <button
+              onClick={() => {
+                if (customTimeInput.trim() && isPending) {
+                  handleDeliveryTimeChange(customTimeInput.trim());
+                  setCustomTimeInput("");
+                }
+              }}
+              disabled={!customTimeInput.trim() || !isPending}
+              className={`w-1/4 px-2 py-2 rounded text-white text-sm ${
+                !customTimeInput.trim() || !isPending
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+              }`}
+            >
+              Submit
+            </button>
+          </>
+        )}
+      </div>
 
       <div className="mt-4 flex flex-wrap gap-4 justify-between items-center">
         <Link
@@ -255,7 +292,9 @@ const OrderTile = ({ order }) => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-semibold text-gray-800">Reject Order</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Reject Order
+            </h2>
             <p className="text-sm text-gray-600 mt-1">
               Please provide a reason for rejection.
             </p>

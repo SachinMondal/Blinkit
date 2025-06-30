@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 const Dashboard = () => {
   const dispatch = useDispatch();
 
+   const [customTimeInput, setCustomTimeInput] = useState({});
   const [deliveryTimes, setDeliveryTimes] = useState({});
   const [selectedImage, setSelectedImage] = useState(null);
   const [altText, setAltText] = useState("");
@@ -170,66 +171,94 @@ const Dashboard = () => {
             </p>
           </motion.div>
         ) : visibleOrders.length > 0 ? (
-          <ul className="max-h-60 overflow-y-auto divide-y divide-gray-200">
+           <ul className="max-h-60 overflow-y-auto divide-y divide-gray-200">
             <AnimatePresence>
-              {visibleOrders.map((order) => (
-                <motion.li
-                  key={order._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: 50 }}
-                  transition={{ duration: 0.3 }}
-                  layout
-                  className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-2"
-                >
-                  <div>
-                    <h4 className="font-semibold">{order.user.name}</h4>
-                    <p className="text-gray-500 text-sm">
-                      {order.orderItems
-                        .map(
-                          (item) => `${item.productId?.name} x ${item.quantity}`
-                        )
-                        .join(", ")}{" "}
-                      - {order.orderStatus}
-                    </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <span className="text-gray-800 font-semibold">
-                      ₹{order?.totalCartDiscountedPrice}
-                    </span>
-                    <select
-                      value={deliveryTimes[order._id] || ""}
-                      onChange={(e) =>
-                        handleDeliveryTimeChange(order._id, e.target.value)
-                      }
-                      className="p-2 border rounded bg-gray-100 text-sm w-full sm:w-auto"
-                    >
-                      <option value="" disabled>
-                        Select Time
-                      </option>
-                      {["10 mins", "20 mins", "30 mins", "1 Hour"].map(
-                        (time) => (
-                          <option key={time} value={time}>
-                            {time}
-                          </option>
-                        )
+              {visibleOrders.map((order) => {
+                const selectedTime = deliveryTimes[order._id];
+                const isCustom = selectedTime === "custom";
+                return (
+                  <motion.li
+                    key={order._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: 50 }}
+                    transition={{ duration: 0.3 }}
+                    layout
+                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 gap-2"
+                  >
+                    <div>
+                      <h4 className="font-semibold">{order.user.name}</h4>
+                      <p className="text-gray-500 text-sm">
+                        {order.orderItems
+                          .map(
+                            (item) => `${item.productId?.name} x ${item.quantity}`
+                          )
+                          .join(", ")} - {order.orderStatus}
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                      <span className="text-gray-800 font-semibold">
+                        ₹{order?.totalCartDiscountedPrice}
+                      </span>
+                      <select
+                        value={selectedTime || ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === "custom") {
+                            setDeliveryTimes((prev) => ({
+                              ...prev,
+                              [order._id]: "custom",
+                            }));
+                          } else {
+                            handleDeliveryTimeChange(order._id, value);
+                          }
+                        }}
+                        className="p-2 border rounded bg-gray-100 text-sm w-full sm:w-auto"
+                      >
+                        <option value="" disabled>
+                          Select Time
+                        </option>
+                        {["10 mins", "20 mins", "30 mins", "1 Hour"].map(
+                          (time) => (
+                            <option key={time} value={time}>
+                              {time}
+                            </option>
+                          )
+                        )}
+                        <option value="custom">Custom</option>
+                      </select>
+                      {isCustom && (
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <input
+                            type="text"
+                            placeholder="Custom time"
+                            value={customTimeInput[order._id] || ""}
+                            onChange={(e) =>
+                              setCustomTimeInput((prev) => ({
+                                ...prev,
+                                [order._id]: e.target.value,
+                              }))
+                            }
+                            className="p-2 border rounded text-sm w-full sm:w-auto"
+                          />
+                          <button
+                            onClick={() =>
+                              handleDeliveryTimeChange(
+                                order._id,
+                                customTimeInput[order._id]
+                              )
+                            }
+                            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700"
+                            disabled={!customTimeInput[order._id]?.trim()}
+                          >
+                            Submit
+                          </button>
+                        </div>
                       )}
-                      <option value="custom">Custom</option>
-                    </select>
-
-                    {deliveryTimes[order._id] === "custom" && (
-                      <input
-                        type="text"
-                        placeholder="Custom time"
-                        className="p-2 border rounded text-sm w-full sm:w-auto"
-                        onBlur={(e) =>
-                          handleDeliveryTimeChange(order._id, e.target.value)
-                        }
-                      />
-                    )}
-                  </div>
-                </motion.li>
-              ))}
+                    </div>
+                  </motion.li>
+                );
+              })}
             </AnimatePresence>
           </ul>
         ) : (

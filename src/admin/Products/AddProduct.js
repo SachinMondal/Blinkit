@@ -239,6 +239,8 @@ const AddProduct = () => {
           newErrors.quantities = "Variants are required";
         if (!formData.vegNonVeg)
           newErrors.vegNonVeg = "Veg/Non-Veg is required";
+        if (!formData.isArchive)
+          newErrors.isArchive = "Archive is required";
       } else if (step === 4) {
         if (!formData.customerCare)
           newErrors.customerCare = "Customer Care is required";
@@ -345,6 +347,9 @@ const AddProduct = () => {
                   </optgroup>
                 ))}
               </select>
+                {error.categoryName && (
+  <p className="text-red-500 text-sm mt-1">{error.categoryName}</p>
+)}
             </div>
 
             <div>
@@ -368,6 +373,9 @@ const AddProduct = () => {
                   <br />
                   Select the First Image Properly as it will be the Cover Image
                 </p>
+                {error.images && (
+  <p className="text-red-500 text-sm mt-1">{error.images}</p>
+)}
               </div>
 
               {/* Preview Images */}
@@ -405,6 +413,9 @@ const AddProduct = () => {
                 className="border p-2 rounded w-full text-sm"
                 placeholder="e.g., Organic Honey"
               />
+              {error.productName && (
+  <p className="text-red-500 text-sm mt-1">{error.productName}</p>
+)}
             </div>
 
             {/* Product Description */}
@@ -419,6 +430,9 @@ const AddProduct = () => {
                 className="border p-2 rounded w-full h-24 text-sm resize-none"
                 placeholder="Brief description about the product..."
               />
+              {error.productDescription && (
+  <p className="text-red-500 text-sm mt-1">{error.productDescription}</p>
+)}
             </div>
           </div>
         )}
@@ -452,6 +466,9 @@ const AddProduct = () => {
                 className="border p-2 rounded w-full text-sm"
                 placeholder="e.g., 100"
               />
+              {error.stock && (
+  <p className="text-red-500 text-sm mt-1">{error.stock}</p>
+)}
             </div>
 
             {/* Variants */}
@@ -529,6 +546,7 @@ const AddProduct = () => {
                   >
                     ❌
                   </button>
+               
                 </div>
               ))}
 
@@ -540,6 +558,9 @@ const AddProduct = () => {
               >
                 + Add More
               </button>
+                 {error.quantities && (
+  <p className="text-red-500 text-sm mt-1">{error.quantities}</p>
+)}
             </div>
 
             {/* Veg/Non-Veg */}
@@ -559,6 +580,9 @@ const AddProduct = () => {
                 <option value="veg">Veg</option>
                 <option value="nonveg">Non-Veg</option>
               </select>
+                 {error.vegNonVeg && (
+  <p className="text-red-500 text-sm mt-1">{error.vegNonVeg}</p>
+)}
             </div>
 
             <div>
@@ -577,6 +601,9 @@ const AddProduct = () => {
                 <option value="true">Yes</option>
                 <option value="false">No</option>
               </select>
+                 {error.isArchive && (
+  <p className="text-red-500 text-sm mt-1">{error.isArchive}</p>
+)}
             </div>
           </div>
         )}
@@ -679,6 +706,9 @@ const AddProduct = () => {
                 rows="3"
                 placeholder="e.g., Return within 7 days of delivery"
               ></textarea>
+                 {error.returnPolicy && (
+  <p className="text-red-500 text-sm mt-1">{error.returnPolicy}</p>
+)}
             </div>
 
             {/* Manufacturer Address */}
@@ -738,6 +768,9 @@ const AddProduct = () => {
                 rows="2"
                 placeholder="e.g., support@domain.com, +91-XXXXXXXXXX"
               ></textarea>
+                {error.customerCare && (
+  <p className="text-red-500 text-sm mt-1">{error.customerCare}</p>
+)} 
             </div>
 
             {/* Seller */}
@@ -804,16 +837,7 @@ const AddProduct = () => {
           )}
         </div>
 
-        {/* Error Messages */}
-        {error && (
-          <div className="flex flex-col gap-1">
-            {Object.values(error).map((errMsg, index) => (
-              <p key={index} className="text-red-500 text-sm">
-                {errMsg}
-              </p>
-            ))}
-          </div>
-        )}
+       
 
         {/* Next or Submit Button */}
         <div>

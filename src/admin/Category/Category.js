@@ -381,24 +381,25 @@ const Category = () => {
                             )}
                           </div>
                         </td>
-                        <td className="p-4 flex justify-center flex-wrap gap-2">
-                          <button
-                            className="bg-green-500 px-3 py-1.5 rounded-md text-sm text-white hover:bg-green-600 transition"
-                            onClick={() =>
-                              navigate(`/admin/category/edit/${parent._id}`)
-                            }
-                            disabled={isDeleting}
-                          >
-                            <Pencil size={16} />
-                          </button>
-                          <button
-                            className="bg-red-500 px-3 py-1.5 rounded-md text-sm text-white hover:bg-red-600 transition"
-                            onClick={() => openModal(parent)}
-                            disabled={isDeleting}
-                          >
-                            <Trash size={16} />
-                          </button>
-                        </td>
+                        <td className="p-4">
+  <div className="flex justify-center items-center gap-2 flex-nowrap whitespace-nowrap">
+    <button
+      className="bg-green-500 px-3 py-1.5 rounded-md text-sm text-white hover:bg-green-600 transition"
+      onClick={() => navigate(`/admin/category/edit/${parent._id}`)}
+      disabled={isDeleting}
+    >
+      <Pencil size={16} />
+    </button>
+    <button
+      className="bg-red-500 px-3 py-1.5 rounded-md text-sm text-white hover:bg-red-600 transition"
+      onClick={() => openModal(parent)}
+      disabled={isDeleting}
+    >
+      <Trash size={16} />
+    </button>
+  </div>
+</td>
+
                       </motion.tr>
 
                       {/* Children Rows */}

@@ -78,12 +78,12 @@ const Settings = () => {
                       key={user._id}
                       className="flex items-center justify-between bg-gray-50 border rounded-md p-3"
                     >
-                      <span className="text-sm text-gray-800">
+                      <span className="text-xs text-gray-800">
                         {user.name} ({user.email})
                       </span>
                       {user._id !== currentUser._id && (
                         <button
-                          className="text-sm text-red-600 hover:text-red-700 transition"
+                          className="text-xs text-red-600 hover:text-red-700 transition"
                           title="Remove admin access"
                           onClick={() => handleAdminToggle(user)}
                         >
@@ -102,7 +102,7 @@ const Settings = () => {
                 Users
               </h3>
               {normalUsers.length === 0 ? (
-                <p className="text-sm text-gray-500">No normal users.</p>
+                <p className="text-xs text-gray-500">No normal users.</p>
               ) : (
                 <div className="space-y-3">
                   {normalUsers.map((user) => (
@@ -110,11 +110,11 @@ const Settings = () => {
                       key={user._id}
                       className="flex items-center justify-between bg-gray-50 border rounded-md p-3"
                     >
-                      <span className="text-sm text-gray-800">
+                      <span className="text-xs text-gray-800">
                         {user.name} ({user.email})
                       </span>
                       <button
-                        className="text-sm text-blue-600 hover:text-blue-700 transition"
+                        className="text-xs text-blue-600 hover:text-blue-700 transition"
                         title="Make admin"
                         onClick={() => handleAdminToggle(user)}
                       >
