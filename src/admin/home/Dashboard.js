@@ -353,95 +353,135 @@ const Dashboard = () => {
       </motion.div>
 
       {/* Charges Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-white p-6 rounded-lg shadow col-span-full"
+    <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ delay: 0.3 }}
+  className="bg-white p-6 rounded-lg shadow col-span-full"
+>
+  {/* Header Info */}
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+    <h3 className="text-2xl font-semibold">⚙️ Charges Settings</h3>
+
+    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 text-sm sm:text-base text-gray-500">
+      {settings?.lastUpdatedBy && (
+        <p className="text-sm">
+          Last updated by:{" "}
+          <span className="font-medium text-gray-800">
+            {settings.lastUpdatedBy.name}
+          </span>
+        </p>
+      )}
+      {settings?.updatedAt && (
+        <p className="text-xs sm:text-sm text-gray-400">
+          Last updated at: {new Date(settings.updatedAt).toLocaleString()}
+        </p>
+      )}
+    </div>
+
+    {/* Edit/Save/Cancel - Desktop (top right) */}
+    {!isEditingCharges ? (
+      <button
+        onClick={handleEditClick}
+        className="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 hidden sm:block"
       >
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-2xl font-semibold">⚙️ Charges Settings</h3>
-          {settings?.lastUpdatedBy && (
-            <p className="text-sm text-gray-500 mt-1">
-              Last updated by:{" "}
-              <span className="font-medium text-gray-800">
-                {settings.lastUpdatedBy.name}
-              </span>
-            </p>
-          )}
-          {settings?.updatedAt && (
-            <p className="text-xs text-gray-400">
-              Last updated at: {new Date(settings.updatedAt).toLocaleString()}
-            </p>
-          )}
+        Edit
+      </button>
+    ) : (
+      <div className="hidden sm:flex gap-2">
+        <button
+          onClick={handleSaveClick}
+          disabled={loading}
+          className={`text-sm px-4 py-2 rounded ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed text-white"
+              : "bg-green-600 text-white hover:bg-green-700"
+          }`}
+        >
+          {loading ? "Saving..." : "Save"}
+        </button>
+        <button
+          onClick={handleCancelClick}
+          className="text-sm bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+      </div>
+    )}
+  </div>
 
-          {!isEditingCharges ? (
-            <button
-              onClick={handleEditClick}
-              className="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-              Edit
-            </button>
-          ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={handleSaveClick}
-                disabled={loading}
-                className={`text-sm px-4 py-2 rounded ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed text-white"
-                    : "bg-green-600 text-white hover:bg-green-700"
-                }`}
-              >
-                {loading ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={handleCancelClick}
-                className="text-sm bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
-              >
-                Cancel
-              </button>
-            </div>
-          )}
-        </div>
+  {/* Input Fields */}
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div>
+      <label className="block text-gray-700 font-medium mb-1">
+        Delivery Charge (₹)
+      </label>
+      <input
+        type="number"
+        value={deliveryCharge}
+        onChange={(e) => setDeliveryCharge(e.target.value)}
+        disabled={!isEditingCharges}
+        className={`w-full px-4 py-2 border rounded-md shadow-sm ${
+          isEditingCharges
+            ? "focus:ring-2 focus:ring-green-500"
+            : "bg-gray-100 cursor-not-allowed"
+        }`}
+        placeholder="e.g. 30"
+      />
+    </div>
+    <div>
+      <label className="block text-gray-700 font-medium mb-1">
+        Handling Charge (₹)
+      </label>
+      <input
+        type="number"
+        value={handlingCharge}
+        onChange={(e) => setHandlingCharge(e.target.value)}
+        disabled={!isEditingCharges}
+        className={`w-full px-4 py-2 border rounded-md shadow-sm ${
+          isEditingCharges
+            ? "focus:ring-2 focus:ring-green-500"
+            : "bg-gray-100 cursor-not-allowed"
+        }`}
+        placeholder="e.g. 10"
+      />
+    </div>
+  </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Delivery Charge (₹)
-            </label>
-            <input
-              type="number"
-              value={deliveryCharge}
-              onChange={(e) => setDeliveryCharge(e.target.value)}
-              disabled={!isEditingCharges}
-              className={`w-full px-4 py-2 border rounded-md shadow-sm ${
-                isEditingCharges
-                  ? "focus:ring-2 focus:ring-green-500"
-                  : "bg-gray-100 cursor-not-allowed"
-              }`}
-              placeholder="e.g. 30"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Handling Charge (₹)
-            </label>
-            <input
-              type="number"
-              value={handlingCharge}
-              onChange={(e) => setHandlingCharge(e.target.value)}
-              disabled={!isEditingCharges}
-              className={`w-full px-4 py-2 border rounded-md shadow-sm ${
-                isEditingCharges
-                  ? "focus:ring-2 focus:ring-green-500"
-                  : "bg-gray-100 cursor-not-allowed"
-              }`}
-              placeholder="e.g. 10"
-            />
-          </div>
-        </div>
-      </motion.div>
+  {/* Edit/Save/Cancel - Mobile (below inputs) */}
+  <div className="mt-6 sm:hidden">
+    {!isEditingCharges ? (
+      <button
+        onClick={handleEditClick}
+        className="text-sm bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"
+      >
+        Edit
+      </button>
+    ) : (
+      <div className="flex flex-col gap-2">
+        <button
+          onClick={handleSaveClick}
+          disabled={loading}
+          className={`text-sm px-4 py-2 rounded ${
+            loading
+              ? "bg-gray-400 cursor-not-allowed text-white"
+              : "bg-green-600 text-white hover:bg-green-700"
+          }`}
+        >
+          {loading ? "Saving..." : "Save"}
+        </button>
+        <button
+          onClick={handleCancelClick}
+          className="text-sm bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+      </div>
+    )}
+  </div>
+</motion.div>
+
+
     </div>
   );
 };

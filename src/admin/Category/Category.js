@@ -188,12 +188,12 @@ const Category = () => {
         </h1>
         <button
           onClick={() => navigate("/admin/category/addCategory")}
-          className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow transition-transform hover:scale-105"
+          className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow transition-transform hover:scale-105 whitespace-nowrap"
         >
           + Add
         </button>
       </div>
-      <div className="flex flex-wrap gap-4 mb-6 items-start">
+      <div className="flex flex-wrap gap-4 mb-6 items-start max-w-full">
         <input
           type="text"
           placeholder="Search categories..."
@@ -208,7 +208,7 @@ const Category = () => {
             onClick={() => setFilterDropdownOpen((prev) => !prev)}
             aria-expanded={filterDropdownOpen}
             aria-controls="filter-dropdown"
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-400 focus:outline-none text-white px-4 py-2 rounded-md shadow-md transition disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-400 focus:outline-none text-white px-4 py-2 rounded-md shadow-md transition disabled:cursor-not-allowed whitespace-nowrap"
             disabled={!categories.length > 0 ? true : false}
           >
             <Filter size={18} />
@@ -222,8 +222,20 @@ const Category = () => {
                 initial={{ opacity: 0, y: -15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
-                className="absolute z-50 right-0 mt-2 bg-white dark:bg-green-300 shadow-xl rounded-lg p-4 sm:p-5 border border-gray-200 dark:border-gray-700 w-[90vw] sm:w-64 md:w-72 max-h-[90vh] overflow-auto"
-              >
+                className=" absolute
+    z-50
+    mt-2
+    bg-white dark:bg-green-300
+    shadow-xl
+    rounded-lg
+    p-4 sm:p-5
+    border border-gray-200 dark:border-gray-700
+    max-h-[90vh]
+    w-[90vw] max-w-[400px]
+    left-0 sm:left-auto sm:right-0
+    sm:translate-x-0
+    overflow-auto"
+             >
                 <div className="mb-5">
                   <h3 className="font-semibold text-black dark:text-black mb-3 text-base sm:text-lg border-b pb-1 border-gray-300 dark:border-gray-600">
                     Status
